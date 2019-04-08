@@ -16,30 +16,27 @@
 */
 package tv.hd3g.processlauncher;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public class EndExecutionCallbacker {// TODO rename: not only End
+	// private static Logger log = LogManager.getLogger();
 
-public class EndExecutionCallbacker {
-	private static Logger log = LogManager.getLogger();
-	
 	// private final ArrayList<EndExecutionCallback<?>> end_exec_callback_list;
-
+	
 	public EndExecutionCallbacker() {
 		// end_exec_callback_list = new ArrayList<>(1);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/*public <T extends ExecProcessResult> ExecProcess addEndExecutionCallback(final Consumer<T> onEnd, final Executor executor) {
 		end_exec_callback_list.add(new EndExecutionCallback<>(onEnd, executor));
 		return this;
 	}*/
-
+	
 	/*
 	class EndExecutionCallback<T extends ExecProcessResult> {
-
+	
 	private final Consumer<T> onEnd;
 	protected final Executor executor;
-
+	
 	EndExecutionCallback(Consumer<T> onEnd, Executor executor) {
 		this.onEnd = onEnd;
 		if (onEnd == null) {
@@ -50,7 +47,7 @@ public class EndExecutionCallbacker {
 			throw new NullPointerException("\"executor\" can't to be null");
 		}
 	}
-
+	
 	 * Async
 	@SuppressWarnings("unchecked")
 	void onEnd(ExecProcessResult source) {
@@ -58,7 +55,16 @@ public class EndExecutionCallbacker {
 			onEnd.accept((T) source);
 		});
 	}
-	
+
 	}
 	 */
+
+	void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
+		// TODO Auto-generated method stub
+	}
+	
+	void postStartupAction(final ProcesslauncherLifecycle processlauncherLifecycle) {
+		// TODO Auto-generated method stub
+	}
+
 }

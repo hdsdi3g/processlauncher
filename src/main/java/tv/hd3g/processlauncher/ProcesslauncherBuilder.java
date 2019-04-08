@@ -4,9 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import tv.hd3g.processlauncher.cmdline.ExecutableCommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
@@ -16,10 +21,11 @@ public class ProcesslauncherBuilder {
 
 	private final ExecutableCommandLine executableCommandLine;
 	private final LinkedHashMap<String, String> environment;
-	private boolean exec_code_must_be_zero;
 	private File working_directory;
-	private EndExecutionCallbacker endExecutionCallbacker;
-	private ExecutionTimeLimiter executionTimeLimiter;
+	
+	private boolean execCodeMustBeZero;
+	private Optional<EndExecutionCallbacker> endExecutionCallbacker;
+	private Optional<ExecutionTimeLimiter> executionTimeLimiter;
 
 	public ProcesslauncherBuilder(final ExecutableCommandLine executableCommandLine) {
 		this.executableCommandLine = executableCommandLine;
@@ -38,7 +44,9 @@ public class ProcesslauncherBuilder {
 		} else {
 			environment.put("PATH", System.getenv("PATH"));
 		}
-		exec_code_must_be_zero = true;
+		execCodeMustBeZero = true;
+		endExecutionCallbacker = Optional.empty();
+		executionTimeLimiter = Optional.empty();
 
 		try {
 			setWorkingDirectory(new File(System.getProperty("java.io.tmpdir", "")));
@@ -99,39 +107,61 @@ public class ProcesslauncherBuilder {
 	/**
 	 * Default, yes.
 	 */
-	public ProcesslauncherBuilder setExecCodeMustBeZero(final boolean exec_code_must_be_zero) {
-		this.exec_code_must_be_zero = exec_code_must_be_zero;
+	public ProcesslauncherBuilder setExecCodeMustBeZero(final boolean execCodeMustBeZero) {
+		this.execCodeMustBeZero = execCodeMustBeZero;
 		return this;
 	}
 	
 	public boolean isExecCodeMustBeZero() {
-		return exec_code_must_be_zero;
+		return execCodeMustBeZero;
 	}
 
+	public Optional<EndExecutionCallbacker> getEndExecutionCallbacker() {
+		return endExecutionCallbacker;
+	}
+
+	public Optional<ExecutionTimeLimiter> getExecutionTimeLimiter() {
+		return executionTimeLimiter;
+	}
+	
 	public ProcesslauncherBuilder setEndExecutionCallbacker(final EndExecutionCallbacker endExecutionCallbacker) {
-		this.endExecutionCallbacker = endExecutionCallbacker;
+		this.endExecutionCallbacker = Optional.ofNullable(endExecutionCallbacker);
 		return this;
 	}
 
 	public ProcesslauncherBuilder setExecutionTimeLimiter(final ExecutionTimeLimiter executionTimeLimiter) {
-		this.executionTimeLimiter = executionTimeLimiter;
+		this.executionTimeLimiter = Optional.ofNullable(executionTimeLimiter);
 		return this;
 	}
 	
-	/*
-	enum CaptureOutStreamsBehavior { BOTH_STDOUT_STDERR ONLY_STDOUT ONLY_STDERR
-	StdOutErrObserver onText(ExecProcessTextResult source, String line, boolean is_std_err)
-	StdOutErrCallback onStdout(ExecProcessTextResult source, String line) ...
-	StdInInjection -> OutputStream
-	InteractiveExecProcessHandler ->  onText(ExecProcessTextResult source, String line, boolean is_std_err)
-	EndExecutionCallback<T extends ExecProcessResult>  onEnd(ExecProcessResult source) executor.execute(
+	public ProcessBuilder makeProcessBuilder() {
+		final List<String> fullCommandLine = new ArrayList<>();
+		fullCommandLine.add(executableCommandLine.getExecutable().getAbsolutePath());
+		fullCommandLine.addAll(executableCommandLine.getParameters());
+
+		final ProcessBuilder process_builder = new ProcessBuilder(fullCommandLine);
+		process_builder.environment().putAll(environment);
+
+		if (working_directory != null) {
+			process_builder.directory(working_directory);
+		}
+		return process_builder;
+	}
+
+	private static final Function<String, String> addQuotesIfSpaces = s -> {
+		if (s.contains(" ")) {
+			return "\"" + s + "\"";
+		} else {
+			return s;
+		}
+	};
 	
-	enum EndStatus NOT_YET_DONE, CORRECTLY_DONE, DONE_WITH_ERROR, KILLED, TOO_LONG_EXECUTION_TIME;
-	
-	ExecProcessResult
-	ExecProcessText extends ExecProcess
-	ExecProcessTextResult extends ExecProcessResult
-	
-	TODO refactor: eclipse coll, Objects.requireNonNull, exec_name/execName
-	 */
+	public String getFullCommandLine() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(addQuotesIfSpaces.apply(executableCommandLine.getExecutable().getAbsolutePath()));
+		sb.append(" ");
+		sb.append(executableCommandLine.getParameters().stream().map(addQuotesIfSpaces).collect(Collectors.joining(" ")));
+		return sb.toString().trim();
+	}
+
 }
