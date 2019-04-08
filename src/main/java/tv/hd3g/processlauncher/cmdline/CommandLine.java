@@ -32,7 +32,7 @@ public class CommandLine {
 
 	private final String execName;
 	private final Parameters parameters;
-
+	
 	public CommandLine(final String execName, final Parameters sourceParameters) {
 		this.execName = execName;
 		if (execName == null) {
@@ -99,17 +99,17 @@ public class CommandLine {
 	
 	/**
 	 * @param removeParamsIfNoVarToInject if true, for "-a -b c -d" -> "-a -d", else "-a -b -d"
-	 * @return unmodifiableList started by executable
+	 * @return unmodifiableList
 	 */
-	public List<String> removeVars(final boolean removeParamsIfNoVarToInject) {
-		return injectVars(Collections.emptyMap(), removeParamsIfNoVarToInject);
+	public List<String> getParametersRemoveVars(final boolean removeParamsIfNoVarToInject) {
+		return getParametersInjectVars(Collections.emptyMap(), removeParamsIfNoVarToInject);
 	}
 	
 	/**
 	 * @param removeParamsIfNoVarToInject if true, for "-a -b c -d" -> "-a -d", else "-a -b -d"
-	 * @return unmodifiableList started by executable
+	 * @return unmodifiableList
 	 */
-	public List<String> injectVars(final Map<String, String> varsToInject, final boolean removeParamsIfNoVarToInject) {
+	public List<String> getParametersInjectVars(final Map<String, String> varsToInject, final boolean removeParamsIfNoVarToInject) {
 		final List<String> newParameters;
 		if (removeParamsIfNoVarToInject) {
 			newParameters = parameters.getParameters().stream().reduce(Collections.unmodifiableList(new ArrayList<String>()), (list, arg) -> {
@@ -140,11 +140,7 @@ public class CommandLine {
 				}
 			}).filter(arg -> arg != null).collect(Collectors.toUnmodifiableList());
 		}
-
-		final ArrayList<String> result = new ArrayList<>();
-		result.add(execName);
-		result.addAll(newParameters);
-		return Collections.unmodifiableList(result);
+		return Collections.unmodifiableList(newParameters);
 	}
 
 }

@@ -31,10 +31,10 @@ public class CommandLineTest extends TestCase {
 		vars.put("var1", "value1");
 		vars.put("var2", "value2");
 
-		assertTrue(Arrays.equals(Arrays.asList("exec", "-a", "value1", "value2", "-b").toArray(), cmd.injectVars(vars, true).toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("exec", "-a", "value1", "value2", "-b").toArray(), cmd.getParametersInjectVars(vars, true).toArray()));
 		
-		assertTrue(Arrays.equals(Arrays.asList("exec", "-a").toArray(), new CommandLine("exec -a <%varNOPE%>").removeVars(false).toArray()));
-		assertTrue(Arrays.equals(Arrays.asList("exec", "-b").toArray(), new CommandLine("exec -a <%varNOPE%> -b").injectVars(new HashMap<>(), true).toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("exec", "-a").toArray(), new CommandLine("exec -a <%varNOPE%>").getParametersRemoveVars(false).toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("exec", "-b").toArray(), new CommandLine("exec -a <%varNOPE%> -b").getParametersInjectVars(new HashMap<>(), true).toArray()));
 	}
 	
 	/* TODO not here
