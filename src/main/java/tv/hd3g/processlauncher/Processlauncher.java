@@ -17,60 +17,72 @@
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 
 public class Processlauncher { // TODO test
-
+	
 	/*
 	TODO refactor: eclipse coll, exec_name/execName
 	 */
-
+	
 	private final boolean execCodeMustBeZero;
-	private final Optional<ExecutionCallbacker> executionCallbacker;
+	private final List<ExecutionCallbacker> executionCallbackers;
 	private final Optional<ExecutionTimeLimiter> executionTimeLimiter;
 	private final Optional<CaptureStandardOutput> captureStandardOutput;
+	private final Optional<ExternalProcessStartup> externalProcessStartup;
 	private final ProcessBuilder processBuilder;
 	private final String fullCommandLine;
 	private final ProcesslauncherBuilder processlauncherBuilder;
-	
+
 	public Processlauncher(final ProcesslauncherBuilder processlauncherBuilder) {
 		this.processlauncherBuilder = Objects.requireNonNull(processlauncherBuilder, "\"processlauncherBuilder\" can't to be null");
-
+		
 		execCodeMustBeZero = processlauncherBuilder.isExecCodeMustBeZero();
-		executionCallbacker = processlauncherBuilder.getExecutionCallbacker();
+		executionCallbackers = Collections.unmodifiableList(new ArrayList<>(processlauncherBuilder.getExecutionCallbackers()));
 		executionTimeLimiter = processlauncherBuilder.getExecutionTimeLimiter();
-		captureStandardOutput = processlauncherBuilder.captureStandardOutput();
+		captureStandardOutput = processlauncherBuilder.getCaptureStandardOutput();
+		externalProcessStartup = processlauncherBuilder.getExternalProcessStartup();
 		processBuilder = processlauncherBuilder.makeProcessBuilder();
 		fullCommandLine = processlauncherBuilder.getFullCommandLine();
 	}
-
+	
 	public ProcesslauncherLifecycle start() throws IOException {
 		return new ProcesslauncherLifecycle(this);
 	}
-
-	public Optional<ExecutionCallbacker> getExecutionCallbacker() {
-		return executionCallbacker;
+	
+	/**
+	 * @return unmodifiableList
+	 */
+	public List<ExecutionCallbacker> getExecutionCallbackers() {
+		return executionCallbackers;
 	}
-
+	
 	public Optional<ExecutionTimeLimiter> getExecutionTimeLimiter() {
 		return executionTimeLimiter;
 	}
-
+	
 	public Optional<CaptureStandardOutput> getCaptureStandardOutput() {
 		return captureStandardOutput;
+	}
+	
+	public Optional<ExternalProcessStartup> getExternalProcessStartup() {
+		return externalProcessStartup;
 	}
 
 	public boolean isExecCodeMustBeZero() {
 		return execCodeMustBeZero;
 	}
-
+	
 	public ProcessBuilder getProcessBuilder() {
 		return processBuilder;
 	}
-
+	
 	/**
 	 * @return getFullCommandLine()
 	 */
@@ -78,11 +90,11 @@ public class Processlauncher { // TODO test
 	public String toString() {
 		return fullCommandLine;
 	}
-
+	
 	public String getFullCommandLine() {
 		return fullCommandLine;
 	}
-	
+
 	public ProcesslauncherBuilder getProcesslauncherBuilder() {
 		return processlauncherBuilder;
 	}

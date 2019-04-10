@@ -18,7 +18,7 @@ package tv.hd3g.processlauncher.io;
 
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
-public class LineEntry { // TODO test
+public class LineEntry {
 
 	private final long date;
 	private final String line;
@@ -33,7 +33,7 @@ public class LineEntry { // TODO test
 	}
 
 	public long getTimeAgo() {
-		return date - source.getStartDate(); // TODO manager the exec end
+		return date - source.getStartDate();
 	}
 
 	public long getDate() {
@@ -53,6 +53,6 @@ public class LineEntry { // TODO test
 	}
 
 	public boolean canUseThis(final CaptureStandardOutputStreams choosedStream) {
-		return stdErr && choosedStream.canCaptureStderr() | stdErr == false && choosedStream.canCaptureStdout();
+		return stdErr && choosedStream.canCaptureStderr() || stdErr == false && choosedStream.canCaptureStdout();
 	}
 }

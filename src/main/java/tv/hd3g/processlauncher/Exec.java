@@ -25,9 +25,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableCommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
@@ -39,65 +36,64 @@ import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 /**
  * Shortcut for alls classes
  */
-public class Exec {
-	private static Logger log = LogManager.getLogger();
-
+public class Exec {// TODO test
+	
 	private final String execName;
 	private final ExecutableFinder executableFinder;
 	private final Parameters parameters;
 	private final Map<String, String> varsToInject;
 	private boolean removeParamsIfNoVarToInject;
-	
+
 	public Exec(final String execName, final ExecutableFinder executableFinder) {
 		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
 		parameters = new Parameters();
 		varsToInject = new HashMap<>();
 	}
-	
+
 	public Map<String, String> getVarsToInject() {
 		return varsToInject;
 	}
-
+	
 	public Exec setRemoveParamsIfNoVarToInject(final boolean removeParamsIfNoVarToInject) {
 		this.removeParamsIfNoVarToInject = removeParamsIfNoVarToInject;
 		return this;
 	}
-
+	
 	public boolean isRemoveParamsIfNoVarToInject() {
 		return removeParamsIfNoVarToInject;
 	}
-	
+
 	public Parameters getParameters() {
 		return parameters;
 	}
-	
+
 	/**
 	 * Blocking
 	 */
-	public CapturedStdOutErrTextRetention run(final Consumer<ProcesslauncherBuilder> beforeRun) throws IOException {
+	public CapturedStdOutErrTextRetention runWaitGetText(final Consumer<ProcesslauncherBuilder> beforeRun) throws IOException {
 		final CommandLine commandLine = new CommandLine(execName, parameters);
 		final List<String> params = commandLine.getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
 		final ExecutableCommandLine executableCommandLine = new ExecutableCommandLine(execName, params, executableFinder);
 		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(executableCommandLine);
-		
+
 		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention(CaptureStandardOutputStreams.BOTH_STDOUT_STDERR);
 		builder.setCaptureStandardOutput(new CaptureStandardOutputText(outStreamWatcher, textRetention));
-		
+
 		beforeRun.accept(builder);
-		builder.setExecutionCallbacker(new ExecutionCallbacker() {
+		builder.addExecutionCallbacker(new ExecutionCallbacker() {
 			@Override
 			public void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
 				outStreamWatcher.shutdown();
 			}
 		});
-		
+
 		final Processlauncher processlauncher = new Processlauncher(builder);
 		final ProcesslauncherLifecycle processlauncherLifecycle = new ProcesslauncherLifecycle(processlauncher);
 		processlauncherLifecycle.checkExecution();
-		
+
 		return textRetention;
 	}
-	
+
 }

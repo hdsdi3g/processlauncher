@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -25,9 +26,10 @@ public class ProcesslauncherBuilder {
 	private File working_directory;
 	
 	private boolean execCodeMustBeZero;
-	private Optional<ExecutionCallbacker> endExecutionCallbacker;
+	private final List<ExecutionCallbacker> executionCallbackers;
 	private Optional<ExecutionTimeLimiter> executionTimeLimiter;
 	private Optional<CaptureStandardOutput> captureStandardOutput;
+	private Optional<ExternalProcessStartup> externalProcessStartup;
 
 	public ProcesslauncherBuilder(final ExecutableCommandLine executableCommandLine) {
 		this.executableCommandLine = Objects.requireNonNull(executableCommandLine, "\"executableCommandLine\" can't to be null");
@@ -45,10 +47,11 @@ public class ProcesslauncherBuilder {
 			environment.put("PATH", System.getenv("PATH"));
 		}
 		execCodeMustBeZero = true;
-		endExecutionCallbacker = Optional.empty();
+		executionCallbackers = new ArrayList<>();
 		executionTimeLimiter = Optional.empty();
 		captureStandardOutput = Optional.empty();
-
+		externalProcessStartup = Optional.empty();
+		
 		try {
 			setWorkingDirectory(new File(System.getProperty("java.io.tmpdir", "")));
 		} catch (final IOException e) {
@@ -117,24 +120,46 @@ public class ProcesslauncherBuilder {
 		return execCodeMustBeZero;
 	}
 
-	public Optional<ExecutionCallbacker> getExecutionCallbacker() {
-		return endExecutionCallbacker;
+	/**
+	 * @return unmodifiableList
+	 */
+	public List<ExecutionCallbacker> getExecutionCallbackers() {
+		synchronized (executionCallbackers) {
+			return Collections.unmodifiableList(executionCallbackers);
+		}
+	}
+
+	public ProcesslauncherBuilder addExecutionCallbacker(final ExecutionCallbacker executionCallbacker) {
+		Objects.requireNonNull(executionCallbacker, "\"endExecutionCallbacker\" can't to be null");
+		synchronized (executionCallbackers) {
+			executionCallbackers.add(executionCallbacker);
+		}
+		return this;
+	}
+
+	public ProcesslauncherBuilder removeExecutionCallbacker(final ExecutionCallbacker executionCallbacker) {
+		Objects.requireNonNull(executionCallbacker, "\"endExecutionCallbacker\" can't to be null");
+		synchronized (executionCallbackers) {
+			executionCallbackers.remove(executionCallbacker);
+		}
+		return this;
 	}
 
 	public Optional<ExecutionTimeLimiter> getExecutionTimeLimiter() {
 		return executionTimeLimiter;
 	}
 	
-	/**
-	 * TODO Can manage multiple callbackers (all in here, no ExecutionCallbackerBulk), maybe with Processlauncher
-	 */
-	public ProcesslauncherBuilder setExecutionCallbacker(final ExecutionCallbacker endExecutionCallbacker) {
-		this.endExecutionCallbacker = Optional.ofNullable(endExecutionCallbacker);
-		return this;
-	}
-
 	public ProcesslauncherBuilder setExecutionTimeLimiter(final ExecutionTimeLimiter executionTimeLimiter) {
 		this.executionTimeLimiter = Optional.ofNullable(executionTimeLimiter);
+		return this;
+	}
+	
+	public Optional<ExternalProcessStartup> getExternalProcessStartup() {
+		return externalProcessStartup;
+	}
+	
+	public ProcesslauncherBuilder setExternalProcessStartup(final ExternalProcessStartup externalProcessStartup) {
+		this.externalProcessStartup = Optional.ofNullable(externalProcessStartup);
 		return this;
 	}
 	
@@ -143,7 +168,7 @@ public class ProcesslauncherBuilder {
 		return this;
 	}
 	
-	public Optional<CaptureStandardOutput> captureStandardOutput() {
+	public Optional<CaptureStandardOutput> getCaptureStandardOutput() {
 		return captureStandardOutput;
 	}
 

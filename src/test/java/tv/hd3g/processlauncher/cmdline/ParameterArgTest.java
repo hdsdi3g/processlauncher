@@ -14,14 +14,32 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
 */
-package tv.hd3g.processlauncher;
+package tv.hd3g.processlauncher.cmdline;
 
-public interface ExecutionCallbacker {
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
+public class ParameterArgTest extends TestCase {
 	
-	default void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
+	private ParameterArg pArg;
+	
+	@Override
+	protected void setUp() throws Exception {
+		pArg = new ParameterArg(true);
+		pArg.add('a');
+		pArg.add('b');
+		pArg.add('c');
 	}
-
-	default void postStartupExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
+	
+	public void testToString() {
+		Assert.assertEquals("abc", pArg.toString());
 	}
-
+	
+	public void testIsInQuotes() {
+		Assert.assertTrue(pArg.isInQuotes());
+	}
+	
+	public void testIsEmpty() {
+		Assert.assertFalse(pArg.isEmpty());
+	}
 }

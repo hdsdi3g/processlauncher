@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ExecutableCommandLine { // TODO test
-
+public class ExecutableCommandLine {
+	
 	private final File executable;
 	private final List<String> parameters;
 	private final ExecutableFinder executableFinder;
-
+	
 	public ExecutableCommandLine(final File executable, final List<String> parameters) throws IOException {
 		this.executable = executable;
 		if (executable.isFile() == false | executable.exists() == false) {
@@ -39,7 +39,7 @@ public class ExecutableCommandLine { // TODO test
 		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null");
 		executableFinder = null;
 	}
-
+	
 	public ExecutableCommandLine(final String execName, final List<String> parameters, final ExecutableFinder executableFinder) throws IOException {
 		Objects.requireNonNull(execName, "\"execName\" can't to be null");
 		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null");
@@ -55,23 +55,23 @@ public class ExecutableCommandLine { // TODO test
 			}
 		}
 	}
-
+	
 	@Override
 	public String toString() {
 		return executable.getPath() + " " + parameters.stream().collect(Collectors.joining(" "));
 	}
-	
+
 	/**
 	 * @return can be null
 	 */
 	public ExecutableFinder getExecutableFinder() {
 		return executableFinder;
 	}
-
+	
 	public File getExecutable() {
 		return executable;
 	}
-
+	
 	public List<String> getParameters() {
 		return parameters;
 	}

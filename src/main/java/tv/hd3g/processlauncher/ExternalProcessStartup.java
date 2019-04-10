@@ -16,12 +16,14 @@
 */
 package tv.hd3g.processlauncher;
 
-public interface ExecutionCallbacker {
+import java.io.IOException;
+
+@FunctionalInterface
+public interface ExternalProcessStartup {
+
+	Process startProcess(ProcessBuilder pBuilder) throws IOException;
+
+	default void onEndProcess(final ProcesslauncherLifecycle processlauncherLifecycle) {
+	}
 	
-	default void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
-	}
-
-	default void postStartupExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
-	}
-
 }

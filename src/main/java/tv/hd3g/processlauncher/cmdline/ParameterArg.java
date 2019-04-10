@@ -16,30 +16,30 @@
 */
 package tv.hd3g.processlauncher.cmdline;
 
-class ParameterArg {// TODO test me
-
+class ParameterArg {
+	
 	private final boolean isInQuotes;
 	private final StringBuilder content;
-
+	
 	ParameterArg(final boolean isInQuotes) {
 		this.isInQuotes = isInQuotes;
 		content = new StringBuilder();
 	}
-
+	
 	ParameterArg add(final char arg) {
 		content.append(arg);
 		return this;
 	}
-
+	
 	@Override
 	public String toString() {
 		return content.toString();
 	}
-	
+
 	public boolean isInQuotes() {
 		return isInQuotes;
 	}
-
+	
 	public boolean isEmpty() {
 		return content.length() == 0;
 	}
