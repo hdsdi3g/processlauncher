@@ -20,56 +20,62 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
-public class CaptureStdOutErrText implements CaptureStandardOutput {// TODO test me
+public class CaptureStandardOutputText implements CaptureStandardOutput {// TODO test me
 	private static Logger log = LogManager.getLogger();
-
-	private final CaptureOutStreamsBehavior captureOutStreamsBehavior;
-	private final CapturedStdOutErrObserver observer;
+	
+	private final CaptureStandardOutputStreams captureOutStreamsBehavior;
+	private final List<CapturedStdOutErrTextObserver> observers;
 	private final ExecutorService executorConsumer;
-
+	
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStdOutErrText(final CaptureOutStreamsBehavior captureOutStreamsBehavior, final CapturedStdOutErrObserver observer, final ExecutorService executorConsumer) {
+	public CaptureStandardOutputText(final CaptureStandardOutputStreams captureOutStreamsBehavior, final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
-		this.observer = observer;
-		if (observer == null) {
-			throw new NullPointerException("\"observer\" can't to be null");
+
+		this.observers = new ArrayList<>();
+		if (observers != null) {
+			this.observers.addAll(Arrays.stream(observers).filter(o -> o != null).collect(Collectors.toUnmodifiableList()));
 		}
+
 		this.executorConsumer = executorConsumer;
 		if (executorConsumer == null) {
 			throw new NullPointerException("\"executorConsumer\" can't to be null");
 		}
 	}
-	
+
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStdOutErrText(final CapturedStdOutErrObserver observer, final ExecutorService executorConsumer) {
-		this(CaptureOutStreamsBehavior.BOTH_STDOUT_STDERR, observer, executorConsumer);
+	public CaptureStandardOutputText(final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
+		this(CaptureStandardOutputStreams.BOTH_STDOUT_STDERR, executorConsumer, observers);
 	}
-	
+
 	@Override
 	public void stdOutStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStdout()) {
 			parseStream(processInputStream, false, source);
 		}
 	}
-	
+
 	@Override
 	public void stdErrStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStderr()) {
 			parseStream(processInputStream, true, source);
 		}
 	}
-	
+
 	private void parseStream(final InputStream processStream, final boolean isStdErr, final ProcesslauncherLifecycle source) {
 		executorConsumer.execute(() -> {
 			try {
@@ -77,7 +83,14 @@ public class CaptureStdOutErrText implements CaptureStandardOutput {// TODO test
 				try {
 					String line = "";
 					while ((line = reader.readLine()) != null) {
-						observer.onText(source, line, isStdErr);
+						final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr, source);
+						observers.forEach(observer -> {
+							try {
+								observer.onText(lineEntry);
+							} catch (final RuntimeException e) {
+								log.error("Can't callback process text event ", e);
+							}
+						});
 					}
 				} catch (final IOException ioe) {
 					if (ioe.getMessage().equalsIgnoreCase("Bad file descriptor")) {
@@ -98,8 +111,12 @@ public class CaptureStdOutErrText implements CaptureStandardOutput {// TODO test
 				}
 			} catch (final IOException ioe) {
 				log.error("Trouble opening process streams: " + toString(), ioe);
+			} finally {
+				observers.forEach(observer -> {
+					observer.onProcessCloseStream(source, isStdErr);
+				});
 			}
 		});
 	}
-	
+
 }

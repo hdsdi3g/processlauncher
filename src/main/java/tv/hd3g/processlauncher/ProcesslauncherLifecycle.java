@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -48,21 +49,18 @@ public class ProcesslauncherLifecycle {
 		process_was_stopped_because_too_long_time = false;
 		fullCommandLine = launcher.getFullCommandLine();
 
-		process = launcher.getProcessBuilder().start();
-		start_date = System.currentTimeMillis();
+		final ProcessBuilder pBuilder = launcher.getProcessBuilder();
 
-		/*if (log.isTraceEnabled()) {
-			String env = "";
-			if (environment.isEmpty() == false) {
-				env = " ; with environment: " + environment;
-			}
-			String met = "";
-			if (max_exec_time > 0) {
-				met = " and max exec time: " + getMaxExecTime(TimeUnit.SECONDS) + " sec";
-			}
-			log.info("Start process #" + process.pid() + " by " + process.info().user().orElse("(?)") + " " + getCommandline() + env + met);
-		} else {*/
-		log.info("Start process #" + process.pid() + " " + fullCommandLine);
+		final Optional<ExecutionCallbacker> executionCallbacker = launcher.getExecutionCallbacker();
+		if (executionCallbacker.isPresent()) {
+			process = executionCallbacker.get().externalStartup(pBuilder);
+			Objects.requireNonNull(process, "Can't manage null process");
+		} else {
+			process = pBuilder.start();
+			log.info("Start process #" + process.pid() + " " + fullCommandLine);
+		}
+
+		start_date = System.currentTimeMillis();
 
 		shutdown_hook = new Thread(() -> {
 			log.warn("Try to kill " + toString());
@@ -76,23 +74,22 @@ public class ProcesslauncherLifecycle {
 		launcher.getExecutionTimeLimiter().ifPresent(etl -> {
 			etl.addTimesUp(this, process);
 		});
-		
-		launcher.getEndExecutionCallbacker().ifPresent(eec -> {
-			eec.postStartupAction(this);
+
+		executionCallbacker.ifPresent(eec -> {
+			eec.postStartupExecution(this);
 		});
 
 		launcher.getCaptureStandardOutput().ifPresent(cso -> {
 			cso.stdOutStreamConsumer(process.getInputStream(), this);
 			cso.stdErrStreamConsumer(process.getErrorStream(), this);
 		});
-		
+
 		process.onExit().thenRun(() -> {
 			Runtime.getRuntime().removeShutdownHook(shutdown_hook);
-			launcher.getEndExecutionCallbacker().ifPresent(eec -> {
+			executionCallbacker.ifPresent(eec -> {
 				eec.onEndExecution(this);
 			});
 		});
-
 	}
 	
 	@Override
@@ -245,6 +242,9 @@ public class ProcesslauncherLifecycle {
 		return this;
 	}
 	
+	/**
+	 * waitForEnd and checks isCorrectlyDone
+	 */
 	public ProcesslauncherLifecycle checkExecution() {
 		waitForEnd();
 		if (isCorrectlyDone() == false) {

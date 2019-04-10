@@ -16,7 +16,7 @@
 */
 package tv.hd3g.processlauncher.io;
 
-public enum CaptureOutStreamsBehavior {
+public enum CaptureStandardOutputStreams {
 	
 	BOTH_STDOUT_STDERR {
 		boolean canCaptureStdout() {

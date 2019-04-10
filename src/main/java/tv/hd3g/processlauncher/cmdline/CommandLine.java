@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
@@ -34,24 +35,15 @@ public class CommandLine {
 	private final Parameters parameters;
 	
 	public CommandLine(final String execName, final Parameters sourceParameters) {
-		this.execName = execName;
-		if (execName == null) {
-			throw new NullPointerException("\"execName\" can't to be null");
-		}
-		if (sourceParameters == null) {
-			throw new NullPointerException("\"sourceParameters\" can't to be null");
-		}
-		parameters = sourceParameters.clone();
+		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
+		parameters = Objects.requireNonNull(sourceParameters, "\"sourceParameters\" can't to be null").clone();
 	}
 
 	/**
 	 * @param fullCommandLine MUST containt at least an executable reference (exec name or path). It can contain vars
 	 */
 	public CommandLine(final String fullCommandLine) {
-		if (fullCommandLine == null) {
-			throw new NullPointerException("\"fullCommandLine\" can't to be null");
-		}
-		parameters = new Parameters(fullCommandLine);
+		parameters = new Parameters(Objects.requireNonNull(fullCommandLine, "\"fullCommandLine\" can't to be null"));
 		execName = parameters.getParameters().get(0);
 		parameters.getParameters().remove(0);
 	}
@@ -64,13 +56,9 @@ public class CommandLine {
 	 * @return true if the update is done
 	 */
 	public boolean injectParamsAroundVariable(final String varName, final Collection<String> addBefore, final Collection<String> addAfter) {
-		if (varName == null) {
-			throw new NullPointerException("\"varName\" can't to be null");
-		} else if (addBefore == null) {
-			throw new NullPointerException("\"addBefore\" can't to be null");
-		} else if (addAfter == null) {
-			throw new NullPointerException("\"addAfter\" can't to be null");
-		}
+		Objects.requireNonNull(varName, "\"varName\" can't to be null");
+		Objects.requireNonNull(addBefore, "\"addBefore\" can't to be null");
+		Objects.requireNonNull(addAfter, "\"addAfter\" can't to be null");
 		
 		final AtomicBoolean isDone = new AtomicBoolean(false);
 		

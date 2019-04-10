@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -167,9 +168,7 @@ class SimpleParameters {
 	 * @param params OR link
 	 */
 	public boolean hasParameters(final String... params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		return Arrays.stream(params).filter(p -> {
 			return p != null;
@@ -183,9 +182,7 @@ class SimpleParameters {
 	 * @param in_parameters OR link
 	 */
 	public SimpleParameters ifHasNotParameter(final Runnable to_do_if_missing, final String... in_parameters) {
-		if (to_do_if_missing == null) {
-			throw new NullPointerException("\"to_do_if_missing\" can't to be null");
-		}
+		Objects.requireNonNull(to_do_if_missing, "\"to_do_if_missing\" can't to be null");
 		if (hasParameters(in_parameters) == false) {
 			to_do_if_missing.run();
 		}
@@ -204,9 +201,7 @@ class SimpleParameters {
 	 * @param params don't alter params
 	 */
 	public SimpleParameters addParameters(final String... params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		parameters.addAll(Arrays.stream(params).filter(p -> {
 			return p != null;
@@ -221,9 +216,7 @@ class SimpleParameters {
 	 * @param params don't alter params
 	 */
 	public SimpleParameters addParameters(final Collection<String> params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		parameters.addAll(params.stream().filter(p -> {
 			return p != null;
@@ -238,9 +231,7 @@ class SimpleParameters {
 	 * @param params transform spaces in each param to new params: "a b c d" -> ["a", "b", "c", "d"], and it manage " but not tabs.
 	 */
 	public SimpleParameters addBulkParameters(final String params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		parameters.addAll(filterAnTransformParameter.apply(params).map(ParameterArg -> {
 			return ParameterArg.toString();
@@ -255,9 +246,7 @@ class SimpleParameters {
 	 * @param params don't alter params
 	 */
 	public SimpleParameters prependParameters(final Collection<String> params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		final List<String> new_list = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(Collectors.toUnmodifiableList());
 		parameters.clear();
@@ -272,9 +261,7 @@ class SimpleParameters {
 	 * @param params add all in front of command line, don't alter params
 	 */
 	public SimpleParameters prependParameters(final String... params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		prependParameters(Arrays.stream(params).filter(p -> {
 			return p != null;
@@ -287,9 +274,7 @@ class SimpleParameters {
 	 * @param params params add all in front of command line, transform spaces in each param to new params: "a b c d" -> ["a", "b", "c", "d"], and it manage " but not tabs.
 	 */
 	public SimpleParameters prependBulkParameters(final String params) {
-		if (params == null) {
-			throw new NullPointerException("\"params\" can't to be null");
-		}
+		Objects.requireNonNull(params, "\"params\" can't to be null");
 		
 		prependParameters(filterAnTransformParameter.apply(params).map(ParameterArg -> {
 			return ParameterArg.toString();
@@ -338,9 +323,7 @@ class SimpleParameters {
 	 * @return For "-param val1 -param val2 -param val3" -> val1, val2, val3 ; null if param_key can't be found, empty if not values for param
 	 */
 	public List<String> getValues(final String parameter_key) {
-		if (parameter_key == null) {
-			throw new NullPointerException("\"parameter_key\" can't to be null");
-		}
+		Objects.requireNonNull(parameter_key, "\"parameter_key\" can't to be null");
 		
 		final String param = conformParameterKey(parameter_key);
 		
@@ -372,9 +355,7 @@ class SimpleParameters {
 	 * @param parameters_key can have "-" or not (it will be added).
 	 */
 	public boolean removeParameter(final String parameters_key, final int param_as_this_key_pos) {
-		if (parameters_key == null) {
-			throw new NullPointerException("\"parameters_key\" can't to be null");
-		}
+		Objects.requireNonNull(parameters_key, "\"parameters_key\" can't to be null");
 		
 		final String param = conformParameterKey(parameters_key);
 		
@@ -405,11 +386,8 @@ class SimpleParameters {
 	 * @return true if done
 	 */
 	public boolean alterParameter(final String parameter_key, final String new_value, final int param_as_this_key_pos) {
-		if (parameter_key == null) {
-			throw new NullPointerException("\"param_key\" can't to be null");
-		} else if (new_value == null) {
-			throw new NullPointerException("\"new_value\" can't to be null");
-		}
+		Objects.requireNonNull(parameter_key, "\"parameter_key\" can't to be null");
+		Objects.requireNonNull(new_value, "\"new_value\" can't to be null");
 		
 		final String param = conformParameterKey(parameter_key);
 		

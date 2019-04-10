@@ -19,17 +19,11 @@ package tv.hd3g.processlauncher.io;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 @FunctionalInterface
-public interface CapturedStdOutErrObserver {
-	
-	void onText(ProcesslauncherLifecycle source, String line, boolean isStdErr);
-	
-	default void onStdout(final ProcesslauncherLifecycle source, final String line) {
-		onText(source, line, false);
+public interface CapturedStdOutErrTextObserver {
+
+	void onText(LineEntry lineEntry);
+
+	default void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr) {
 	}
-	
-	default void onStderr(final ProcesslauncherLifecycle source, final String line) {
-		onText(source, line, true);
-	}
-	
-	// TODO impl with retention + interactive
+
 }

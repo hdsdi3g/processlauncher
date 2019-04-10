@@ -65,12 +65,12 @@ public class StdInInjection extends OutputStream {
 	/**
 	 * Send text + new line + flush
 	 */
-	public StdInInjection println(final String text, final Charset charset) throws IOException {
+	public StdInInjection println(final String text, final Charset destCharset) throws IOException {
 		if (log.isTraceEnabled()) {
 			log.trace("Println: \"" + text + "\"");
 		}
-		write(text.getBytes(charset));
-		write(LINESEPARATOR.getBytes(charset));
+		write(text.getBytes(destCharset));
+		write(LINESEPARATOR.getBytes(destCharset));
 		flush();
 		return this;
 	}

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ExecutableCommandLine { // TODO test
@@ -35,21 +36,13 @@ public class ExecutableCommandLine { // TODO test
 		} else if (executable.canExecute() == false) {
 			throw new IOException("Can't execute " + executable);
 		}
-		this.parameters = parameters;
-		if (parameters == null) {
-			throw new NullPointerException("\"parameters\" can't to be null");
-		}
+		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null");
 		executableFinder = null;
 	}
 
 	public ExecutableCommandLine(final String execName, final List<String> parameters, final ExecutableFinder executableFinder) throws IOException {
-		if (execName == null) {
-			throw new NullPointerException("\"execName\" can't to be null");
-		}
-		this.parameters = parameters;
-		if (parameters == null) {
-			throw new NullPointerException("\"parameters\" can't to be null");
-		}
+		Objects.requireNonNull(execName, "\"execName\" can't to be null");
+		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null");
 		this.executableFinder = executableFinder;
 		if (executableFinder != null) {
 			executable = executableFinder.get(execName);
