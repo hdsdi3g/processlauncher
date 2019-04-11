@@ -19,11 +19,11 @@ package tv.hd3g.processlauncher.cmdline;
 import java.util.Collection;
 import java.util.Objects;
 
-public class Parameters extends SimpleParameters { // TODO test
-	
+public class Parameters extends SimpleParameters {
+
 	private String startVarTag;
 	private String endVarTag;
-	
+
 	/**
 	 * Use "<%" and "%>" by default
 	 */
@@ -31,12 +31,12 @@ public class Parameters extends SimpleParameters { // TODO test
 		super();
 		setVarTags("<%", "%>");
 	}
-	
+
 	public Parameters(final String start_var_tag, final String end_var_tag) {
 		super();
 		setVarTags(start_var_tag, end_var_tag);
 	}
-
+	
 	/**
 	 * Use "<%" and "%>" by default
 	 */
@@ -44,7 +44,7 @@ public class Parameters extends SimpleParameters { // TODO test
 		super(bulk_parameters);
 		setVarTags("<%", "%>");
 	}
-
+	
 	/**
 	 * Use "<%" and "%>" by default
 	 */
@@ -52,17 +52,17 @@ public class Parameters extends SimpleParameters { // TODO test
 		super(parameters);
 		setVarTags("<%", "%>");
 	}
-
+	
 	public Parameters(final String bulk_parameters, final String start_var_tag, final String end_var_tag) {
 		super(bulk_parameters);
 		setVarTags(start_var_tag, end_var_tag);
 	}
-
+	
 	public Parameters(final Collection<String> parameters, final String start_var_tag, final String end_var_tag) {
 		super(parameters);
 		setVarTags(start_var_tag, end_var_tag);
 	}
-
+	
 	private void setVarTags(final String start_var_tag, final String end_var_tag) {
 		startVarTag = Objects.requireNonNull(start_var_tag, "\"start_var_tag\" can't to be null");
 		if (start_var_tag.isEmpty()) {
@@ -73,21 +73,21 @@ public class Parameters extends SimpleParameters { // TODO test
 			throw new NullPointerException("\"end_var_tag\" can't to be empty");
 		}
 	}
-
+	
 	/**
 	 * @return like "%>"
 	 */
 	public String getEndVarTag() {
 		return endVarTag;
 	}
-
+	
 	/**
 	 * @return like "<%"
 	 */
 	public String getStartVarTag() {
 		return startVarTag;
 	}
-	
+
 	/**
 	 * @param param like
 	 * @return true if like "<%myvar%>"
@@ -101,7 +101,7 @@ public class Parameters extends SimpleParameters { // TODO test
 		}
 		return param.startsWith(startVarTag) & param.endsWith(endVarTag);
 	}
-	
+
 	/**
 	 * @param param like <%myvar%>
 	 * @return like "myvar" or null if param is not a valid variable of if it's empty.
@@ -115,7 +115,7 @@ public class Parameters extends SimpleParameters { // TODO test
 		}
 		return param.substring(startVarTag.length(), param.length() - endVarTag.length());
 	}
-	
+
 	/**
 	 * @return var_name
 	 */
@@ -123,12 +123,12 @@ public class Parameters extends SimpleParameters { // TODO test
 		addParameters(startVarTag + var_name + endVarTag);
 		return var_name;
 	}
-
+	
 	@Override
 	public Parameters clone() {
 		final Parameters new_instance = new Parameters(startVarTag, endVarTag);
 		new_instance.importParametersFrom(this);
 		return new_instance;
 	}
-
+	
 }

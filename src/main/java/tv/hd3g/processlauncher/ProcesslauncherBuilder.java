@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,13 +16,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import tv.hd3g.processlauncher.cmdline.ExecutableCommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 
 public class ProcesslauncherBuilder {
 
-	private final ExecutableCommandLine executableCommandLine;
+	private final File executable;
+	private final List<String> parameters;
 	private final LinkedHashMap<String, String> environment;
 	private File working_directory;
 	
@@ -31,8 +32,9 @@ public class ProcesslauncherBuilder {
 	private Optional<CaptureStandardOutput> captureStandardOutput;
 	private Optional<ExternalProcessStartup> externalProcessStartup;
 
-	public ProcesslauncherBuilder(final ExecutableCommandLine executableCommandLine) {
-		this.executableCommandLine = Objects.requireNonNull(executableCommandLine, "\"executableCommandLine\" can't to be null");
+	public ProcesslauncherBuilder(final File executable, final Collection<String> parameters, final ExecutableFinder execFinder) {
+		this.executable = Objects.requireNonNull(executable, "\"executable\" can't to be null");
+		this.parameters = Collections.unmodifiableList(new ArrayList<>(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")));
 
 		environment = new LinkedHashMap<>();
 		
@@ -40,9 +42,8 @@ public class ProcesslauncherBuilder {
 		if (environment.containsKey("LANG") == false) {
 			environment.put("LANG", Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + "." + Charset.forName("UTF-8"));
 		}
-		final ExecutableFinder eF = executableCommandLine.getExecutableFinder();
-		if (eF != null) {
-			environment.put("PATH", eF.getFullPathToString());
+		if (execFinder != null) {
+			environment.put("PATH", execFinder.getFullPathToString());
 		} else {
 			environment.put("PATH", System.getenv("PATH"));
 		}
@@ -59,6 +60,10 @@ public class ProcesslauncherBuilder {
 		}
 	}
 
+	public ProcesslauncherBuilder(final File executable, final Collection<String> parameters) {
+		this(executable, parameters, null);
+	}
+	
 	/**
 	 * @return null if not found
 	 */
@@ -66,7 +71,7 @@ public class ProcesslauncherBuilder {
 		return environment.get(key);
 	}
 
-	public ProcesslauncherBuilder setEnvironmentVar(final String key, final String value) {
+	public ProcesslauncherBuilder setEnvironmentVar(final String key, final String value) {// TODO test path
 		if (key.equalsIgnoreCase("path") && System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
 			environment.put("PATH", value);
 			environment.put("Path", value);
@@ -87,14 +92,11 @@ public class ProcesslauncherBuilder {
 		environment.forEach(action);
 	}
 
-	/**
-	 * @return never null
-	 */
 	public File getWorkingDirectory() {
 		return working_directory;
 	}
 
-	public ProcesslauncherBuilder setWorkingDirectory(final File working_directory) throws IOException {
+	public ProcesslauncherBuilder setWorkingDirectory(final File working_directory) throws IOException {// TODO test invalid dir
 		Objects.requireNonNull(working_directory, "\"working_directory\" can't to be null");
 		
 		if (working_directory.exists() == false) {
@@ -116,6 +118,9 @@ public class ProcesslauncherBuilder {
 		return this;
 	}
 	
+	/**
+	 * Default, yes.
+	 */
 	public boolean isExecCodeMustBeZero() {
 		return execCodeMustBeZero;
 	}
@@ -174,8 +179,8 @@ public class ProcesslauncherBuilder {
 
 	public ProcessBuilder makeProcessBuilder() {
 		final List<String> fullCommandLine = new ArrayList<>();
-		fullCommandLine.add(executableCommandLine.getExecutable().getAbsolutePath());
-		fullCommandLine.addAll(executableCommandLine.getParameters());
+		fullCommandLine.add(executable.getPath());
+		fullCommandLine.addAll(parameters);
 
 		final ProcessBuilder process_builder = new ProcessBuilder(fullCommandLine);
 		process_builder.environment().putAll(environment);
@@ -185,8 +190,8 @@ public class ProcesslauncherBuilder {
 		}
 		return process_builder;
 	}
-
-	private static final Function<String, String> addQuotesIfSpaces = s -> {
+	
+	static final Function<String, String> addQuotesIfSpaces = s -> {
 		if (s.contains(" ")) {
 			return "\"" + s + "\"";
 		} else {
@@ -196,10 +201,18 @@ public class ProcesslauncherBuilder {
 	
 	public String getFullCommandLine() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(addQuotesIfSpaces.apply(executableCommandLine.getExecutable().getAbsolutePath()));
+		sb.append(addQuotesIfSpaces.apply(executable.getPath()));
 		sb.append(" ");
-		sb.append(executableCommandLine.getParameters().stream().map(addQuotesIfSpaces).collect(Collectors.joining(" ")));
+		sb.append(parameters.stream().map(addQuotesIfSpaces).collect(Collectors.joining(" ")));
 		return sb.toString().trim();
+	}
+
+	/**
+	 * @return getFullCommandLine()
+	 */
+	@Override
+	public String toString() {
+		return getFullCommandLine();
 	}
 
 }

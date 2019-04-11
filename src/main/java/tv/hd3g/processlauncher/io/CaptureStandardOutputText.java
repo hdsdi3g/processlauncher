@@ -31,51 +31,51 @@ import org.apache.logging.log4j.Logger;
 
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
-public class CaptureStandardOutputText implements CaptureStandardOutput {// TODO test me
+public class CaptureStandardOutputText implements CaptureStandardOutput {
 	private static Logger log = LogManager.getLogger();
-	
-	private final CaptureStandardOutputStreams captureOutStreamsBehavior;
+
+	private final CapturedStreams captureOutStreamsBehavior;
 	private final List<CapturedStdOutErrTextObserver> observers;
 	private final ExecutorService executorConsumer;
-	
+
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final CaptureStandardOutputStreams captureOutStreamsBehavior, final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
+	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
-
+		
 		this.observers = new ArrayList<>();
 		if (observers != null) {
 			this.observers.addAll(Arrays.stream(observers).filter(o -> o != null).collect(Collectors.toUnmodifiableList()));
 		}
-
+		
 		this.executorConsumer = executorConsumer;
 		if (executorConsumer == null) {
 			throw new NullPointerException("\"executorConsumer\" can't to be null");
 		}
 	}
-
+	
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
 	public CaptureStandardOutputText(final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
-		this(CaptureStandardOutputStreams.BOTH_STDOUT_STDERR, executorConsumer, observers);
+		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer, observers);
 	}
-
+	
 	@Override
 	public void stdOutStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStdout()) {
 			parseStream(processInputStream, false, source);
 		}
 	}
-
+	
 	@Override
 	public void stdErrStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStderr()) {
 			parseStream(processInputStream, true, source);
 		}
 	}
-
+	
 	private void parseStream(final InputStream processStream, final boolean isStdErr, final ProcesslauncherLifecycle source) {
 		executorConsumer.execute(() -> {
 			try {
@@ -118,5 +118,5 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {// TODO
 			}
 		});
 	}
-
+	
 }

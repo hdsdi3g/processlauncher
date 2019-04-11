@@ -52,7 +52,7 @@ public class LineEntry {
 		return stdErr;
 	}
 
-	public boolean canUseThis(final CaptureStandardOutputStreams choosedStream) {
+	public boolean canUseThis(final CapturedStreams choosedStream) {
 		return stdErr && choosedStream.canCaptureStderr() || stdErr == false && choosedStream.canCaptureStdout();
 	}
 }

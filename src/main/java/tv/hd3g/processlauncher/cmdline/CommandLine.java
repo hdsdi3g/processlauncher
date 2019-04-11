@@ -16,12 +16,16 @@
 */
 package tv.hd3g.processlauncher.cmdline;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
@@ -31,25 +35,44 @@ public class CommandLine {
 
 	private static final BinaryOperator<List<String>> LIST_COMBINER = (list1, list2) -> Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toUnmodifiableList());
 
-	private final String execName;
+	private final File executable;
+	private final ExecutableFinder executableFinder;
 	private final Parameters parameters;
 	
-	public CommandLine(final String execName, final Parameters sourceParameters) {
-		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
-		parameters = Objects.requireNonNull(sourceParameters, "\"sourceParameters\" can't to be null").clone();
+	public CommandLine(final File executable, final Parameters parameters) throws IOException {
+		this.executable = executable;
+		if (executable.isFile() == false | executable.exists() == false) {
+			throw new FileNotFoundException("Can't found " + executable);
+		} else if (executable.canExecute() == false) {
+			throw new IOException("Can't execute " + executable);
+		}
+		executableFinder = null;
+		
+		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null").clone();
 	}
 
-	/**
-	 * @param fullCommandLine MUST containt at least an executable reference (exec name or path). It can contain vars
-	 */
-	public CommandLine(final String fullCommandLine) {
-		parameters = new Parameters(Objects.requireNonNull(fullCommandLine, "\"fullCommandLine\" can't to be null"));
-		execName = parameters.getParameters().get(0);
-		parameters.getParameters().remove(0);
+	public CommandLine(final String execName, final Parameters parameters, final ExecutableFinder executableFinder) throws IOException {
+		Objects.requireNonNull(execName, "\"execName\" can't to be null");
+		this.executableFinder = executableFinder;
+		if (executableFinder != null) {
+			executable = executableFinder.get(execName);
+		} else {
+			executable = new File(execName);
+			if (executable.isFile() == false | executable.exists() == false) {
+				throw new FileNotFoundException("Can't found " + executable);
+			} else if (executable.canExecute() == false) {
+				throw new IOException("Can't execute " + executable);
+			}
+		}
+		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null").clone();
 	}
 
-	public String getExecName() {
-		return execName;
+	public CommandLine(final File executable, final String parameters) throws IOException {
+		this(executable, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")));
+	}
+
+	public CommandLine(final String execName, final String parameters, final ExecutableFinder executableFinder) throws IOException {
+		this(execName, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")), executableFinder);
 	}
 
 	/**
@@ -82,7 +105,19 @@ public class CommandLine {
 
 	@Override
 	public String toString() {
-		return execName + " " + parameters.toString();
+		return executable.getPath() + " " + parameters.toString();
+	}
+	
+	String getParametersToString() {
+		return parameters.toString();
+	}
+	
+	public Optional<ExecutableFinder> getExecutableFinder() {
+		return Optional.ofNullable(executableFinder);
+	}
+	
+	public File getExecutable() {
+		return executable;
 	}
 	
 	/**

@@ -25,12 +25,12 @@ import java.util.Optional;
 
 import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 
-public class Processlauncher { // TODO test
-	
+public class Processlauncher {
+
 	/*
 	TODO refactor: eclipse coll, exec_name/execName
 	 */
-	
+
 	private final boolean execCodeMustBeZero;
 	private final List<ExecutionCallbacker> executionCallbackers;
 	private final Optional<ExecutionTimeLimiter> executionTimeLimiter;
@@ -39,10 +39,10 @@ public class Processlauncher { // TODO test
 	private final ProcessBuilder processBuilder;
 	private final String fullCommandLine;
 	private final ProcesslauncherBuilder processlauncherBuilder;
-
+	
 	public Processlauncher(final ProcesslauncherBuilder processlauncherBuilder) {
 		this.processlauncherBuilder = Objects.requireNonNull(processlauncherBuilder, "\"processlauncherBuilder\" can't to be null");
-		
+
 		execCodeMustBeZero = processlauncherBuilder.isExecCodeMustBeZero();
 		executionCallbackers = Collections.unmodifiableList(new ArrayList<>(processlauncherBuilder.getExecutionCallbackers()));
 		executionTimeLimiter = processlauncherBuilder.getExecutionTimeLimiter();
@@ -51,38 +51,38 @@ public class Processlauncher { // TODO test
 		processBuilder = processlauncherBuilder.makeProcessBuilder();
 		fullCommandLine = processlauncherBuilder.getFullCommandLine();
 	}
-	
+
 	public ProcesslauncherLifecycle start() throws IOException {
 		return new ProcesslauncherLifecycle(this);
 	}
-	
+
 	/**
 	 * @return unmodifiableList
 	 */
 	public List<ExecutionCallbacker> getExecutionCallbackers() {
 		return executionCallbackers;
 	}
-	
+
 	public Optional<ExecutionTimeLimiter> getExecutionTimeLimiter() {
 		return executionTimeLimiter;
 	}
-	
+
 	public Optional<CaptureStandardOutput> getCaptureStandardOutput() {
 		return captureStandardOutput;
 	}
-	
+
 	public Optional<ExternalProcessStartup> getExternalProcessStartup() {
 		return externalProcessStartup;
 	}
-
+	
 	public boolean isExecCodeMustBeZero() {
 		return execCodeMustBeZero;
 	}
-	
+
 	public ProcessBuilder getProcessBuilder() {
 		return processBuilder;
 	}
-	
+
 	/**
 	 * @return getFullCommandLine()
 	 */
@@ -90,11 +90,11 @@ public class Processlauncher { // TODO test
 	public String toString() {
 		return fullCommandLine;
 	}
-	
+
 	public String getFullCommandLine() {
 		return fullCommandLine;
 	}
-
+	
 	public ProcesslauncherBuilder getProcesslauncherBuilder() {
 		return processlauncherBuilder;
 	}

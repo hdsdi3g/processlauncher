@@ -23,10 +23,10 @@ import java.util.stream.Stream;
 
 public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObserver {
 	
-	private final CaptureStandardOutputStreams streamToKeep;
+	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
 	
-	public CapturedStdOutErrTextRetention(final CaptureStandardOutputStreams streamToKeep) {
+	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
 		this.streamToKeep = Objects.requireNonNull(streamToKeep, "\"streamToKeep\" can't to be null");
 		lineEntries = new LinkedBlockingQueue<>();
 	}

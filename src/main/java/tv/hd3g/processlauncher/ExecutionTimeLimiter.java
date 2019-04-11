@@ -21,11 +21,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class ExecutionTimeLimiter {// TODO test
-
+public class ExecutionTimeLimiter {
+	
 	private final ScheduledExecutorService maxExecTimeScheduler;
 	private final long maxExecTime;
-	
+
 	public ExecutionTimeLimiter(final long maxExecTime, final TimeUnit unit, final ScheduledExecutorService maxExecTimeScheduler) {
 		if (maxExecTime == 0) {
 			throw new RuntimeException("Invalid max_exec_time value: " + maxExecTime);
@@ -33,19 +33,19 @@ public class ExecutionTimeLimiter {// TODO test
 		this.maxExecTimeScheduler = Objects.requireNonNull(maxExecTimeScheduler, "\"maxExecTimeScheduler\" can't to be null");
 		this.maxExecTime = unit.toMillis(Math.abs(maxExecTime));
 	}
-	
+
 	public long getMaxExecTime(final TimeUnit unit) {
 		return unit.convert(maxExecTime, TimeUnit.MILLISECONDS);
 	}
-
+	
 	void addTimesUp(final ProcesslauncherLifecycle toCallBack, final Process process) {
 		final ScheduledFuture<?> max_exec_time_stopper = maxExecTimeScheduler.schedule(() -> {
 			toCallBack.runningTakesTooLongTimeStopIt();
 		}, maxExecTime, TimeUnit.MILLISECONDS);
-		
+
 		process.onExit().thenRunAsync(() -> {
 			max_exec_time_stopper.cancel(false);
 		}, maxExecTimeScheduler);
 	}
-	
+
 }

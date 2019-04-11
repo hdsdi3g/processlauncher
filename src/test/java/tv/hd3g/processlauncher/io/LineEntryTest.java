@@ -66,14 +66,14 @@ public class LineEntryTest extends TestCase {
 	}
 	
 	public void testCanUseThis() {
-		Assert.assertFalse(lineEntry.canUseThis(CaptureStandardOutputStreams.ONLY_STDOUT));
-		Assert.assertTrue(lineEntry.canUseThis(CaptureStandardOutputStreams.ONLY_STDERR));
-		Assert.assertTrue(lineEntry.canUseThis(CaptureStandardOutputStreams.BOTH_STDOUT_STDERR));
+		Assert.assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
+		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
+		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
 
 		lineEntry = new LineEntry(date, line, stdErr == false, source);
 		
-		Assert.assertTrue(lineEntry.canUseThis(CaptureStandardOutputStreams.ONLY_STDOUT));
-		Assert.assertFalse(lineEntry.canUseThis(CaptureStandardOutputStreams.ONLY_STDERR));
-		Assert.assertTrue(lineEntry.canUseThis(CaptureStandardOutputStreams.BOTH_STDOUT_STDERR));
+		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
+		Assert.assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
+		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
 	}
 }

@@ -41,6 +41,12 @@
 			<version>2.26.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.3</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<organization>

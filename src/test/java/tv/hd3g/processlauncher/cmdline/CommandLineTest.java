@@ -16,51 +16,70 @@
 */
 package tv.hd3g.processlauncher.cmdline;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class CommandLineTest extends TestCase {
 	
-	public void testInjectVar() {
-		final CommandLine cmd = new CommandLine("exec -a <%var1%> <%var2%> <%varNOPE%> -b");
-		assertEquals("exec", cmd.getExecName());
-		
+	private final ExecutableFinder ef;
+	private final CommandLine cmd;
+	
+	public CommandLineTest() throws IOException {
+		ef = new ExecutableFinder();
+		cmd = new CommandLine("test-exec", "-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c", ef);
+	}
+	
+	public void testInjectVarKeepEmptyParam() {
 		final HashMap<String, String> vars = new HashMap<>();
 		vars.put("var1", "value1");
 		vars.put("var2", "value2");
 
-		assertTrue(Arrays.equals(Arrays.asList("exec", "-a", "value1", "value2", "-b").toArray(), cmd.getParametersInjectVars(vars, true).toArray()));
-		
-		assertTrue(Arrays.equals(Arrays.asList("exec", "-a").toArray(), new CommandLine("exec -a <%varNOPE%>").getParametersRemoveVars(false).toArray()));
-		assertTrue(Arrays.equals(Arrays.asList("exec", "-b").toArray(), new CommandLine("exec -a <%varNOPE%> -b").getParametersInjectVars(new HashMap<>(), true).toArray()));
+		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-a", "value1", "value2", "-b", "-c"), cmd.getParametersInjectVars(vars, false)));
 	}
 	
-	/* TODO not here
-	public void testExecProcess() throws IOException {
-		final CommandLine pcl = new CommandLine("java -a 1 -b 2");
-	
-		final ExecProcess ep1 = new ExecProcess(pcl, ExecProcessTest.executable_finder);
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-b", "2").toArray(), ep1.getParameters().toArray()));
-	
-		final ExecProcessText ep2 = new ExecProcessText(pcl, ExecProcessTest.executable_finder);
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-b", "2").toArray(), ep2.getParameters().toArray()));
+	public void testRemoveVarsKeepEmptyParam() {
+		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-a", "-b", "-c"), cmd.getParametersRemoveVars(false)));
+	}
+
+	public void testInjectVarRemoveEmptyParam() {
+		final HashMap<String, String> vars = new HashMap<>();
+		vars.put("var1", "value1");
+		vars.put("var2", "value2");
+		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-a", "value1", "value2", "-c"), cmd.getParametersInjectVars(vars, true)));
 	}
 	
+	public void testRemoveVarsRemoveEmptyParam() {
+		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-c"), cmd.getParametersRemoveVars(true)));
+	}
+	
+	public void testGetExecutableFinder() {
+		Assert.assertEquals(ef, cmd.getExecutableFinder().get());
+	}
+
+	public void testGetExecutable() throws FileNotFoundException {
+		Assert.assertEquals(ef.get("test-exec"), cmd.getExecutable());
+	}
+
 	public void testInjectParamsAroundVariable() throws IOException {
-		CommandLine cl = new CommandLineProcessor().createCommandLine("exec -before <%myvar%> -after");
+		CommandLine cl = new CommandLine("test-exec", "-before <%myvar%> -after", ef);
+		
 		cl.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		assertEquals("exec -before -addedbefore 1 <%myvar%> -addedafter 2 -after", cl.toString());
-	
-		cl = new CommandLineProcessor().createCommandLine("exec -before <%myvar%> <%myvar%> -after");
+		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -after", cl.getParametersToString());
+		
+		cl = new CommandLine("test-exec", "-before <%myvar%> <%myvar%> -after", ef);
 		cl.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		assertEquals("exec -before -addedbefore 1 <%myvar%> -addedafter 2 -addedbefore 1 <%myvar%> -addedafter 2 -after", cl.toString());
-	
-		cl = new CommandLineProcessor().createCommandLine("exec -before <%myvar1%> <%myvar2%> -after");
+		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -addedbefore 1 <%myvar%> -addedafter 2 -after", cl.getParametersToString());
+		
+		cl = new CommandLine("test-exec", "-before <%myvar1%> <%myvar2%> -after", ef);
 		cl.injectParamsAroundVariable("myvar1", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
 		cl.injectParamsAroundVariable("myvar2", Arrays.asList("-addedbefore", "3"), Arrays.asList("-addedafter", "4"));
-		assertEquals("exec -before -addedbefore 1 <%myvar1%> -addedafter 2 -addedbefore 3 <%myvar2%> -addedafter 4 -after", cl.toString());
+		Assert.assertEquals("-before -addedbefore 1 <%myvar1%> -addedafter 2 -addedbefore 3 <%myvar2%> -addedafter 4 -after", cl.getParametersToString());
 	}
-	*/
 }

@@ -30,27 +30,27 @@ import org.apache.logging.log4j.Logger;
 
 import tv.hd3g.processlauncher.io.StdInInjection;
 
-public class ProcesslauncherLifecycle {
+public class ProcesslauncherLifecycle { // TODO test
 	private static Logger log = LogManager.getLogger();
-
+	
 	private final Processlauncher launcher;
 	private final Process process;
 	private final Thread shutdown_hook;
 	private final String fullCommandLine;
-	
+
 	private volatile boolean process_was_killed;
 	private volatile boolean process_was_stopped_because_too_long_time;
 	private volatile long endDate;
 	private StdInInjection std_in_injection;
-	
+
 	ProcesslauncherLifecycle(final Processlauncher launcher) throws IOException {
 		this.launcher = launcher;
 		process_was_killed = false;
 		process_was_stopped_because_too_long_time = false;
 		fullCommandLine = launcher.getFullCommandLine();
-		
+
 		final ProcessBuilder pBuilder = launcher.getProcessBuilder();
-		
+
 		final Optional<ExternalProcessStartup> externalProcessStartup = launcher.getExternalProcessStartup();
 		if (externalProcessStartup.isPresent()) {
 			process = externalProcessStartup.get().startProcess(pBuilder);
@@ -59,7 +59,7 @@ public class ProcesslauncherLifecycle {
 			process = pBuilder.start();
 			log.info("Start process #" + process.pid() + " " + fullCommandLine);
 		}
-		
+
 		shutdown_hook = new Thread(() -> {
 			log.warn("Try to kill " + toString());
 			killProcessTree(process);
@@ -68,21 +68,21 @@ public class ProcesslauncherLifecycle {
 		shutdown_hook.setPriority(Thread.MAX_PRIORITY);
 		shutdown_hook.setName("ShutdownHook for " + toString());
 		Runtime.getRuntime().addShutdownHook(shutdown_hook);
-		
+
 		launcher.getExecutionTimeLimiter().ifPresent(etl -> {
 			etl.addTimesUp(this, process);
 		});
-		
+
 		final List<ExecutionCallbacker> executionCallbackers = launcher.getExecutionCallbackers();
 		executionCallbackers.forEach(ec -> {
 			ec.postStartupExecution(this);
 		});
-		
+
 		launcher.getCaptureStandardOutput().ifPresent(cso -> {
 			cso.stdOutStreamConsumer(process.getInputStream(), this);
 			cso.stdErrStreamConsumer(process.getErrorStream(), this);
 		});
-		
+
 		process.onExit().thenRun(() -> {
 			endDate = System.currentTimeMillis();
 			Runtime.getRuntime().removeShutdownHook(shutdown_hook);
@@ -92,7 +92,7 @@ public class ProcesslauncherLifecycle {
 			});
 		});
 	}
-
+	
 	@Override
 	public String toString() {
 		if (process.isAlive()) {
@@ -101,7 +101,7 @@ public class ProcesslauncherLifecycle {
 			return "Exec " + getEndStatus() + " " + fullCommandLine;
 		}
 	}
-	
+
 	private static String processHandleToString(final ProcessHandle process_handle, final boolean verbose) {
 		if (verbose) {
 			return process_handle.info().command().orElse("<?>") + " #" + process_handle.pid() + " by " + process_handle.info().user().orElse("<?>") + " since " + process_handle.info().totalCpuDuration().orElse(Duration.ZERO).getSeconds() + " sec";
@@ -109,7 +109,7 @@ public class ProcesslauncherLifecycle {
 			return process_handle.info().commandLine().orElse("<?>") + " #" + process_handle.pid();
 		}
 	}
-	
+
 	/**
 	 * Blocking
 	 */
@@ -117,7 +117,7 @@ public class ProcesslauncherLifecycle {
 		if (process.isAlive() == false) {
 			return;
 		}
-		
+
 		log.debug("Internal kill " + toString());
 		final List<ProcessHandle> cant_kill = process.descendants().filter(process_handle -> {
 			return process_handle.isAlive();
@@ -136,7 +136,7 @@ public class ProcesslauncherLifecycle {
 			}
 			return process_handle.destroyForcibly() == false;
 		}).collect(Collectors.toUnmodifiableList());
-
+		
 		if (process.isAlive()) {
 			log.info("Close manually process " + processHandleToString(process.toHandle(), true));
 			if (process.toHandle().destroy() == false) {
@@ -146,7 +146,7 @@ public class ProcesslauncherLifecycle {
 				}
 			}
 		}
-
+		
 		if (cant_kill.isEmpty() == false) {
 			cant_kill.forEach(process_handle -> {
 				log.error("Can't force close process " + processHandleToString(process_handle, true));
@@ -154,15 +154,15 @@ public class ProcesslauncherLifecycle {
 			throw new RuntimeException("Can't close process " + toString() + " for PID " + cant_kill.stream().map(p -> p.pid()).map(pid -> String.valueOf(pid)).collect(Collectors.joining(", ")));
 		}
 	}
-
+	
 	public Processlauncher getLauncher() {
 		return launcher;
 	}
-
+	
 	public Process getProcess() {
 		return process;
 	}
-
+	
 	public EndStatus getEndStatus() {
 		if (process.isAlive()) {
 			return EndStatus.NOT_YET_DONE;
@@ -175,41 +175,41 @@ public class ProcesslauncherLifecycle {
 		}
 		return EndStatus.CORRECTLY_DONE;
 	}
-
+	
 	public boolean isCorrectlyDone() {
 		return getEndStatus().equals(EndStatus.CORRECTLY_DONE);
 	}
-
+	
 	public Integer getExitCode() {
 		return process.exitValue();
 	}
-
+	
 	public long getStartDate() {
 		return process.info().startInstant().orElse(Instant.EPOCH).toEpochMilli();
 	}
-
+	
 	public long getEndDate() {
 		return endDate;
 	}
-	
+
 	public long getUptime(final TimeUnit unit) {
 		if (endDate > 0l) {
 			return unit.convert(endDate - getStartDate(), TimeUnit.MILLISECONDS);
 		}
 		return unit.convert(System.currentTimeMillis() - getStartDate(), TimeUnit.MILLISECONDS);
 	}
-
+	
 	public long getCPUDuration(final TimeUnit unit) {
 		return unit.convert(process.info().totalCpuDuration().orElse(Duration.ZERO).toMillis(), TimeUnit.MILLISECONDS);
 	}
-
+	
 	/**
 	 * on Windows, return like "HOST_or_DOMAIN"\"username"
 	 */
 	public Optional<String> getUserExec() {
 		return process.info().user();
 	}
-
+	
 	public Optional<Long> getPID() {
 		try {
 			return Optional.of(process.pid());
@@ -217,31 +217,31 @@ public class ProcesslauncherLifecycle {
 			return Optional.empty();
 		}
 	}
-	
+
 	public Boolean isRunning() {
 		return process.isAlive();
 	}
-
+	
 	public boolean isKilled() {
 		return process_was_killed;
 	}
-	
+
 	public boolean isTooLongTime() {
 		return process_was_stopped_because_too_long_time;
 	}
-	
+
 	ProcesslauncherLifecycle runningTakesTooLongTimeStopIt() {
 		process_was_stopped_because_too_long_time = true;
 		killProcessTree(process);
 		return this;
 	}
-	
+
 	public ProcesslauncherLifecycle kill() {
 		process_was_killed = true;
 		killProcessTree(process);
 		return this;
 	}
-	
+
 	public ProcesslauncherLifecycle waitForEnd() {
 		try {
 			process.waitFor();
@@ -250,7 +250,7 @@ public class ProcesslauncherLifecycle {
 		}
 		return this;
 	}
-
+	
 	public ProcesslauncherLifecycle waitForEnd(final long timeout, final TimeUnit unit) {
 		try {
 			process.waitFor(timeout, unit);
@@ -259,7 +259,7 @@ public class ProcesslauncherLifecycle {
 		}
 		return this;
 	}
-
+	
 	/**
 	 * waitForEnd and checks isCorrectlyDone
 	 */
@@ -270,12 +270,12 @@ public class ProcesslauncherLifecycle {
 		}
 		return this;
 	}
-	
+
 	public synchronized StdInInjection getStdInInjection() {
 		if (std_in_injection == null) {
 			std_in_injection = new StdInInjection(process.getOutputStream());
 		}
 		return std_in_injection;
 	}
-
+	
 }
