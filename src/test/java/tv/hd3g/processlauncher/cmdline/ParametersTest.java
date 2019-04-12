@@ -19,10 +19,10 @@ package tv.hd3g.processlauncher.cmdline;
 import junit.framework.TestCase;
 
 public class ParametersTest extends TestCase {
-	
+
 	public void test() {
 		Parameters clp = new Parameters();
-
+		
 		assertEquals("<%", clp.getStartVarTag());
 		assertEquals("%>", clp.getEndVarTag());
 		assertTrue(clp.isTaggedParameter("<%ok%>"));
@@ -33,8 +33,8 @@ public class ParametersTest extends TestCase {
 		assertFalse(clp.isTaggedParameter("%>nope<%"));
 		assertFalse(clp.isTaggedParameter("<%nope %>"));
 		assertEquals("my_var", clp.extractVarNameFromTaggedParameter("<%my_var%>"));
-
-		clp = new Parameters("{", "}");
+		
+		clp = new Parameters().setVarTags("{", "}");
 		assertEquals("{", clp.getStartVarTag());
 		assertEquals("}", clp.getEndVarTag());
 		assertTrue(clp.isTaggedParameter("{ok}"));
@@ -44,7 +44,7 @@ public class ParametersTest extends TestCase {
 		assertFalse(clp.isTaggedParameter("nope"));
 		assertFalse(clp.isTaggedParameter("}nope{"));
 		assertEquals("my_var", clp.extractVarNameFromTaggedParameter("{my_var}"));
-
+		
 		clp = new Parameters();
 		assertNull(clp.extractVarNameFromTaggedParameter("<%%>"));
 		assertNull(clp.extractVarNameFromTaggedParameter("<%"));

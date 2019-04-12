@@ -237,6 +237,9 @@ public class ProcesslauncherLifecycle { // TODO test
 	}
 
 	public ProcesslauncherLifecycle kill() {
+		if (process.isAlive() == false) {
+			return this;
+		}
 		process_was_killed = true;
 		killProcessTree(process);
 		return this;

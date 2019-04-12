@@ -16,6 +16,7 @@
 */
 package tv.hd3g.processlauncher.cmdline;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -32,11 +33,6 @@ public class Parameters extends SimpleParameters {
 		setVarTags("<%", "%>");
 	}
 
-	public Parameters(final String start_var_tag, final String end_var_tag) {
-		super();
-		setVarTags(start_var_tag, end_var_tag);
-	}
-	
 	/**
 	 * Use "<%" and "%>" by default
 	 */
@@ -44,7 +40,20 @@ public class Parameters extends SimpleParameters {
 		super(bulk_parameters);
 		setVarTags("<%", "%>");
 	}
-	
+
+	/**
+	 * Use "<%" and "%>" by default
+	 */
+	public Parameters(final String... bulk_parameters) {
+		super();
+		setVarTags("<%", "%>");
+		
+		Objects.requireNonNull(bulk_parameters, "\"bulk_parameters\" can't to be null");
+		Arrays.stream(bulk_parameters).filter(p -> {
+			return p != null;
+		}).forEach(bulk_parameter -> super.addBulkParameters(bulk_parameter));
+	}
+
 	/**
 	 * Use "<%" and "%>" by default
 	 */
@@ -53,17 +62,7 @@ public class Parameters extends SimpleParameters {
 		setVarTags("<%", "%>");
 	}
 	
-	public Parameters(final String bulk_parameters, final String start_var_tag, final String end_var_tag) {
-		super(bulk_parameters);
-		setVarTags(start_var_tag, end_var_tag);
-	}
-	
-	public Parameters(final Collection<String> parameters, final String start_var_tag, final String end_var_tag) {
-		super(parameters);
-		setVarTags(start_var_tag, end_var_tag);
-	}
-	
-	private void setVarTags(final String start_var_tag, final String end_var_tag) {
+	public Parameters setVarTags(final String start_var_tag, final String end_var_tag) {
 		startVarTag = Objects.requireNonNull(start_var_tag, "\"start_var_tag\" can't to be null");
 		if (start_var_tag.isEmpty()) {
 			throw new NullPointerException("\"start_var_tag\" can't to be empty");
@@ -72,6 +71,7 @@ public class Parameters extends SimpleParameters {
 		if (end_var_tag.isEmpty()) {
 			throw new NullPointerException("\"end_var_tag\" can't to be empty");
 		}
+		return this;
 	}
 	
 	/**

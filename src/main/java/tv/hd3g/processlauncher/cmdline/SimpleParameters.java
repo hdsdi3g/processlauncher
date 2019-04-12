@@ -165,9 +165,9 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @param params OR link
+	 * @param params (anyMatch) ; params can have "-" or not (it will be added).
 	 */
-	public boolean hasParameters(final String... params) {// TODO test
+	public boolean hasParameters(final String... params) {
 		Objects.requireNonNull(params, "\"params\" can't to be null");
 
 		return Arrays.stream(params).filter(p -> {
@@ -179,9 +179,9 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @param in_parameters OR link
+	 * @see SimpleParameters#hasParameters()
 	 */
-	public SimpleParameters ifHasNotParameter(final Runnable to_do_if_missing, final String... in_parameters) {// TODO test
+	public SimpleParameters ifHasNotParameter(final Runnable to_do_if_missing, final String... in_parameters) {
 		Objects.requireNonNull(to_do_if_missing, "\"to_do_if_missing\" can't to be null");
 		if (hasParameters(in_parameters) == false) {
 			to_do_if_missing.run();

@@ -48,7 +48,15 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		pb.setEnvironmentVar("foo", "bar");
 		Assert.assertEquals("bar", pb.getEnvironmentVar("foo"));
 	}
-	
+
+	public void testGetSetEnvironmentVarWinPath() {
+		if (System.getProperty("os.name").toLowerCase().indexOf("win") > -1) {
+			pb.setEnvironmentVar("path", "foo");
+			Assert.assertEquals("foo", pb.getEnvironmentVar("Path"));
+			Assert.assertEquals("foo", pb.getEnvironmentVar("PATH"));
+		}
+	}
+
 	public void testSetEnvironmentVarIfNotFound() {
 		pb.setEnvironmentVarIfNotFound("foo", "bar");
 		pb.setEnvironmentVarIfNotFound("foo", "tot");
@@ -71,6 +79,17 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		Assert.assertTrue(pb.getWorkingDirectory().exists() && pb.getWorkingDirectory().isDirectory());
 		pb.setWorkingDirectory(new File("."));
 		Assert.assertEquals(new File("."), pb.getWorkingDirectory());
+		
+		try {
+			pb.setWorkingDirectory(new File("./DontExists"));
+			Assert.fail();
+		} catch (final IOException e) {
+		}
+		try {
+			pb.setWorkingDirectory(execFile);
+			Assert.fail();
+		} catch (final IOException e) {
+		}
 	}
 	
 	public void testSetIsExecCodeMustBeZero() {
