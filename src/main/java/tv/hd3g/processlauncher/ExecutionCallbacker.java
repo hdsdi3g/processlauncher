@@ -17,7 +17,7 @@
 package tv.hd3g.processlauncher;
 
 public interface ExecutionCallbacker {
-	
+
 	default void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
 	}
 

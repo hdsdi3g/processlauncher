@@ -25,5 +25,5 @@ public interface ExternalProcessStartup {
 
 	default void onEndProcess(final ProcesslauncherLifecycle processlauncherLifecycle) {
 	}
-	
+
 }

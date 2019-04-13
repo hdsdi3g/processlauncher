@@ -20,9 +20,9 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class ParameterArgTest extends TestCase {
-	
+
 	private ParameterArg pArg;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		pArg = new ParameterArg(true);
@@ -30,15 +30,15 @@ public class ParameterArgTest extends TestCase {
 		pArg.add('b');
 		pArg.add('c');
 	}
-	
+
 	public void testToString() {
 		Assert.assertEquals("abc", pArg.toString());
 	}
-	
+
 	public void testIsInQuotes() {
 		Assert.assertTrue(pArg.isInQuotes());
 	}
-	
+
 	public void testIsEmpty() {
 		Assert.assertFalse(pArg.isEmpty());
 	}

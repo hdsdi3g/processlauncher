@@ -22,13 +22,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObserver {
-	
+
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
-	
+
 	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
 		this.streamToKeep = Objects.requireNonNull(streamToKeep, "\"streamToKeep\" can't to be null");
 		lineEntries = new LinkedBlockingQueue<>();
+	}
+
+	public CapturedStdOutErrTextRetention() {// TODO replace tests call by that
+		this(CapturedStreams.BOTH_STDOUT_STDERR);
 	}
 
 	@Override
@@ -54,7 +58,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 			return le.getLine();
 		});
 	}
-	
+
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty stream.
 	 * @param keep_empty_lines if set false, discard all empty trimed lines
@@ -71,7 +75,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 			return le.getLine();
 		});
 	}
-	
+
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty stream.
 	 * @param keep_empty_lines if set false, discard all empty trimed lines
@@ -86,7 +90,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 			return le.getLine();
 		});
 	}
-	
+
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty text.
 	 * @param keep_empty_lines if set false, discard all empty trimed lines
@@ -96,7 +100,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 	public String getStdout(final boolean keep_empty_lines, final String new_line_separator) {
 		return getStdoutLines(keep_empty_lines).collect(Collectors.joining(new_line_separator));
 	}
-	
+
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty text.
 	 * @param keep_empty_lines if set false, discard all empty trimed lines
@@ -106,7 +110,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 	public String getStderr(final boolean keep_empty_lines, final String new_line_separator) {
 		return getStderrLines(keep_empty_lines).collect(Collectors.joining(new_line_separator));
 	}
-	
+
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty text.
 	 * @param keep_empty_lines if set false, discard all empty trimed lines
@@ -116,5 +120,5 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 	public String getStdouterr(final boolean keep_empty_lines, final String new_line_separator) {
 		return getStdouterrLines(keep_empty_lines).collect(Collectors.joining(new_line_separator));
 	}
-	
+
 }

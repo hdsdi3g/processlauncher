@@ -36,12 +36,12 @@ import junit.framework.TestCase;
 public class ExecutionTimeLimiterTest extends TestCase {
 
 	public void test() {
-		
+
 		final FakesScheduledExecutorService fakeSES = new FakesScheduledExecutorService();
 		final ExecutionTimeLimiter etl = new ExecutionTimeLimiter(1, TimeUnit.SECONDS, fakeSES);
-		
+
 		Assert.assertEquals(1000, etl.getMaxExecTime(TimeUnit.MILLISECONDS));
-		
+
 		final ProcesslauncherLifecycle toCallBack = Mockito.mock(ProcesslauncherLifecycle.class);
 		final Process process = Mockito.mock(Process.class);
 		Mockito.when(process.onExit()).thenReturn(CompletableFuture.completedFuture(null));
@@ -57,41 +57,41 @@ public class ExecutionTimeLimiterTest extends TestCase {
 	@SuppressWarnings("rawtypes")
 	static class ReturnedScheduledFuture implements ScheduledFuture {
 		private boolean hasCancel;
-		
+
 		ReturnedScheduledFuture() {
 			hasCancel = false;
 		}
-		
+
 		@Override
 		public long getDelay(final TimeUnit unit) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public int compareTo(final Delayed o) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public boolean cancel(final boolean mayInterruptIfRunning) {
 			return hasCancel = true;
 		}
-		
+
 		@Override
 		public boolean isCancelled() {
 			return hasCancel;
 		}
-		
+
 		@Override
 		public boolean isDone() {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public Object get() throws InterruptedException, ExecutionException {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public Object get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 			throw new UnsupportedOperationException();
@@ -99,11 +99,11 @@ public class ExecutionTimeLimiterTest extends TestCase {
 	}
 
 	static class FakesScheduledExecutorService implements ScheduledExecutorService {
-		
+
 		private long delay;
 		private TimeUnit unit;
 		private ReturnedScheduledFuture returned;
-		
+
 		@Override
 		public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit) {
 			command.run();

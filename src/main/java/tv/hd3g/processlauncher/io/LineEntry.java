@@ -24,7 +24,7 @@ public class LineEntry {
 	private final String line;
 	private final boolean stdErr;
 	private final ProcesslauncherLifecycle source;
-	
+
 	public LineEntry(final long date, final String line, final boolean stdErr, final ProcesslauncherLifecycle source) {
 		this.line = line;
 		this.stdErr = stdErr;

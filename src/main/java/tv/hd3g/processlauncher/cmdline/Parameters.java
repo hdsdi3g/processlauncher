@@ -47,7 +47,7 @@ public class Parameters extends SimpleParameters {
 	public Parameters(final String... bulk_parameters) {
 		super();
 		setVarTags("<%", "%>");
-		
+
 		Objects.requireNonNull(bulk_parameters, "\"bulk_parameters\" can't to be null");
 		Arrays.stream(bulk_parameters).filter(p -> {
 			return p != null;
@@ -61,7 +61,7 @@ public class Parameters extends SimpleParameters {
 		super(parameters);
 		setVarTags("<%", "%>");
 	}
-	
+
 	public Parameters setVarTags(final String start_var_tag, final String end_var_tag) {
 		startVarTag = Objects.requireNonNull(start_var_tag, "\"start_var_tag\" can't to be null");
 		if (start_var_tag.isEmpty()) {
@@ -73,14 +73,14 @@ public class Parameters extends SimpleParameters {
 		}
 		return this;
 	}
-	
+
 	/**
 	 * @return like "%>"
 	 */
 	public String getEndVarTag() {
 		return endVarTag;
 	}
-	
+
 	/**
 	 * @return like "<%"
 	 */
@@ -123,12 +123,12 @@ public class Parameters extends SimpleParameters {
 		addParameters(startVarTag + var_name + endVarTag);
 		return var_name;
 	}
-	
+
 	@Override
 	public Parameters clone() {
 		final Parameters new_instance = new Parameters(startVarTag, endVarTag);
 		new_instance.importParametersFrom(this);
 		return new_instance;
 	}
-	
+
 }

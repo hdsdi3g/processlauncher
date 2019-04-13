@@ -28,9 +28,7 @@ import java.util.function.Consumer;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.io.CaptureStandardOutputText;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
-import tv.hd3g.processlauncher.io.CapturedStreams;
 
 /**
  * Shortcut for alls classes
@@ -42,14 +40,14 @@ public class Exec {// TODO test
 	private final Parameters parameters;
 	private final Map<String, String> varsToInject;
 	private boolean removeParamsIfNoVarToInject;
-	
+
 	public Exec(final String execName, final ExecutableFinder executableFinder) {
 		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
 		parameters = new Parameters();
 		varsToInject = new HashMap<>();
 	}
-	
+
 	public Map<String, String> getVarsToInject() {
 		return varsToInject;
 	}
@@ -62,11 +60,11 @@ public class Exec {// TODO test
 	public boolean isRemoveParamsIfNoVarToInject() {
 		return removeParamsIfNoVarToInject;
 	}
-	
+
 	public Parameters getParameters() {
 		return parameters;
 	}
-	
+
 	/**
 	 * Blocking
 	 */
@@ -74,11 +72,11 @@ public class Exec {// TODO test
 		final CommandLine commandLine = new CommandLine(execName, parameters, executableFinder);
 		final List<String> params = commandLine.getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
 		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(commandLine.getExecutable(), params, executableFinder);
-		
+
 		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
-		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention(CapturedStreams.BOTH_STDOUT_STDERR);
-		builder.setCaptureStandardOutput(new CaptureStandardOutputText(outStreamWatcher, textRetention));
-		
+		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
+		builder.setCaptureStandardOutput(outStreamWatcher, textRetention);
+
 		beforeRun.accept(builder);
 		builder.addExecutionCallbacker(new ExecutionCallbacker() {
 			@Override
@@ -86,12 +84,10 @@ public class Exec {// TODO test
 				outStreamWatcher.shutdown();
 			}
 		});
-		
-		final Processlauncher processlauncher = new Processlauncher(builder);
-		final ProcesslauncherLifecycle processlauncherLifecycle = new ProcesslauncherLifecycle(processlauncher);
-		processlauncherLifecycle.checkExecution();
-		
+
+		builder.start().checkExecution();
+
 		return textRetention;
 	}
-	
+
 }

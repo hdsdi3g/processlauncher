@@ -31,10 +31,10 @@ import org.apache.logging.log4j.Logger;
 
 class SimpleParameters {
 	private static Logger log = LogManager.getLogger();
-	
+
 	private static final Character QUOTE = '"';
 	private static final Character SPACE = ' ';
-	
+
 	private final List<String> parameters;
 	private String parameter_keys_starts_with = "-";
 
@@ -80,82 +80,82 @@ class SimpleParameters {
 	}
 
 	private final Function<String, Stream<ParameterArg>> filterAnTransformParameter = p -> {
-		/**
-		 * Split >-a -b "c d" e< to [-a, -b, c d, e]
-		 */
-		return p.trim().chars().mapToObj(i -> (char) i).reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
-			if (list.isEmpty()) {
-				/**
-				 * First entry
-				 */
-				if (chr == QUOTE) {
-					/**
-					 * Start quote zone
-					 */
-					list.add(new ParameterArg(true));
-				} else if (chr == SPACE) {
-					/**
-					 * Trailing space > ignore it
-					 */
-				} else {
-					/**
-					 * Start first "classic" ParameterArg
-					 */
-					list.add(new ParameterArg(false).add(chr));
-				}
-			} else {
-				/**
-				 * Get current entry
-				 */
-				final int last_pos = list.size() - 1;
-				final ParameterArg last_entry = list.get(last_pos);
+	    /**
+	     * Split >-a -b "c d" e< to [-a, -b, c d, e]
+	     */
+	    return p.trim().chars().mapToObj(i -> (char) i).reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
+		    if (list.isEmpty()) {
+			    /**
+			     * First entry
+			     */
+			    if (chr == QUOTE) {
+				    /**
+				     * Start quote zone
+				     */
+				    list.add(new ParameterArg(true));
+			    } else if (chr == SPACE) {
+				    /**
+				     * Trailing space > ignore it
+				     */
+			    } else {
+				    /**
+				     * Start first "classic" ParameterArg
+				     */
+				    list.add(new ParameterArg(false).add(chr));
+			    }
+		    } else {
+			    /**
+			     * Get current entry
+			     */
+			    final int last_pos = list.size() - 1;
+			    final ParameterArg last_entry = list.get(last_pos);
 
-				if (chr == QUOTE) {
-					if (last_entry.isInQuotes()) {
-						/**
-						 * Switch off quote zone
-						 */
-						list.add(new ParameterArg(false));
-					} else {
-						/**
-						 * Switch on quote zone
-						 */
-						if (last_entry.isEmpty()) {
-							/**
-							 * Remove previous empty ParameterArg
-							 */
-							list.remove(last_pos);
-						}
-						list.add(new ParameterArg(true));
-					}
-				} else if (chr == SPACE) {
-					if (last_entry.isInQuotes()) {
-						/**
-						 * Add space in quotes
-						 */
-						last_entry.add(chr);
-					} else {
-						if (last_entry.isEmpty() == false) {
-							/**
-							 * New space -> new ParameterArg (and ignore space)
-							 */
-							list.add(new ParameterArg(false));
-						} else {
-							/**
-							 * Space between ParameterArgs > ignore it
-							 */
-						}
-					}
-				} else {
-					last_entry.add(chr);
-				}
-			}
-			return list;
-		}, (list1, list2) -> {
-			final ArrayList<ParameterArg> ParameterArgs = new ArrayList<>(list1);
-			ParameterArgs.addAll(list2);
-			return ParameterArgs;
-		}).stream();
+			    if (chr == QUOTE) {
+				    if (last_entry.isInQuotes()) {
+					    /**
+					     * Switch off quote zone
+					     */
+					    list.add(new ParameterArg(false));
+				    } else {
+					    /**
+					     * Switch on quote zone
+					     */
+					    if (last_entry.isEmpty()) {
+						    /**
+						     * Remove previous empty ParameterArg
+						     */
+						    list.remove(last_pos);
+					    }
+					    list.add(new ParameterArg(true));
+				    }
+			    } else if (chr == SPACE) {
+				    if (last_entry.isInQuotes()) {
+					    /**
+					     * Add space in quotes
+					     */
+					    last_entry.add(chr);
+				    } else {
+					    if (last_entry.isEmpty() == false) {
+						    /**
+						     * New space -> new ParameterArg (and ignore space)
+						     */
+						    list.add(new ParameterArg(false));
+					    } else {
+						    /**
+						     * Space between ParameterArgs > ignore it
+						     */
+					    }
+				    }
+			    } else {
+				    last_entry.add(chr);
+			    }
+		    }
+		    return list;
+	    }, (list1, list2) -> {
+		    final ArrayList<ParameterArg> ParameterArgs = new ArrayList<>(list1);
+		    ParameterArgs.addAll(list2);
+		    return ParameterArgs;
+	    }).stream();
 	};
 
 	public SimpleParameters clear() {
@@ -416,5 +416,5 @@ class SimpleParameters {
 
 		return false;
 	}
-	
+
 }

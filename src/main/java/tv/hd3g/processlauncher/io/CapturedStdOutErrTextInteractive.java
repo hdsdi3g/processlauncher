@@ -30,12 +30,12 @@ import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextObserver {
 	private static Logger log = LogManager.getLogger();
-	
+
 	private final Function<LineEntry, String> interactive;
 	private final BiConsumer<ProcesslauncherLifecycle, Boolean> onDone;
 	private final Charset destCharset;
 	private final Executor eventExecutor;
-	
+
 	/**
 	 * @param interactive function return null if nothing to send.
 	 * @param onDone -> source, isStdErr
@@ -71,7 +71,7 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 		eventExecutor.execute(() -> {
 			final String result = interactive.apply(lineEntry);
 			final ProcesslauncherLifecycle source = lineEntry.getSource();
-			
+
 			if (result != null & source.isRunning()) {
 				try {
 					source.getStdInInjection().println(result, destCharset);
@@ -81,12 +81,12 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 			}
 		});
 	}
-	
+
 	@Override
 	public void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr) {
 		eventExecutor.execute(() -> {
 			onDone.accept(source, isStdErr);
 		});
 	}
-	
+
 }

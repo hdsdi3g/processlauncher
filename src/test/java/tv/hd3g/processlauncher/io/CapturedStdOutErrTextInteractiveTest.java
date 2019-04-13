@@ -30,7 +30,7 @@ import junit.framework.TestCase;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class CapturedStdOutErrTextInteractiveTest extends TestCase {
-	
+
 	public void test() throws Exception {
 		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
 		Mockito.when(source.isRunning()).thenReturn(true);
@@ -61,7 +61,7 @@ public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 		final LineEntry added = new LineEntry(0, "My text", true, source);
 		csoeti.onText(added);
 		csoeti.onProcessCloseStream(source, true);
-		
+
 		Assert.assertEquals(1, capturedLe.size());
 		Assert.assertEquals(added, capturedLe.get(0));
 		Assert.assertEquals(1, done.get());

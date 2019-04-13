@@ -21,17 +21,17 @@ import java.io.InputStream;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public interface CaptureStandardOutput {
-	
+
 	/**
 	 * Called one time juste after process starts.
 	 * @param processInputStream consuming should be in another and dedicated thread.
 	 */
 	void stdOutStreamConsumer(InputStream processInputStream, ProcesslauncherLifecycle source);
-	
+
 	/**
 	 * Called one time juste after process starts.
 	 * @param processInputStream consuming should be in another and dedicated thread.
 	 */
 	void stdErrStreamConsumer(InputStream processInputStream, ProcesslauncherLifecycle source);
-	
+
 }

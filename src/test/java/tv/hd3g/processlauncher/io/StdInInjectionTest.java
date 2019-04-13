@@ -44,5 +44,5 @@ public class StdInInjectionTest extends TestCase {
 
 		assertTrue(Arrays.equals(("test !" + StdInInjection.LINESEPARATOR).getBytes(StandardCharsets.UTF_8), result));
 	}
-	
+
 }

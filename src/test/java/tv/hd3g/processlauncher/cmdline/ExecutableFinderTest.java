@@ -22,17 +22,17 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 public class ExecutableFinderTest extends TestCase {
-	
+
 	public void testPreCheck() throws IOException {
 		assertEquals("\\", "/".replaceAll("/", "\\\\"));
 		assertEquals("/", "\\".replaceAll("\\\\", "/"));
 	}
-	
+
 	public void test() throws IOException {
 		final ExecutableFinder ef = new ExecutableFinder();
-		
+
 		assertTrue(ef.getFullPath().contains(new File(System.getProperty("user.dir"))));
-		
+
 		final File exec = ef.get("test-exec");
 		if (File.separator.equals("/")) {
 			assertEquals("test-exec", exec.getName());
@@ -40,17 +40,17 @@ public class ExecutableFinderTest extends TestCase {
 			assertEquals("test-exec.bat", exec.getName());
 		}
 	}
-	
+
 	public void testRegisterExecutable() throws IOException {
 		ExecutableFinder ef = new ExecutableFinder();
-		
+
 		final File element = ef.get("test-exec");
-		
+
 		ef = new ExecutableFinder();
 		ef.registerExecutable("other-test", element);
-		
+
 		assertEquals(element.getPath(), ef.get("other-test").getPath());
-		
+
 		ef.get("java");
 		ef.registerExecutable("java", element);
 		assertEquals(element.getPath(), ef.get("java").getPath());

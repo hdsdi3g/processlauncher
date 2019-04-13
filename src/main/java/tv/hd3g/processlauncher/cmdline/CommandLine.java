@@ -38,7 +38,7 @@ public class CommandLine {
 	private final File executable;
 	private final ExecutableFinder executableFinder;
 	private final Parameters parameters;
-	
+
 	public CommandLine(final File executable, final Parameters parameters) throws IOException {
 		this.executable = executable;
 		if (executable.isFile() == false | executable.exists() == false) {
@@ -47,7 +47,7 @@ public class CommandLine {
 			throw new IOException("Can't execute " + executable);
 		}
 		executableFinder = null;
-		
+
 		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null").clone();
 	}
 
@@ -82,9 +82,9 @@ public class CommandLine {
 		Objects.requireNonNull(varName, "\"varName\" can't to be null");
 		Objects.requireNonNull(addBefore, "\"addBefore\" can't to be null");
 		Objects.requireNonNull(addAfter, "\"addAfter\" can't to be null");
-		
+
 		final AtomicBoolean isDone = new AtomicBoolean(false);
-		
+
 		final List<String> newParameters = parameters.getParameters().stream().reduce(Collections.unmodifiableList(new ArrayList<String>()), (list, arg) -> {
 			if (parameters.isTaggedParameter(arg)) {
 				final String currentVarName = parameters.extractVarNameFromTaggedParameter(arg);
@@ -93,13 +93,13 @@ public class CommandLine {
 					return Stream.concat(list.stream(), Stream.concat(Stream.concat(addBefore.stream(), Stream.of(arg)), addAfter.stream())).collect(Collectors.toUnmodifiableList());
 				}
 			}
-			
+
 			return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors.toUnmodifiableList());
 		}, LIST_COMBINER);
-		
+
 		parameters.getParameters().clear();
 		parameters.getParameters().addAll(newParameters);
-		
+
 		return isDone.get();
 	}
 
@@ -107,19 +107,19 @@ public class CommandLine {
 	public String toString() {
 		return executable.getPath() + " " + parameters.toString();
 	}
-	
+
 	String getParametersToString() {
 		return parameters.toString();
 	}
-	
+
 	public Optional<ExecutableFinder> getExecutableFinder() {
 		return Optional.ofNullable(executableFinder);
 	}
-	
+
 	public File getExecutable() {
 		return executable;
 	}
-	
+
 	/**
 	 * @param removeParamsIfNoVarToInject if true, for "-a -b c -d" -> "-a -d", else "-a -b -d"
 	 * @return unmodifiableList
@@ -127,7 +127,7 @@ public class CommandLine {
 	public List<String> getParametersRemoveVars(final boolean removeParamsIfNoVarToInject) {
 		return getParametersInjectVars(Collections.emptyMap(), removeParamsIfNoVarToInject);
 	}
-	
+
 	/**
 	 * @param removeParamsIfNoVarToInject if true, for "-a -b c -d" -> "-a -d", else "-a -b -d"
 	 * @return unmodifiableList

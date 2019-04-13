@@ -54,10 +54,10 @@ public class ProcesslauncherTest extends TestCase {
 		Mockito.when(processlauncherBuilder.getExternalProcessStartup()).thenReturn(Optional.of(externalProcessStartup));
 		Mockito.when(processlauncherBuilder.makeProcessBuilder()).thenReturn(processBuilder);
 		Mockito.when(processlauncherBuilder.getFullCommandLine()).thenReturn(fullCommandLine);
-		
+
 		pl = new Processlauncher(processlauncherBuilder);
 	}
-	
+
 	public void testGetExecutionCallbackers() {
 		Assert.assertTrue(CollectionUtils.isEqualCollection(executionCallbackers, pl.getExecutionCallbackers()));
 	}
@@ -89,7 +89,7 @@ public class ProcesslauncherTest extends TestCase {
 	public void testGetProcesslauncherBuilder() {
 		Assert.assertEquals(processlauncherBuilder, pl.getProcesslauncherBuilder());
 	}
-	
+
 	public void testToString() {
 		Assert.assertEquals(fullCommandLine, pl.toString());
 	}

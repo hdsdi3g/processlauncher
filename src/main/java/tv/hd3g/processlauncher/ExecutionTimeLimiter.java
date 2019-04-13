@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class ExecutionTimeLimiter {
-	
+
 	private final ScheduledExecutorService maxExecTimeScheduler;
 	private final long maxExecTime;
 
@@ -37,7 +37,7 @@ public class ExecutionTimeLimiter {
 	public long getMaxExecTime(final TimeUnit unit) {
 		return unit.convert(maxExecTime, TimeUnit.MILLISECONDS);
 	}
-	
+
 	void addTimesUp(final ProcesslauncherLifecycle toCallBack, final Process process) {
 		final ScheduledFuture<?> max_exec_time_stopper = maxExecTimeScheduler.schedule(() -> {
 			toCallBack.runningTakesTooLongTimeStopIt();

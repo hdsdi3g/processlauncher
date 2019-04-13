@@ -39,7 +39,7 @@ public class Processlauncher {
 	private final ProcessBuilder processBuilder;
 	private final String fullCommandLine;
 	private final ProcesslauncherBuilder processlauncherBuilder;
-	
+
 	public Processlauncher(final ProcesslauncherBuilder processlauncherBuilder) {
 		this.processlauncherBuilder = Objects.requireNonNull(processlauncherBuilder, "\"processlauncherBuilder\" can't to be null");
 
@@ -52,7 +52,7 @@ public class Processlauncher {
 		fullCommandLine = processlauncherBuilder.getFullCommandLine();
 	}
 
-	public ProcesslauncherLifecycle start() throws IOException {
+	public ProcesslauncherLifecycle start() throws IOException {// TODO is tested ?
 		return new ProcesslauncherLifecycle(this);
 	}
 
@@ -74,7 +74,7 @@ public class Processlauncher {
 	public Optional<ExternalProcessStartup> getExternalProcessStartup() {
 		return externalProcessStartup;
 	}
-	
+
 	public boolean isExecCodeMustBeZero() {
 		return execCodeMustBeZero;
 	}
@@ -94,7 +94,7 @@ public class Processlauncher {
 	public String getFullCommandLine() {
 		return fullCommandLine;
 	}
-	
+
 	public ProcesslauncherBuilder getProcesslauncherBuilder() {
 		return processlauncherBuilder;
 	}

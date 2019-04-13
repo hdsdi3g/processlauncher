@@ -82,7 +82,7 @@ public class ExecutableFinder {
 
 		/*if (System.getProperty("execfinder.exec", "").equals("") == false) {
 			// GLOBAL_DECLARED_EXECUTABLES = Collections.unmodifiableList(Arrays.stream(System.getProperty("execfinder.searchdir").split(File.pathSeparator)).map(File::new).filter(isValidDirectory).map(File::getAbsoluteFile).collect(Collectors.toList()));
-
+		
 			// log.debug("Specific executable path declared via system property: " + GLOBAL_DECLARED_DIRS.stream().map(File::getPath).collect(Collectors.joining(", ")));
 		} else {
 			GLOBAL_DECLARED_EXECUTABLES = Collections.emptyMap();
@@ -244,10 +244,10 @@ public class ExecutableFinder {
 					 * We must to add ext, we try with all avaliable ext.
 					 */
 					return WINDOWS_EXEC_EXTENSIONS.stream().flatMap(ext -> {
-						/**
-						 * Try with lower/upper case extensions.
-						 */
-						return Stream.of(new File(file + "." + ext.toLowerCase()), new File(file + "." + ext.toUpperCase()));
+					    /**
+					     * Try with lower/upper case extensions.
+					     */
+					    return Stream.of(new File(file + "." + ext.toLowerCase()), new File(file + "." + ext.toUpperCase()));
 					}).filter(file_ext -> {
 						return validExec(file_ext);
 					});

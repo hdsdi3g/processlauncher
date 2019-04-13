@@ -43,39 +43,39 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	 */
 	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
-		
+
 		this.observers = new ArrayList<>();
 		if (observers != null) {
 			this.observers.addAll(Arrays.stream(observers).filter(o -> o != null).collect(Collectors.toUnmodifiableList()));
 		}
-		
+
 		this.executorConsumer = executorConsumer;
 		if (executorConsumer == null) {
 			throw new NullPointerException("\"executorConsumer\" can't to be null");
 		}
 	}
-	
+
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
 	public CaptureStandardOutputText(final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
 		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer, observers);
 	}
-	
+
 	@Override
 	public void stdOutStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStdout()) {
 			parseStream(processInputStream, false, source);
 		}
 	}
-	
+
 	@Override
 	public void stdErrStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStderr()) {
 			parseStream(processInputStream, true, source);
 		}
 	}
-	
+
 	private void parseStream(final InputStream processStream, final boolean isStdErr, final ProcesslauncherLifecycle source) {
 		executorConsumer.execute(() -> {
 			try {
@@ -118,5 +118,5 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 			}
 		});
 	}
-	
+
 }

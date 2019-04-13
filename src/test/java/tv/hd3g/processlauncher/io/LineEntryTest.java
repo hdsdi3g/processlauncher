@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class LineEntryTest extends TestCase {
-	
+
 	private final long date;
 	private final String line;
 	private final boolean stdErr;
@@ -37,41 +37,41 @@ public class LineEntryTest extends TestCase {
 		source = Mockito.mock(ProcesslauncherLifecycle.class);
 		Mockito.when(source.getStartDate()).thenReturn(date - 10000l);
 	}
-	
+
 	private LineEntry lineEntry;
 
 	@Override
 	public void setUp() {
 		lineEntry = new LineEntry(date, line, stdErr, source);
 	}
-	
+
 	public void testGetTimeAgo() {
 		Assert.assertEquals(10000l, lineEntry.getTimeAgo());
 	}
-	
+
 	public void testGetDate() {
 		Assert.assertEquals(date, lineEntry.getDate());
 	}
-	
+
 	public void testGetLine() {
 		Assert.assertEquals(line, lineEntry.getLine());
 	}
-	
+
 	public void testGetSource() {
 		Assert.assertEquals(source, lineEntry.getSource());
 	}
-	
+
 	public void testIsStdErr() {
 		Assert.assertEquals(stdErr, lineEntry.isStdErr());
 	}
-	
+
 	public void testCanUseThis() {
 		Assert.assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
 		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
 		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
 
 		lineEntry = new LineEntry(date, line, stdErr == false, source);
-		
+
 		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
 		Assert.assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
 		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));

@@ -41,34 +41,34 @@ public class CaptureStandardOutputTextTest extends TestCase {
 
 	public void test() throws InterruptedException {
 		final ExecutorService executorConsumer = new ThreadlessExecutorService();
-		
+
 		final List<LineEntry> capturedlines = new ArrayList<>();
 		final CapturedStdOutErrTextObserver csoeto = lineEntry -> {
 			capturedlines.add(lineEntry);
 		};
-		
+
 		final CaptureStandardOutputText csot = new CaptureStandardOutputText(executorConsumer, csoeto);
-		
+
 		final List<String> textLinesStdOut = Arrays.asList("Line 1", "Line 2", "", "\tline 4");
 		final ByteArrayInputStream processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(Collectors.joining("\n")).getBytes());
-		
+
 		final List<String> textLinesStdErr = Arrays.asList("Line 5", "Line 6", "", "\tline 8");
 		final ByteArrayInputStream processInputStreamErr = new ByteArrayInputStream(textLinesStdErr.stream().collect(Collectors.joining("\r\n")).getBytes());
-		
+
 		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
 		csot.stdOutStreamConsumer(processInputStreamOut, source);
 		csot.stdErrStreamConsumer(processInputStreamErr, source);
-		
+
 		Assert.assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
 		Assert.assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));
-		
+
 		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(le -> le.getLine()).collect(Collectors.toList());
 		final List<String> capturedlinesErr = capturedlines.stream().filter(le -> le.isStdErr()).map(le -> le.getLine()).collect(Collectors.toList());
-		
+
 		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdOut, capturedlinesOut));
 		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdErr, capturedlinesErr));
 	}
-	
+
 	public static class ThreadlessExecutorService implements ExecutorService {
 
 		@Override

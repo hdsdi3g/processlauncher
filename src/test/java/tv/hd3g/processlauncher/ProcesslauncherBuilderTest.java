@@ -34,16 +34,16 @@ public class ProcesslauncherBuilderTest extends TestCase {
 
 	private ProcesslauncherBuilder pb;
 	private final File execFile;
-	
+
 	public ProcesslauncherBuilderTest() throws FileNotFoundException {
 		execFile = new ExecutableFinder().get("test-exec");
 	}
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		pb = new ProcesslauncherBuilder(execFile, Arrays.asList("p"));
 	}
-	
+
 	public void testGetSetEnvironmentVar() {
 		pb.setEnvironmentVar("foo", "bar");
 		Assert.assertEquals("bar", pb.getEnvironmentVar("foo"));
@@ -62,7 +62,7 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		pb.setEnvironmentVarIfNotFound("foo", "tot");
 		Assert.assertEquals("bar", pb.getEnvironmentVar("foo"));
 	}
-	
+
 	public void testForEachEnvironmentVar() {
 		pb.setEnvironmentVar("foo1", "bar1");
 		pb.setEnvironmentVar("foo2", "bar2");
@@ -74,12 +74,12 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		Assert.assertEquals("bar1", val.get("foo1"));
 		Assert.assertEquals("bar2", val.get("foo2"));
 	}
-	
+
 	public void testGetSetWorkingDirectory() throws IOException {
 		Assert.assertTrue(pb.getWorkingDirectory().exists() && pb.getWorkingDirectory().isDirectory());
 		pb.setWorkingDirectory(new File("."));
 		Assert.assertEquals(new File("."), pb.getWorkingDirectory());
-		
+
 		try {
 			pb.setWorkingDirectory(new File("./DontExists"));
 			Assert.fail();
@@ -91,17 +91,17 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		} catch (final IOException e) {
 		}
 	}
-	
+
 	public void testSetIsExecCodeMustBeZero() {
 		Assert.assertTrue(pb.isExecCodeMustBeZero());
 		pb.setExecCodeMustBeZero(false);
 		Assert.assertFalse(pb.isExecCodeMustBeZero());
 	}
-	
+
 	public void testGetExecutionCallbackers() {
 		Assert.assertEquals(0, pb.getExecutionCallbackers().size());
 	}
-	
+
 	public void testAddExecutionCallbacker() {
 		final ExecutionCallbacker executionCallbacker0 = Mockito.mock(ExecutionCallbacker.class);
 		final ExecutionCallbacker executionCallbacker1 = Mockito.mock(ExecutionCallbacker.class);
@@ -112,46 +112,46 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		Assert.assertEquals(executionCallbacker0, pb.getExecutionCallbackers().get(0));
 		Assert.assertEquals(executionCallbacker1, pb.getExecutionCallbackers().get(1));
 	}
-	
+
 	public void testRemoveExecutionCallbacker() {
 		final ExecutionCallbacker executionCallbacker = Mockito.mock(ExecutionCallbacker.class);
 		pb.addExecutionCallbacker(executionCallbacker);
 		pb.removeExecutionCallbacker(executionCallbacker);
 		Assert.assertEquals(0, pb.getExecutionCallbackers().size());
 	}
-	
+
 	public void testGetSetExecutionTimeLimiter() {
 		Assert.assertFalse(pb.getExecutionTimeLimiter().isPresent());
 
 		final ExecutionTimeLimiter executionTimeLimiter = Mockito.mock(ExecutionTimeLimiter.class);
 		pb.setExecutionTimeLimiter(executionTimeLimiter);
-		
+
 		Assert.assertEquals(executionTimeLimiter, pb.getExecutionTimeLimiter().get());
 	}
-	
+
 	public void testGetSetExternalProcessStartup() {
 		Assert.assertFalse(pb.getExternalProcessStartup().isPresent());
 
 		final ExternalProcessStartup externalProcessStartup = Mockito.mock(ExternalProcessStartup.class);
 		pb.setExternalProcessStartup(externalProcessStartup);
-		
+
 		Assert.assertEquals(externalProcessStartup, pb.getExternalProcessStartup().get());
 	}
-	
+
 	public void testSetGetCaptureStandardOutput() {
 		Assert.assertFalse(pb.getCaptureStandardOutput().isPresent());
 
 		final CaptureStandardOutput captureStandardOutput = Mockito.mock(CaptureStandardOutput.class);
 		pb.setCaptureStandardOutput(captureStandardOutput);
-		
+
 		Assert.assertEquals(captureStandardOutput, pb.getCaptureStandardOutput().get());
 	}
-	
+
 	public void testMakeProcessBuilder() {
 		final ProcessBuilder processb = pb.makeProcessBuilder();
 		Assert.assertEquals(pb.getFullCommandLine(), processb.command().stream().collect(Collectors.joining(" ")));
 	}
-	
+
 	public void testGetFullCommandLine() {
 		Assert.assertEquals(ProcesslauncherBuilder.addQuotesIfSpaces.apply(execFile.getAbsolutePath()) + " p", pb.getFullCommandLine());
 	}
@@ -159,5 +159,5 @@ public class ProcesslauncherBuilderTest extends TestCase {
 	public void testToString() {
 		Assert.assertEquals(pb.getFullCommandLine(), pb.toString());
 	}
-	
+
 }

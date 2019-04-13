@@ -27,7 +27,7 @@ import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.demo.Test0;
 
 public class ProcesslauncherLifecycleTest extends TestCase {
-	
+
 	private final long beforeStartDate;
 	private final long afterEndDate;
 	private final Processlauncher launcher;
@@ -43,7 +43,7 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 		p = new ProcesslauncherLifecycle(launcher).waitForEnd(500, TimeUnit.MILLISECONDS);
 		afterEndDate = System.currentTimeMillis() + 10;
 	}
-	
+
 	public void testStatues() {
 		Assert.assertEquals(launcher, p.getLauncher());
 		Assert.assertNotNull(p.getProcess());
@@ -61,7 +61,7 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 		Assert.assertTrue(p.getUserExec().isPresent());
 		Assert.assertTrue(p.getPID().isPresent());
 		Assert.assertTrue(p.getPID().get() > 0l);
-		
+
 		/**
 		 * Should do nothing
 		 */

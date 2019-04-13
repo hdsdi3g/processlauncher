@@ -14,40 +14,14 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2018
  * 
 */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher.demo;
 
-public enum CapturedStreams {
+public class Test1 {
 
-	BOTH_STDOUT_STDERR {
-		boolean canCaptureStdout() {
-			return true;
-		}
+	public static final String expected = "HELLO";
 
-		boolean canCaptureStderr() {
-			return true;
-		}
-	},
-	ONLY_STDOUT {
-		boolean canCaptureStdout() {
-			return true;
-		}
-
-		boolean canCaptureStderr() {
-			return false;
-		}
-	},
-	ONLY_STDERR {
-		boolean canCaptureStdout() {
-			return false;
-		}
-
-		boolean canCaptureStderr() {
-			return true;
-		}
-	};
-
-	abstract boolean canCaptureStdout();
-
-	abstract boolean canCaptureStderr();
+	public static void main(String[] args) {
+		System.out.println(expected);
+	}
 
 }

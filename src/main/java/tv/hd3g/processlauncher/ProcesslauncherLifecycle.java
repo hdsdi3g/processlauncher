@@ -32,7 +32,7 @@ import tv.hd3g.processlauncher.io.StdInInjection;
 
 public class ProcesslauncherLifecycle { // TODO test
 	private static Logger log = LogManager.getLogger();
-	
+
 	private final Processlauncher launcher;
 	private final Process process;
 	private final Thread shutdown_hook;
@@ -92,7 +92,7 @@ public class ProcesslauncherLifecycle { // TODO test
 			});
 		});
 	}
-	
+
 	@Override
 	public String toString() {
 		if (process.isAlive()) {
@@ -136,7 +136,7 @@ public class ProcesslauncherLifecycle { // TODO test
 			}
 			return process_handle.destroyForcibly() == false;
 		}).collect(Collectors.toUnmodifiableList());
-		
+
 		if (process.isAlive()) {
 			log.info("Close manually process " + processHandleToString(process.toHandle(), true));
 			if (process.toHandle().destroy() == false) {
@@ -146,7 +146,7 @@ public class ProcesslauncherLifecycle { // TODO test
 				}
 			}
 		}
-		
+
 		if (cant_kill.isEmpty() == false) {
 			cant_kill.forEach(process_handle -> {
 				log.error("Can't force close process " + processHandleToString(process_handle, true));
@@ -154,15 +154,15 @@ public class ProcesslauncherLifecycle { // TODO test
 			throw new RuntimeException("Can't close process " + toString() + " for PID " + cant_kill.stream().map(p -> p.pid()).map(pid -> String.valueOf(pid)).collect(Collectors.joining(", ")));
 		}
 	}
-	
+
 	public Processlauncher getLauncher() {
 		return launcher;
 	}
-	
+
 	public Process getProcess() {
 		return process;
 	}
-	
+
 	public EndStatus getEndStatus() {
 		if (process.isAlive()) {
 			return EndStatus.NOT_YET_DONE;
@@ -175,19 +175,19 @@ public class ProcesslauncherLifecycle { // TODO test
 		}
 		return EndStatus.CORRECTLY_DONE;
 	}
-	
+
 	public boolean isCorrectlyDone() {
 		return getEndStatus().equals(EndStatus.CORRECTLY_DONE);
 	}
-	
+
 	public Integer getExitCode() {
 		return process.exitValue();
 	}
-	
+
 	public long getStartDate() {
 		return process.info().startInstant().orElse(Instant.EPOCH).toEpochMilli();
 	}
-	
+
 	public long getEndDate() {
 		return endDate;
 	}
@@ -198,18 +198,18 @@ public class ProcesslauncherLifecycle { // TODO test
 		}
 		return unit.convert(System.currentTimeMillis() - getStartDate(), TimeUnit.MILLISECONDS);
 	}
-	
+
 	public long getCPUDuration(final TimeUnit unit) {
 		return unit.convert(process.info().totalCpuDuration().orElse(Duration.ZERO).toMillis(), TimeUnit.MILLISECONDS);
 	}
-	
+
 	/**
 	 * on Windows, return like "HOST_or_DOMAIN"\"username"
 	 */
 	public Optional<String> getUserExec() {
 		return process.info().user();
 	}
-	
+
 	public Optional<Long> getPID() {
 		try {
 			return Optional.of(process.pid());
@@ -221,7 +221,7 @@ public class ProcesslauncherLifecycle { // TODO test
 	public Boolean isRunning() {
 		return process.isAlive();
 	}
-	
+
 	public boolean isKilled() {
 		return process_was_killed;
 	}
@@ -253,7 +253,7 @@ public class ProcesslauncherLifecycle { // TODO test
 		}
 		return this;
 	}
-	
+
 	public ProcesslauncherLifecycle waitForEnd(final long timeout, final TimeUnit unit) {
 		try {
 			process.waitFor(timeout, unit);
@@ -262,7 +262,7 @@ public class ProcesslauncherLifecycle { // TODO test
 		}
 		return this;
 	}
-	
+
 	/**
 	 * waitForEnd and checks isCorrectlyDone
 	 */
@@ -280,5 +280,5 @@ public class ProcesslauncherLifecycle { // TODO test
 		}
 		return std_in_injection;
 	}
-	
+
 }
