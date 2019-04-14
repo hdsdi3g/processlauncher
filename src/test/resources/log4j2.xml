@@ -14,7 +14,7 @@
 	</Appenders>
 	
 	<Loggers>
-		<Logger name="tv.hd3g" level="info" />
+		<Logger name="tv.hd3g" level="warn" />
 
 		<Root level="warn">
 			<AppenderRef ref="Console OUT" />
