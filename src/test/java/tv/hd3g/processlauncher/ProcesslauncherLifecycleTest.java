@@ -35,13 +35,13 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 	private final ProcesslauncherLifecycle p;
 
 	public ProcesslauncherLifecycleTest() throws IOException {
-		beforeStartDate = System.currentTimeMillis() - 1;
+		beforeStartDate = System.currentTimeMillis() - 100;
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class.getName());
 		final CommandLine cmd = new CommandLine("java", parameters, new ExecutableFinder());
 		processlauncherBuilder = new ProcesslauncherBuilder(cmd);
 		launcher = new Processlauncher(processlauncherBuilder);
 		p = new ProcesslauncherLifecycle(launcher).waitForEnd(500, TimeUnit.MILLISECONDS);
-		afterEndDate = System.currentTimeMillis() + 10;
+		afterEndDate = System.currentTimeMillis() + 100;
 	}
 
 	public void testStatues() {
