@@ -16,12 +16,12 @@
 */
 package tv.hd3g.processlauncher.demo;
 
-import tv.hd3g.processlauncher.ProcesslauncherLifecycleIT;
+import tv.hd3g.processlauncher.ProcesslauncherLifecycleITTest;
 
 public class DemoExecSubProcess {
 
 	public static void main(final String[] args) throws Exception {
-		new ProcesslauncherLifecycleIT().prepareBuilder(DemoExecLongSleep.class).start().waitForEnd();
+		new ProcesslauncherLifecycleITTest().prepareBuilder(DemoExecLongSleep.class).start().waitForEnd();
 	}
 
 }
