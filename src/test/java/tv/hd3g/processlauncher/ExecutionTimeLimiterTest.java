@@ -54,8 +54,7 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		Assert.assertTrue(fakeSES.returned.hasCancel);
 	}
 
-	@SuppressWarnings("rawtypes")
-	static class ReturnedScheduledFuture implements ScheduledFuture {
+	static class ReturnedScheduledFuture implements ScheduledFuture<Void> {
 		private boolean hasCancel;
 
 		ReturnedScheduledFuture() {
@@ -88,12 +87,12 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		}
 
 		@Override
-		public Object get() throws InterruptedException, ExecutionException {
+		public Void get() throws InterruptedException, ExecutionException {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public Object get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 			throw new UnsupportedOperationException();
 		}
 	}
