@@ -34,7 +34,7 @@ public class CapturedStdOutErrTextRetentionTest extends TestCase {
 
 	public CapturedStdOutErrTextRetentionTest() {
 		source = Mockito.mock(ProcesslauncherLifecycle.class);
-		capText = new CapturedStdOutErrTextRetention(CapturedStreams.BOTH_STDOUT_STDERR);
+		capText = new CapturedStdOutErrTextRetention();
 		capText.onText(createLineEntry("Out 0", false));
 		capText.onText(createLineEntry("Err 0", true));
 		capText.onText(createLineEntry("Out 1", false));

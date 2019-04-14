@@ -162,6 +162,7 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		return executionTimeLimiter;
 	}
 
+	@Override
 	public ProcesslauncherBuilder setExecutionTimeLimiter(final ExecutionTimeLimiter executionTimeLimiter) {
 		this.executionTimeLimiter = Optional.ofNullable(executionTimeLimiter);
 		return this;
@@ -228,7 +229,7 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 	 * @return new Processlauncher(this)
 	 */
 	@Override
-	public Processlauncher toProcesslauncher() {// TODO add test
+	public Processlauncher toProcesslauncher() {
 		return new Processlauncher(this);
 	}
 

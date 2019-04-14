@@ -1,5 +1,5 @@
 /*
- * This file is part of fflauncher.
+ * This file is part of processlauncher.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,7 +16,7 @@
 */
 package tv.hd3g.processlauncher.demo;
 
-public class Test0 {
+public class DemoExecEmpty {
 
 	public static void main(final String[] args) {
 	}

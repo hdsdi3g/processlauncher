@@ -52,7 +52,7 @@ public class Processlauncher {
 		fullCommandLine = processlauncherBuilder.getFullCommandLine();
 	}
 
-	public ProcesslauncherLifecycle start() throws IOException {// TODO is tested ?
+	public ProcesslauncherLifecycle start() throws IOException {
 		return new ProcesslauncherLifecycle(this);
 	}
 

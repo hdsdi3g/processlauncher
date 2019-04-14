@@ -31,7 +31,10 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 		lineEntries = new LinkedBlockingQueue<>();
 	}
 
-	public CapturedStdOutErrTextRetention() {// TODO replace tests call by that
+	/**
+	 * With BOTH_STDOUT_STDERR
+	 */
+	public CapturedStdOutErrTextRetention() {
 		this(CapturedStreams.BOTH_STDOUT_STDERR);
 	}
 

@@ -18,7 +18,6 @@ package tv.hd3g.processlauncher;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 import tv.hd3g.processlauncher.io.StdInInjection;
 
-public class ProcesslauncherLifecycle { // TODO test
+public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcutTraits {
 	private static Logger log = LogManager.getLogger();
 
 	private final Processlauncher launcher;
@@ -159,10 +158,12 @@ public class ProcesslauncherLifecycle { // TODO test
 		return launcher;
 	}
 
+	@Override
 	public Process getProcess() {
 		return process;
 	}
 
+	@Override
 	public EndStatus getEndStatus() {
 		if (process.isAlive()) {
 			return EndStatus.NOT_YET_DONE;
@@ -174,18 +175,6 @@ public class ProcesslauncherLifecycle { // TODO test
 			return EndStatus.DONE_WITH_ERROR;
 		}
 		return EndStatus.CORRECTLY_DONE;
-	}
-
-	public boolean isCorrectlyDone() {
-		return getEndStatus().equals(EndStatus.CORRECTLY_DONE);
-	}
-
-	public Integer getExitCode() {
-		return process.exitValue();
-	}
-
-	public long getStartDate() {
-		return process.info().startInstant().orElse(Instant.EPOCH).toEpochMilli();
 	}
 
 	public long getEndDate() {
@@ -201,25 +190,6 @@ public class ProcesslauncherLifecycle { // TODO test
 
 	public long getCPUDuration(final TimeUnit unit) {
 		return unit.convert(process.info().totalCpuDuration().orElse(Duration.ZERO).toMillis(), TimeUnit.MILLISECONDS);
-	}
-
-	/**
-	 * on Windows, return like "HOST_or_DOMAIN"\"username"
-	 */
-	public Optional<String> getUserExec() {
-		return process.info().user();
-	}
-
-	public Optional<Long> getPID() {
-		try {
-			return Optional.of(process.pid());
-		} catch (final UnsupportedOperationException e) {
-			return Optional.empty();
-		}
-	}
-
-	public Boolean isRunning() {
-		return process.isAlive();
 	}
 
 	public boolean isKilled() {

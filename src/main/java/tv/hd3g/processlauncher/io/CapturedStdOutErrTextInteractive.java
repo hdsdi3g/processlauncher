@@ -32,38 +32,38 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 	private static Logger log = LogManager.getLogger();
 
 	private final Function<LineEntry, String> interactive;
-	private final BiConsumer<ProcesslauncherLifecycle, Boolean> onDone;
+	private final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream;
 	private final Charset destCharset;
 	private final Executor eventExecutor;
 
 	/**
 	 * @param interactive function return null if nothing to send.
-	 * @param onDone -> source, isStdErr
+	 * @param onProcessClosedStream -> source, isStdErr
 	 * @param destCharset used for injected String to byte[] in stream
 	 */
-	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onDone, final Charset destCharset, final Executor eventExecutor) {
+	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream, final Charset destCharset, final Executor eventExecutor) {
 		this.eventExecutor = Objects.requireNonNull(eventExecutor, "\"eventExecutor\" can't to be null");
 		this.interactive = Objects.requireNonNull(interactive, "\"interactive\" can't to be null");
-		this.onDone = Objects.requireNonNull(onDone, "\"onDone\" can't to be null");
+		this.onProcessClosedStream = Objects.requireNonNull(onProcessClosedStream, "\"onProcessClosedStream\" can't to be null");
 		this.destCharset = Objects.requireNonNull(destCharset, "\"destCharset\" can't to be null");
 	}
 
 	/**
 	 * @param interactive function return null if nothing to send.
-	 * @param onDone -> source, isStdErr
+	 * @param onProcessClosedStream -> source, isStdErr
 	 * @param destCharset used for injected String to byte[] in stream
 	 */
-	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onDone, final Executor eventExecutor) {
-		this(interactive, onDone, Charset.defaultCharset(), eventExecutor);
+	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream, final Executor eventExecutor) {
+		this(interactive, onProcessClosedStream, Charset.defaultCharset(), eventExecutor);
 	}
 
 	/**
 	 * Sync (blocking) execution.
 	 * @param interactive function return null if nothing to send.
-	 * @param onDone -> source, isStdErr
+	 * @param onProcessClosedStream -> source, isStdErr
 	 */
-	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onDone) {
-		this(interactive, onDone, Charset.defaultCharset(), r -> r.run());
+	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream) {
+		this(interactive, onProcessClosedStream, Charset.defaultCharset(), r -> r.run());
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 	@Override
 	public void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr) {
 		eventExecutor.execute(() -> {
-			onDone.accept(source, isStdErr);
+			onProcessClosedStream.accept(source, isStdErr);
 		});
 	}
 

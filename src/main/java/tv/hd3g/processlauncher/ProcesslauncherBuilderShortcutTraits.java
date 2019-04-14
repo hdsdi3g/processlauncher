@@ -18,6 +18,8 @@ package tv.hd3g.processlauncher;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 import tv.hd3g.processlauncher.io.CaptureStandardOutputText;
@@ -52,6 +54,15 @@ public interface ProcesslauncherBuilderShortcutTraits {
 	 */
 	default ProcesslauncherLifecycle start() throws IOException {
 		return toProcesslauncher().start();
+	}
+
+	ProcesslauncherBuilder setExecutionTimeLimiter(final ExecutionTimeLimiter executionTimeLimiter);
+
+	/**
+	 * Shortcut for setExecutionTimeLimiter
+	 */
+	default ProcesslauncherBuilder setExecutionTimeLimiter(final long maxExecTime, final TimeUnit unit, final ScheduledExecutorService maxExecTimeScheduler) {
+		return setExecutionTimeLimiter(new ExecutionTimeLimiter(maxExecTime, unit, maxExecTimeScheduler));
 	}
 
 }

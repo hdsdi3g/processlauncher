@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.demo.Test0;
+import tv.hd3g.processlauncher.demo.DemoExecEmpty;
 
 public class ProcesslauncherLifecycleTest extends TestCase {
 
@@ -36,7 +36,7 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 
 	public ProcesslauncherLifecycleTest() throws IOException {
 		beforeStartDate = System.currentTimeMillis() - 1;
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), Test0.class.getName());
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class.getName());
 		final CommandLine cmd = new CommandLine("java", parameters, new ExecutableFinder());
 		processlauncherBuilder = new ProcesslauncherBuilder(cmd);
 		launcher = new Processlauncher(processlauncherBuilder);
