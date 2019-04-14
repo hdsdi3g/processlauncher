@@ -48,13 +48,13 @@ import tv.hd3g.processlauncher.io.CapturedStdOutErrTextInteractive;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.io.LineEntry;
 
-public class ProcesslauncherLifecycleIT extends TestCase {
+public class ProcesslauncherLifecycleITTest extends TestCase {
 
 	private final ExecutableFinder executableFinder;
 	private final ExecutorService outStreamWatcher;
 	private final ScheduledThreadPoolExecutor scheduledThreadPool;
 
-	public ProcesslauncherLifecycleIT() {
+	public ProcesslauncherLifecycleITTest() {
 		executableFinder = new ExecutableFinder();
 		outStreamWatcher = Executors.newCachedThreadPool();
 		scheduledThreadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
