@@ -19,6 +19,9 @@ package tv.hd3g.processlauncher;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -54,8 +57,10 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 		Assert.assertEquals(0, p.getExitCode().intValue());
 		Assert.assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
 		Assert.assertTrue(p.isCorrectlyDone());
-		Assert.assertTrue(beforeStartDate <= p.getStartDate());
-		Assert.assertTrue(afterEndDate >= p.getEndDate());
+
+		MatcherAssert.assertThat("beforeStartDate", p.getStartDate(), Matchers.greaterThanOrEqualTo(beforeStartDate));
+		MatcherAssert.assertThat("beforeStartDate", afterEndDate, Matchers.greaterThanOrEqualTo(p.getEndDate()));
+
 		Assert.assertTrue(p.getUptime(TimeUnit.NANOSECONDS) > 0l);
 		Assert.assertTrue(p.getCPUDuration(TimeUnit.MILLISECONDS) > 0l);
 		Assert.assertTrue(p.getUserExec().isPresent());
