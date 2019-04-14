@@ -18,10 +18,37 @@ package tv.hd3g.processlauncher.cmdline;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
 public class ExecutableFinderTest extends TestCase {
+
+	/**
+	 * During some maven operation, on Linux, executable state can be drop.
+	 */
+	public static void patchTestExec() {
+		if (File.separator.equals("\\")) {
+			/**
+			 * Test is running on windows, cancel this patch.
+			 */
+			return;
+		}
+		Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator)).map(p -> {
+			return new File(p);
+		}).filter(ExecutableFinder.isValidDirectory).flatMap(dir -> {
+			return Arrays.stream(dir.listFiles());
+		}).filter(subFile -> {
+			return subFile.isFile() && subFile.canExecute() == false && subFile.getName().equals("test-exec");
+		}).findFirst().ifPresent(f -> {
+			System.out.println(f.getAbsolutePath() + " has not the executable bit, set it now.");
+			f.setExecutable(true);
+		});
+	}
+
+	public ExecutableFinderTest() {
+		ExecutableFinderTest.patchTestExec();
+	}
 
 	public void testPreCheck() throws IOException {
 		assertEquals("\\", "/".replaceAll("/", "\\\\"));

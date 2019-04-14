@@ -32,6 +32,8 @@ public class CommandLineTest extends TestCase {
 	private final CommandLine cmd;
 
 	public CommandLineTest() throws IOException {
+		ExecutableFinderTest.patchTestExec();
+
 		ef = new ExecutableFinder();
 		cmd = new CommandLine("test-exec", "-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c", ef);
 	}

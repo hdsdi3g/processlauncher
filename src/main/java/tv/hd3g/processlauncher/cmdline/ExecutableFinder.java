@@ -39,7 +39,10 @@ import org.apache.logging.log4j.Logger;
 public class ExecutableFinder {
 	private static final Logger log = LogManager.getLogger();
 
-	private static Predicate<File> isValidDirectory = f -> {
+	/**
+	 * @return exists && isDirectory && canRead
+	 */
+	public static final Predicate<File> isValidDirectory = f -> {
 		return f.exists() && f.isDirectory() && f.canRead();
 	};
 
@@ -82,7 +85,7 @@ public class ExecutableFinder {
 
 		/*if (System.getProperty("execfinder.exec", "").equals("") == false) {
 			// GLOBAL_DECLARED_EXECUTABLES = Collections.unmodifiableList(Arrays.stream(System.getProperty("execfinder.searchdir").split(File.pathSeparator)).map(File::new).filter(isValidDirectory).map(File::getAbsoluteFile).collect(Collectors.toList()));
-		
+
 			// log.debug("Specific executable path declared via system property: " + GLOBAL_DECLARED_DIRS.stream().map(File::getPath).collect(Collectors.joining(", ")));
 		} else {
 			GLOBAL_DECLARED_EXECUTABLES = Collections.emptyMap();
