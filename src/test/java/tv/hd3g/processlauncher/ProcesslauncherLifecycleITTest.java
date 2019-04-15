@@ -18,7 +18,6 @@ package tv.hd3g.processlauncher;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -208,6 +207,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		}, DemoExecLongSleep.MAX_DURATION * 4, TimeUnit.MILLISECONDS);
 
 		Thread.sleep(DemoExecLongSleep.MAX_DURATION);
+		Assert.assertEquals(1, result.getProcess().children().count());
 		Assert.assertEquals(1, result.getProcess().descendants().count());
 
 		result.waitForEnd();
@@ -232,8 +232,6 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long start_time = System.currentTimeMillis();
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
-
-		Assert.assertEquals(result.getProcess().info().startInstant().orElse(Instant.EPOCH).toEpochMilli(), result.getStartDate());
 
 		final long duration = System.currentTimeMillis() - start_time;
 		Assert.assertTrue(duration >= result.getUptime(TimeUnit.MILLISECONDS));// TODO patch
