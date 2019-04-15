@@ -29,6 +29,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -151,7 +154,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - start_time;
 
-		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION + 300);/** 300 is a "startup time bonus" */ // TODO patch
+		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION + 300)); /** 300 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.TOO_LONG_EXECUTION_TIME, result.getEndStatus());
 
 		Assert.assertTrue(result.isTooLongTime());
@@ -174,7 +177,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - start_time;
 
-		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION + 300);/** 300 is a "startup time bonus" */ // TODO patch
+		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION + 300)); /** 300 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
 
 		Assert.assertFalse(result.isTooLongTime());
@@ -193,6 +196,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 			result.kill();
 		}, DemoExecLongSleep.MAX_DURATION * 4, TimeUnit.MILLISECONDS);
 
+		Assert.assertEquals(1, result.getProcess().children().count());
+		Assert.assertEquals(1, result.getProcess().descendants().count());
 		Thread.sleep(DemoExecLongSleep.MAX_DURATION);
 		// Assert.assertEquals(1, result.getProcess().children().count()); TODO flacky on linux
 		// Assert.assertEquals(1, result.getProcess().descendants().count()); TODO flacky on linux
@@ -201,7 +206,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - start_time;
 
-		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION * 4 * 2);// TODO patch
+		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION * 4 * 2));
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
 
 		Assert.assertFalse(result.isTooLongTime());
@@ -221,7 +226,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
 		final long duration = System.currentTimeMillis() - start_time;
-		Assert.assertTrue(duration >= result.getUptime(TimeUnit.MILLISECONDS));// TODO patch
+		MatcherAssert.assertThat(duration, Matchers.greaterThanOrEqualTo(result.getUptime(TimeUnit.MILLISECONDS)));
 
 		Assert.assertEquals(result.getProcess().pid(), (long) result.getPID().get());
 		// Assert.assertTrue(result.getUserExec().get().endsWith(System.getProperty("user.name")));//TODO Flacky on Linux
