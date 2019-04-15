@@ -148,8 +148,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		Assert.assertEquals((long) p.getPID().get(), p.getProcess().pid());
 		Assert.assertFalse(p.getProcess().isAlive());
 
-		Assert.assertTrue(p.getStartDate() > start_date);
-		Assert.assertTrue(p.getStartDate() < System.currentTimeMillis());
+		Assert.assertTrue(p.getStartDate() > start_date);// TODO change this test, see MatcherAssert.assertThat("beforeStartDate", p.getStartDate(), Matchers.greaterThanOrEqualTo(beforeStartDate));
+		Assert.assertTrue(p.getStartDate() < System.currentTimeMillis());// TODO change this test
 	}
 
 	public void testMaxExecTime() throws Exception {

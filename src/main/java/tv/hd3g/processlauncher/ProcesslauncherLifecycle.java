@@ -36,6 +36,7 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 	private final Process process;
 	private final Thread shutdown_hook;
 	private final String fullCommandLine;
+	private final long startDate;
 
 	private volatile boolean process_was_killed;
 	private volatile boolean process_was_stopped_because_too_long_time;
@@ -58,6 +59,7 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 			process = pBuilder.start();
 			log.info("Start process #" + process.pid() + " " + fullCommandLine);
 		}
+		startDate = System.currentTimeMillis();
 
 		shutdown_hook = new Thread(() -> {
 			log.warn("Try to kill " + toString());
@@ -90,6 +92,10 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 				ec.onEndExecution(this);
 			});
 		});
+	}
+
+	public long getStartDate() {
+		return getProcess().info().startInstant().flatMap(i -> Optional.of(i.toEpochMilli())).orElse(startDate);
 	}
 
 	@Override

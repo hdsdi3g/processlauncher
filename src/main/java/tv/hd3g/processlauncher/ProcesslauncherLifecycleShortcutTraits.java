@@ -16,7 +16,6 @@
 */
 package tv.hd3g.processlauncher;
 
-import java.time.Instant;
 import java.util.Optional;
 
 public interface ProcesslauncherLifecycleShortcutTraits {
@@ -31,10 +30,6 @@ public interface ProcesslauncherLifecycleShortcutTraits {
 
 	default Integer getExitCode() {
 		return getProcess().exitValue();
-	}
-
-	default long getStartDate() {
-		return getProcess().info().startInstant().orElse(Instant.EPOCH).toEpochMilli();
 	}
 
 	/**
