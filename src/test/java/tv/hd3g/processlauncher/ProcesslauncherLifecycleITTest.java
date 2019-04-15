@@ -29,9 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -126,8 +123,6 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	public void testResultValues() throws Exception {
-		final long start_date = System.currentTimeMillis() - 1;
-
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecIOText.class.getName());
 		parameters.addParameters(DemoExecIOText.expected_in);
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
@@ -143,15 +138,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		Assert.assertEquals(DemoExecIOText.exit_ok, (int) p.getExitCode());
 		Assert.assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
 
-		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getPID().get()));
-		Assert.assertTrue(p.getUserExec().get().endsWith(System.getProperty("user.name")));
-
 		Assert.assertEquals(DemoExecIOText.exit_ok, p.getExitCode().intValue());
-		Assert.assertEquals((long) p.getPID().get(), p.getProcess().pid());
-		Assert.assertFalse(p.getProcess().isAlive());
-
-		MatcherAssert.assertThat(start_date, Matchers.lessThan(p.getStartDate()));
-		MatcherAssert.assertThat(System.currentTimeMillis(), Matchers.greaterThan(p.getStartDate()));
 	}
 
 	public void testMaxExecTime() throws Exception {

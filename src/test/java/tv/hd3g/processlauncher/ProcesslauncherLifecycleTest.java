@@ -63,7 +63,7 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 
 		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getUptime(TimeUnit.NANOSECONDS)));
 		MatcherAssert.assertThat(0l, Matchers.lessThanOrEqualTo(p.getCPUDuration(TimeUnit.NANOSECONDS)));
-		Assert.assertTrue(p.getUserExec().isPresent());
+		Assert.assertNotNull(p.getUserExec());
 		Assert.assertTrue(p.getPID().isPresent());
 		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getPID().get()));
 
