@@ -30,6 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -141,15 +144,15 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		Assert.assertEquals(DemoExecIOText.exit_ok, (int) p.getExitCode());
 		Assert.assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
 
-		Assert.assertTrue(p.getPID().get() > 0);
+		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getPID().get()));
 		Assert.assertTrue(p.getUserExec().get().endsWith(System.getProperty("user.name")));
 
 		Assert.assertEquals(DemoExecIOText.exit_ok, p.getExitCode().intValue());
 		Assert.assertEquals((long) p.getPID().get(), p.getProcess().pid());
 		Assert.assertFalse(p.getProcess().isAlive());
 
-		Assert.assertTrue(p.getStartDate() > start_date);// TODO change this test, see MatcherAssert.assertThat("beforeStartDate", p.getStartDate(), Matchers.greaterThanOrEqualTo(beforeStartDate));
-		Assert.assertTrue(p.getStartDate() < System.currentTimeMillis());// TODO change this test
+		MatcherAssert.assertThat(start_date, Matchers.lessThan(p.getStartDate()));
+		MatcherAssert.assertThat(System.currentTimeMillis(), Matchers.greaterThan(p.getStartDate()));
 	}
 
 	public void testMaxExecTime() throws Exception {
@@ -162,7 +165,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - start_time;
 
-		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION + 300);/** 300 is a "startup time bonus" */
+		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION + 300);/** 300 is a "startup time bonus" */ // TODO patch
 		Assert.assertEquals(EndStatus.TOO_LONG_EXECUTION_TIME, result.getEndStatus());
 
 		Assert.assertTrue(result.isTooLongTime());
@@ -185,7 +188,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - start_time;
 
-		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION + 300);/** 300 is a "startup time bonus" */
+		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION + 300);/** 300 is a "startup time bonus" */ // TODO patch
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
 
 		Assert.assertFalse(result.isTooLongTime());
@@ -211,7 +214,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - start_time;
 
-		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION * 4 * 2);
+		Assert.assertTrue(duration < DemoExecLongSleep.MAX_DURATION * 4 * 2);// TODO patch
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
 
 		Assert.assertFalse(result.isTooLongTime());
@@ -233,7 +236,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		Assert.assertEquals(result.getProcess().info().startInstant().orElse(Instant.EPOCH).toEpochMilli(), result.getStartDate());
 
 		final long duration = System.currentTimeMillis() - start_time;
-		Assert.assertTrue(duration >= result.getUptime(TimeUnit.MILLISECONDS));
+		Assert.assertTrue(duration >= result.getUptime(TimeUnit.MILLISECONDS));// TODO patch
 
 		Assert.assertEquals(result.getProcess().pid(), (long) result.getPID().get());
 		Assert.assertTrue(result.getUserExec().get().endsWith(System.getProperty("user.name")));

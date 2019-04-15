@@ -58,14 +58,14 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 		Assert.assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
 		Assert.assertTrue(p.isCorrectlyDone());
 
-		MatcherAssert.assertThat("beforeStartDate", p.getStartDate(), Matchers.greaterThanOrEqualTo(beforeStartDate));
-		MatcherAssert.assertThat("beforeStartDate", afterEndDate, Matchers.greaterThanOrEqualTo(p.getEndDate()));
+		MatcherAssert.assertThat(beforeStartDate, Matchers.lessThanOrEqualTo(p.getStartDate()));
+		MatcherAssert.assertThat(afterEndDate, Matchers.greaterThanOrEqualTo(p.getEndDate()));
 
-		Assert.assertTrue(p.getUptime(TimeUnit.NANOSECONDS) > 0l);
-		Assert.assertTrue(p.getCPUDuration(TimeUnit.MILLISECONDS) > 0l);
+		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getUptime(TimeUnit.NANOSECONDS)));
+		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getCPUDuration(TimeUnit.NANOSECONDS)));
 		Assert.assertTrue(p.getUserExec().isPresent());
 		Assert.assertTrue(p.getPID().isPresent());
-		Assert.assertTrue(p.getPID().get() > 0l);
+		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getPID().get()));
 
 		/**
 		 * Should do nothing
