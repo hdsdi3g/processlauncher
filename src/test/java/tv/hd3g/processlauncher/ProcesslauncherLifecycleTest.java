@@ -66,11 +66,17 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 		Assert.assertNotNull(p.getUserExec());
 		Assert.assertTrue(p.getPID().isPresent());
 		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getPID().get()));
+		Assert.assertEquals(p.getProcess().pid(), (long) p.getPID().get());
+		/**
+		 * Flacky on Linux
+		 * Assert.assertTrue(result.getUserExec().get().endsWith(System.getProperty("user.name")));
+		 */
 
 		/**
 		 * Should do nothing
 		 */
 		p.kill();
+		Assert.assertFalse(p.isKilled());
 		p.waitForEnd();
 		p.checkExecution();
 	}
