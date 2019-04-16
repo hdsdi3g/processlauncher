@@ -32,8 +32,9 @@ import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
 /**
  * Shortcut for alls classes
+ * Reusable
  */
-public class Exec {// TODO test
+public class Exec {
 
 	private final String execName;
 	private final ExecutableFinder executableFinder;
