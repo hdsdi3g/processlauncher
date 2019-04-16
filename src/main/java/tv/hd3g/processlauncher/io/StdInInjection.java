@@ -28,30 +28,30 @@ public class StdInInjection extends OutputStream {
 	private static final Logger log = LogManager.getLogger();
 	public static final String LINESEPARATOR = System.getProperty("line.separator");
 
-	private final OutputStream std_in;
+	private final OutputStream stdIn;
 
-	public StdInInjection(final OutputStream std_in) {
-		this.std_in = std_in;
+	public StdInInjection(final OutputStream stdIn) {
+		this.stdIn = stdIn;
 	}
 
 	@Override
 	public void flush() throws IOException {
-		std_in.flush();
+		stdIn.flush();
 	}
 
 	@Override
 	public void close() throws IOException {
-		std_in.close();
+		stdIn.close();
 	}
 
 	@Override
 	public void write(final int b) throws IOException {
-		std_in.write(b);
+		stdIn.write(b);
 	}
 
 	@Override
 	public void write(final byte[] b, final int off, final int len) throws IOException {
-		std_in.write(b, off, len);
+		stdIn.write(b, off, len);
 	}
 
 	/**

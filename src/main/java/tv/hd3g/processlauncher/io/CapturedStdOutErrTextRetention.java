@@ -49,9 +49,9 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty stream.
 	 */
-	public Stream<String> getStdoutLines(final boolean keep_empty_lines) {
+	public Stream<String> getStdoutLines(final boolean keepEmptyLines) {
 		return lineEntries.stream().filter(le -> {
-			if (keep_empty_lines) {
+			if (keepEmptyLines) {
 				return true;
 			}
 			return le.getLine().equals("") == false;
@@ -64,11 +64,11 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty stream.
-	 * @param keep_empty_lines if set false, discard all empty trimed lines
+	 * @param keepEmptyLines if set false, discard all empty trimed lines
 	 */
-	public Stream<String> getStderrLines(final boolean keep_empty_lines) {
+	public Stream<String> getStderrLines(final boolean keepEmptyLines) {
 		return lineEntries.stream().filter(le -> {
-			if (keep_empty_lines) {
+			if (keepEmptyLines) {
 				return true;
 			}
 			return le.getLine().equals("") == false;
@@ -81,11 +81,11 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty stream.
-	 * @param keep_empty_lines if set false, discard all empty trimed lines
+	 * @param keepEmptyLines if set false, discard all empty trimed lines
 	 */
-	public Stream<String> getStdouterrLines(final boolean keep_empty_lines) {
+	public Stream<String> getStdouterrLines(final boolean keepEmptyLines) {
 		return lineEntries.stream().filter(le -> {
-			if (keep_empty_lines) {
+			if (keepEmptyLines) {
 				return true;
 			}
 			return le.getLine().equals("") == false;
@@ -96,32 +96,32 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty text.
-	 * @param keep_empty_lines if set false, discard all empty trimed lines
-	 * @param new_line_separator replace new line char by this
+	 * @param keepEmptyLines if set false, discard all empty trimed lines
+	 * @param newLineSeparator replace new line char by this
 	 *        Use System.lineSeparator() if needed
 	 */
-	public String getStdout(final boolean keep_empty_lines, final String new_line_separator) {
-		return getStdoutLines(keep_empty_lines).collect(Collectors.joining(new_line_separator));
+	public String getStdout(final boolean keepEmptyLines, final String newLineSeparator) {
+		return getStdoutLines(keepEmptyLines).collect(Collectors.joining(newLineSeparator));
 	}
 
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty text.
-	 * @param keep_empty_lines if set false, discard all empty trimed lines
-	 * @param new_line_separator replace new line char by this
+	 * @param keepEmptyLines if set false, discard all empty trimed lines
+	 * @param newLineSeparator replace new line char by this
 	 *        Use System.lineSeparator() if needed
 	 */
-	public String getStderr(final boolean keep_empty_lines, final String new_line_separator) {
-		return getStderrLines(keep_empty_lines).collect(Collectors.joining(new_line_separator));
+	public String getStderr(final boolean keepEmptyLines, final String newLineSeparator) {
+		return getStderrLines(keepEmptyLines).collect(Collectors.joining(newLineSeparator));
 	}
 
 	/**
 	 * Only set if setKeepStdout is set (false by default), else return empty text.
-	 * @param keep_empty_lines if set false, discard all empty trimed lines
-	 * @param new_line_separator replace new line char by this
+	 * @param keepEmptyLines if set false, discard all empty trimed lines
+	 * @param newLineSeparator replace new line char by this
 	 *        Use System.lineSeparator() if needed
 	 */
-	public String getStdouterr(final boolean keep_empty_lines, final String new_line_separator) {
-		return getStdouterrLines(keep_empty_lines).collect(Collectors.joining(new_line_separator));
+	public String getStdouterr(final boolean keepEmptyLines, final String newLineSeparator) {
+		return getStdouterrLines(keepEmptyLines).collect(Collectors.joining(newLineSeparator));
 	}
 
 }

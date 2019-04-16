@@ -36,15 +36,15 @@ class SimpleParameters {
 	private static final Character SPACE = ' ';
 
 	private final List<String> parameters;
-	private String parameter_keys_starts_with = "-";
+	private String parameterKeysStartsWith = "-";
 
 	SimpleParameters() {
 		parameters = new ArrayList<>();
 	}
 
-	SimpleParameters(final String bulk_parameters) {
+	SimpleParameters(final String bulkParameters) {
 		this();
-		addBulkParameters(bulk_parameters);
+		addBulkParameters(bulkParameters);
 	}
 
 	SimpleParameters(final Collection<String> parameters) {
@@ -53,22 +53,22 @@ class SimpleParameters {
 	}
 
 	/**
-	 * Don't touch to current parameters, only parameter_keys_starts_with
+	 * Don't touch to current parameters, only parameterKeysStartsWith
 	 */
-	public SimpleParameters transfertThisConfigurationTo(final SimpleParameters new_instance) {
-		new_instance.parameter_keys_starts_with = parameter_keys_starts_with;
+	public SimpleParameters transfertThisConfigurationTo(final SimpleParameters newInstance) {
+		newInstance.parameterKeysStartsWith = parameterKeysStartsWith;
 		return this;
 	}
 
 	/**
-	 * Transfer (clone) current parameters and parameter_keys_starts_with
+	 * Transfer (clone) current parameters and parameterKeysStartsWith
 	 */
-	public SimpleParameters importParametersFrom(final SimpleParameters previous_instance) {
-		log.trace("Import from {}", () -> previous_instance);
+	public SimpleParameters importParametersFrom(final SimpleParameters previousInstance) {
+		log.trace("Import from {}", () -> previousInstance);
 
-		parameter_keys_starts_with = previous_instance.parameter_keys_starts_with;
+		parameterKeysStartsWith = previousInstance.parameterKeysStartsWith;
 		parameters.clear();
-		parameters.addAll(previous_instance.parameters);
+		parameters.addAll(previousInstance.parameters);
 		return this;
 	}
 
@@ -107,11 +107,11 @@ class SimpleParameters {
 			    /**
 			     * Get current entry
 			     */
-			    final int last_pos = list.size() - 1;
-			    final ParameterArg last_entry = list.get(last_pos);
+			    final int lastPos = list.size() - 1;
+			    final ParameterArg lastEntry = list.get(lastPos);
 
 			    if (chr == QUOTE) {
-				    if (last_entry.isInQuotes()) {
+				    if (lastEntry.isInQuotes()) {
 					    /**
 					     * Switch off quote zone
 					     */
@@ -120,22 +120,22 @@ class SimpleParameters {
 					    /**
 					     * Switch on quote zone
 					     */
-					    if (last_entry.isEmpty()) {
+					    if (lastEntry.isEmpty()) {
 						    /**
 						     * Remove previous empty ParameterArg
 						     */
-						    list.remove(last_pos);
+						    list.remove(lastPos);
 					    }
 					    list.add(new ParameterArg(true));
 				    }
 			    } else if (chr == SPACE) {
-				    if (last_entry.isInQuotes()) {
+				    if (lastEntry.isInQuotes()) {
 					    /**
 					     * Add space in quotes
 					     */
-					    last_entry.add(chr);
+					    lastEntry.add(chr);
 				    } else {
-					    if (last_entry.isEmpty() == false) {
+					    if (lastEntry.isEmpty() == false) {
 						    /**
 						     * New space -> new ParameterArg (and ignore space)
 						     */
@@ -147,7 +147,7 @@ class SimpleParameters {
 					    }
 				    }
 			    } else {
-				    last_entry.add(chr);
+				    lastEntry.add(chr);
 			    }
 		    }
 		    return list;
@@ -181,10 +181,10 @@ class SimpleParameters {
 	/**
 	 * @see SimpleParameters#hasParameters()
 	 */
-	public SimpleParameters ifHasNotParameter(final Runnable to_do_if_missing, final String... in_parameters) {
-		Objects.requireNonNull(to_do_if_missing, "\"to_do_if_missing\" can't to be null");
-		if (hasParameters(in_parameters) == false) {
-			to_do_if_missing.run();
+	public SimpleParameters ifHasNotParameter(final Runnable toDoIfMissing, final String... inParameters) {
+		Objects.requireNonNull(toDoIfMissing, "\"toDoIfMissing\" can't to be null");
+		if (hasParameters(inParameters) == false) {
+			toDoIfMissing.run();
 		}
 
 		return this;
@@ -248,9 +248,9 @@ class SimpleParameters {
 	public SimpleParameters prependParameters(final Collection<String> params) {
 		Objects.requireNonNull(params, "\"params\" can't to be null");
 
-		final List<String> new_list = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(Collectors.toUnmodifiableList());
+		final List<String> newList = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(Collectors.toUnmodifiableList());
 		parameters.clear();
-		parameters.addAll(new_list);
+		parameters.addAll(newList);
 
 		log.trace("Prepend parameters: {}", () -> params);
 
@@ -289,11 +289,11 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @param parameters_keys_starts_with "-" by default
+	 * @param parameterKeysStartsWith "-" by default
 	 */
-	public SimpleParameters setParametersKeysStartsWith(final String parameters_keys_starts_with) {
-		parameter_keys_starts_with = parameters_keys_starts_with;
-		log.debug("Set parameters key start with: {}", parameters_keys_starts_with);
+	public SimpleParameters setParametersKeysStartsWith(final String parameterKeysStartsWith) {
+		this.parameterKeysStartsWith = parameterKeysStartsWith;
+		log.debug("Set parameters key start with: {}", parameterKeysStartsWith);
 		return this;
 	}
 
@@ -301,31 +301,31 @@ class SimpleParameters {
 	 * @return "-" by default
 	 */
 	public String getParametersKeysStartsWith() {
-		return parameter_keys_starts_with;
+		return parameterKeysStartsWith;
 	}
 
 	boolean isParameterArgIsAParametersKey(final String arg) {
-		return arg.startsWith(parameter_keys_starts_with);
+		return arg.startsWith(parameterKeysStartsWith);
 	}
 
 	/**
-	 * @param parameter_key add "-" in front of param_key if needed
+	 * @param parameterKey add "-" in front of paramKey if needed
 	 */
-	protected String conformParameterKey(final String parameter_key) {
-		if (isParameterArgIsAParametersKey(parameter_key) == false) {
-			return parameter_keys_starts_with + parameter_key;
+	protected String conformParameterKey(final String parameterKey) {
+		if (isParameterArgIsAParametersKey(parameterKey) == false) {
+			return parameterKeysStartsWith + parameterKey;
 		}
-		return parameter_key;
+		return parameterKey;
 	}
 
 	/**
-	 * @param parameter_key can have "-" or not (it will be added).
-	 * @return For "-param val1 -param val2 -param val3" -> val1, val2, val3 ; null if param_key can't be found, empty if not values for param
+	 * @param parameterKey can have "-" or not (it will be added).
+	 * @return For "-param val1 -param val2 -param val3" -> val1, val2, val3 ; null if parameterKey can't be found, empty if not values for param
 	 */
-	public List<String> getValues(final String parameter_key) {
-		Objects.requireNonNull(parameter_key, "\"parameter_key\" can't to be null");
+	public List<String> getValues(final String parameterKey) {
+		Objects.requireNonNull(parameterKey, "\"parameterKey\" can't to be null");
 
-		final String param = conformParameterKey(parameter_key);
+		final String param = conformParameterKey(parameterKey);
 
 		final ArrayList<String> result = new ArrayList<>();
 
@@ -351,21 +351,21 @@ class SimpleParameters {
 	}
 
 	/**
-	 * Search a remove all parameters with param_key as name, even associated values.
-	 * @param parameters_key can have "-" or not (it will be added).
+	 * Search a remove all parameters with paramKey as name, even associated values.
+	 * @param parametersKey can have "-" or not (it will be added).
 	 */
-	public boolean removeParameter(final String parameters_key, final int param_as_this_key_pos) {
-		Objects.requireNonNull(parameters_key, "\"parameters_key\" can't to be null");
+	public boolean removeParameter(final String parametersKey, final int paramAsThisKeyPos) {
+		Objects.requireNonNull(parametersKey, "\"parametersKey\" can't to be null");
 
-		final String param = conformParameterKey(parameters_key);
+		final String param = conformParameterKey(parametersKey);
 
-		int to_skip = param_as_this_key_pos + 1;
+		int toSkip = paramAsThisKeyPos + 1;
 
 		for (int pos = 0; pos < parameters.size(); pos++) {
 			final String current = parameters.get(pos);
 			if (current.equals(param)) {
-				to_skip--;
-				if (to_skip == 0) {
+				toSkip--;
+				if (toSkip == 0) {
 					if (parameters.size() > pos + 1) {
 						final String next = parameters.get(pos + 1);
 						if (isParameterArgIsAParametersKey(next) == false) {
@@ -382,33 +382,33 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @param parameter_key can have "-" or not (it will be added).
+	 * @param parameterKey can have "-" or not (it will be added).
 	 * @return true if done
 	 */
-	public boolean alterParameter(final String parameter_key, final String new_value, final int param_as_this_key_pos) {
-		Objects.requireNonNull(parameter_key, "\"parameter_key\" can't to be null");
-		Objects.requireNonNull(new_value, "\"new_value\" can't to be null");
+	public boolean alterParameter(final String parameterKey, final String newValue, final int paramAsThisKeyPos) {
+		Objects.requireNonNull(parameterKey, "\"parameterKey\" can't to be null");
+		Objects.requireNonNull(newValue, "\"newValue\" can't to be null");
 
-		final String param = conformParameterKey(parameter_key);
+		final String param = conformParameterKey(parameterKey);
 
-		int to_skip = param_as_this_key_pos + 1;
+		int toSkip = paramAsThisKeyPos + 1;
 
 		for (int pos = 0; pos < parameters.size(); pos++) {
 			final String current = parameters.get(pos);
 			if (current.equals(param)) {
-				to_skip--;
-				if (to_skip == 0) {
+				toSkip--;
+				if (toSkip == 0) {
 					if (parameters.size() > pos + 1) {
 						final String next = parameters.get(pos + 1);
 						if (isParameterArgIsAParametersKey(next) == false) {
-							parameters.set(pos + 1, new_value);
+							parameters.set(pos + 1, newValue);
 						} else {
-							parameters.add(pos + 1, new_value);
+							parameters.add(pos + 1, newValue);
 						}
 					} else {
-						parameters.add(new_value);
+						parameters.add(newValue);
 					}
-					log.trace("Add parameter: {}", new_value);
+					log.trace("Add parameter: {}", newValue);
 					return true;
 				}
 			}

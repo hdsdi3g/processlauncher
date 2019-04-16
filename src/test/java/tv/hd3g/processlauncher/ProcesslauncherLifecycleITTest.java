@@ -62,8 +62,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		scheduledThreadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
 	}
 
-	public ProcesslauncherBuilder prepareBuilder(final Class<?> exec_class) throws IOException {
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), exec_class.getName());
+	public ProcesslauncherBuilder prepareBuilder(final Class<?> execClass) throws IOException {
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), execClass.getName());
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
 		return new ProcesslauncherBuilder(cmd);
 	}
@@ -127,7 +127,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 	public void testResultValues() throws Exception {
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecIOText.class.getName());
-		parameters.addParameters(DemoExecIOText.expected_in);
+		parameters.addParameters(DemoExecIOText.expectedIn);
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
 		final ProcesslauncherBuilder ept = new ProcesslauncherBuilder(cmd);
 
@@ -136,12 +136,12 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final ProcesslauncherLifecycle p = captureTextAndStart(ept).waitForEnd();
 
-		Assert.assertEquals(DemoExecIOText.expected_out, textRetention.getStdout(false, ""));
-		Assert.assertEquals(DemoExecIOText.expected_err, textRetention.getStderr(false, ""));
-		Assert.assertEquals(DemoExecIOText.exit_ok, (int) p.getExitCode());
+		Assert.assertEquals(DemoExecIOText.expectedOut, textRetention.getStdout(false, ""));
+		Assert.assertEquals(DemoExecIOText.expectedErr, textRetention.getStderr(false, ""));
+		Assert.assertEquals(DemoExecIOText.exitOk, (int) p.getExitCode());
 		Assert.assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
 
-		Assert.assertEquals(DemoExecIOText.exit_ok, p.getExitCode().intValue());
+		Assert.assertEquals(DemoExecIOText.exitOk, p.getExitCode().intValue());
 	}
 
 	public void testMaxExecTime() throws Exception {
@@ -149,10 +149,10 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		ept.setExecutionTimeLimiter(DemoExecLongSleep.MAX_DURATION, TimeUnit.MILLISECONDS, scheduledThreadPool);
 
-		final long start_time = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
-		final long duration = System.currentTimeMillis() - start_time;
+		final long duration = System.currentTimeMillis() - startTime;
 
 		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION + 300)); /** 300 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.TOO_LONG_EXECUTION_TIME, result.getEndStatus());
@@ -166,7 +166,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	public void testKill() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecLongSleep.class);
 
-		final long start_time = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 		final ProcesslauncherLifecycle result = ept.start();
 
 		scheduledThreadPool.schedule(() -> {
@@ -175,7 +175,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		result.waitForEnd();
 
-		final long duration = System.currentTimeMillis() - start_time;
+		final long duration = System.currentTimeMillis() - startTime;
 
 		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION + 300)); /** 300 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
@@ -189,7 +189,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	public void testKillSubProcess() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecSubProcess.class);
 
-		final long start_time = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 		final ProcesslauncherLifecycle result = ept.start();
 
 		scheduledThreadPool.schedule(() -> {
@@ -206,7 +206,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		result.waitForEnd();
 
-		final long duration = System.currentTimeMillis() - start_time;
+		final long duration = System.currentTimeMillis() - startTime;
 
 		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION * 4 * 2));
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
@@ -224,10 +224,10 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		ept.setExecutionTimeLimiter(DemoExecLongSleep.MAX_DURATION, TimeUnit.MILLISECONDS, scheduledThreadPool);
 
-		final long start_time = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
-		final long duration = System.currentTimeMillis() - start_time;
+		final long duration = System.currentTimeMillis() - startTime;
 		MatcherAssert.assertThat(duration, Matchers.greaterThanOrEqualTo(result.getUptime(TimeUnit.MILLISECONDS)));
 	}
 
@@ -245,7 +245,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 			final String line = lineEntry.getLine();
 			if (lineEntry.isStdErr()) {
 				System.err.println("Process say: " + line);
-				errors.add(new Exception("is_std_err is true"));
+				errors.add(new Exception("isStdErr is true"));
 				return DemoExecInteractive.QUIT;
 			} else if (line.equals("FOO")) {
 				return "bar";

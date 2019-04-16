@@ -64,11 +64,11 @@ public class ExecutableFinder {
 			/**
 			 * Like .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
 			 */
-			final String path_ext = System.getenv("PATHEXT");
-			if (path_ext.indexOf(";") > 0) {
-				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.stream(path_ext.split(";")).map(ext -> ext.toLowerCase().substring(1)).collect(Collectors.toUnmodifiableList()));
+			final String pathExt = System.getenv("PATHEXT");
+			if (pathExt.indexOf(";") > 0) {
+				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.stream(pathExt.split(";")).map(ext -> ext.toLowerCase().substring(1)).collect(Collectors.toUnmodifiableList()));
 			} else {
-				log.warn("Invalid PATHEXT env.: " + path_ext);
+				log.warn("Invalid PATHEXT env.: " + pathExt);
 				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.asList("exe", "com", "cmd", "bat"));
 			}
 		} else {
@@ -85,7 +85,7 @@ public class ExecutableFinder {
 
 		/*if (System.getProperty("execfinder.exec", "").equals("") == false) {
 			// GLOBAL_DECLARED_EXECUTABLES = Collections.unmodifiableList(Arrays.stream(System.getProperty("execfinder.searchdir").split(File.pathSeparator)).map(File::new).filter(isValidDirectory).map(File::getAbsoluteFile).collect(Collectors.toList()));
-
+		
 			// log.debug("Specific executable path declared via system property: " + GLOBAL_DECLARED_DIRS.stream().map(File::getPath).collect(Collectors.joining(", ")));
 		} else {
 			GLOBAL_DECLARED_EXECUTABLES = Collections.emptyMap();
@@ -97,12 +97,12 @@ public class ExecutableFinder {
 	 * synchronizedList
 	 */
 	private final LinkedList<File> paths;
-	private final LinkedHashMap<String, File> declared_in_configuration;
-	private final boolean is_windows_style_path;
+	private final LinkedHashMap<String, File> declaredInConfiguration;
+	private final boolean isWindowsStylePath;
 
 	public ExecutableFinder() {
-		declared_in_configuration = new LinkedHashMap<>();
-		is_windows_style_path = File.separator.equals("\\");// System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+		declaredInConfiguration = new LinkedHashMap<>();
+		isWindowsStylePath = File.separator.equals("\\");// System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
 
 		/**
 		 * Adds only valid dirs
@@ -123,9 +123,9 @@ public class ExecutableFinder {
 		/**
 		 * Remove duplicate entries
 		 */
-		final List<File> new_list = paths.stream().distinct().collect(Collectors.toUnmodifiableList());
+		final List<File> newList = paths.stream().distinct().collect(Collectors.toUnmodifiableList());
 		paths.clear();
-		paths.addAll(new_list);
+		paths.addAll(newList);
 
 		if (log.isTraceEnabled()) {
 			log.trace("Full path: " + paths.stream().map(f -> f.getPath()).collect(Collectors.joining(File.pathSeparator)));
@@ -149,15 +149,15 @@ public class ExecutableFinder {
 	 * Put in top priority.
 	 * Path / or \ will be corrected
 	 */
-	public ExecutableFinder addLocalPath(final String relative_user_home_path) {
-		if (is_windows_style_path) {
-			relative_user_home_path.replaceAll("/", "\\\\");
+	public ExecutableFinder addLocalPath(final String relativeUserHomePath) {
+		if (isWindowsStylePath) {
+			relativeUserHomePath.replaceAll("/", "\\\\");
 		} else {
-			relative_user_home_path.replaceAll("\\\\", "/");
+			relativeUserHomePath.replaceAll("\\\\", "/");
 		}
 
-		final String user_home = System.getProperty("user.home");
-		final File f = new File(user_home + File.separator + relative_user_home_path).getAbsoluteFile();
+		final String userHome = System.getProperty("user.home");
+		final File f = new File(userHome + File.separator + relativeUserHomePath).getAbsoluteFile();
 
 		return addPath(f);
 	}
@@ -165,8 +165,8 @@ public class ExecutableFinder {
 	/**
 	 * Put in top priority.
 	 */
-	public ExecutableFinder addPath(final File file_path) {
-		final File f = file_path.getAbsoluteFile();
+	public ExecutableFinder addPath(final File filePath) {
+		final File f = filePath.getAbsoluteFile();
 
 		if (isValidDirectory.test(f)) {
 			synchronized (this) {
@@ -189,11 +189,11 @@ public class ExecutableFinder {
 		}
 	}
 
-	public ExecutableFinder registerExecutable(final String name, final File full_path) throws IOException {
-		if (validExec(full_path) == false) {
-			throw new IOException("Invalid declared_in_configuration executable: " + name + " can't be correctly found in " + full_path);
+	public ExecutableFinder registerExecutable(final String name, final File fullPath) throws IOException {
+		if (validExec(fullPath) == false) {
+			throw new IOException("Invalid declaredInConfiguration executable: " + name + " can't be correctly found in " + fullPath);
 		}
-		declared_in_configuration.put(name, full_path);
+		declaredInConfiguration.put(name, fullPath);
 		return this;
 	}
 
@@ -204,8 +204,8 @@ public class ExecutableFinder {
 	 * @throws FileNotFoundException if exec don't exists or is not correctly registed.
 	 */
 	public File get(final String name) throws FileNotFoundException {
-		if (declared_in_configuration.containsKey(name)) {
-			return declared_in_configuration.get(name);
+		if (declaredInConfiguration.containsKey(name)) {
+			return declaredInConfiguration.get(name);
 		}
 
 		final File exec = new File(name);
@@ -213,17 +213,17 @@ public class ExecutableFinder {
 			return exec;
 		}
 
-		final List<File> all_file_candidates = Stream.concat(declared_in_configuration.values().stream().map(file -> {
+		final List<File> allFileCandidates = Stream.concat(declaredInConfiguration.values().stream().map(file -> {
 			return file.getParentFile();
 		}), paths.stream()).map(dir -> {
 			return new File(dir + File.separator + name).getAbsoluteFile();
 		}).distinct().collect(Collectors.toUnmodifiableList());
 
-		if (is_windows_style_path == false) {
+		if (isWindowsStylePath == false) {
 			/**
 			 * *nix flavors
 			 */
-			return all_file_candidates.stream().filter(file -> {
+			return allFileCandidates.stream().filter(file -> {
 				return validExec(file);
 			}).findFirst().orElseThrow(() -> new FileNotFoundException("Can't found executable \"" + name + "\""));
 		} else {
@@ -231,12 +231,12 @@ public class ExecutableFinder {
 			 * Windows flavor
 			 * Try with add windows ext
 			 */
-			return all_file_candidates.stream().flatMap(file -> {
-				final boolean has_already_valid_ext = WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> {
+			return allFileCandidates.stream().flatMap(file -> {
+				final boolean hasAlreadyValidExt = WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> {
 					return file.getName().toLowerCase().endsWith("." + ext.toLowerCase());
 				});
 
-				if (has_already_valid_ext) {
+				if (hasAlreadyValidExt) {
 					if (validExec(file)) {
 						return Stream.of(file);
 					} else {
@@ -251,8 +251,8 @@ public class ExecutableFinder {
 					     * Try with lower/upper case extensions.
 					     */
 					    return Stream.of(new File(file + "." + ext.toLowerCase()), new File(file + "." + ext.toUpperCase()));
-					}).filter(file_ext -> {
-						return validExec(file_ext);
+					}).filter(fileExt -> {
+						return validExec(fileExt);
 					});
 				}
 			}).findFirst().orElseThrow(() -> new FileNotFoundException("Can't found executable \"" + name + "\""));

@@ -28,7 +28,7 @@ import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 public class Processlauncher {
 
 	/*
-	TODO refactor: eclipse coll, exec_name/execName
+	TODO refactor: eclipse coll
 	 */
 
 	private final boolean execCodeMustBeZero;

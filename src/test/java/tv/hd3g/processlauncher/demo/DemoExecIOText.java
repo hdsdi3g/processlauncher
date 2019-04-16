@@ -18,38 +18,38 @@ package tv.hd3g.processlauncher.demo;
 
 public class DemoExecIOText {
 
-	public static final String expected_out = "OUT";
-	public static final String expected_err = "ERR";
-	public static final String expected_in = "InputValue\\1";
+	public static final String expectedOut = "OUT";
+	public static final String expectedErr = "ERR";
+	public static final String expectedIn = "InputValue\\1";
 
-	public static final int exit_ok = 1;
-	public static final int exit_bad_param_len = 2;
-	public static final int exit_bad_param_value = 3;
-	public static final int exit_bad_env = 4;
-	public static final int exit_bad_import_env = 5;
+	public static final int exitOk = 1;
+	public static final int exitBadParamLen = 2;
+	public static final int exitBadParamValue = 3;
+	public static final int exitBadEnv = 4;
+	public static final int exitBadImportEnv = 5;
 
 	public static final String ENV_KEY = "EnvKey";
 	public static final String ENV_VALUE = "EnvValue";
 
 	public static void main(final String[] args) {
-		System.out.println(expected_out);
-		System.err.println(expected_err);
+		System.out.println(expectedOut);
+		System.err.println(expectedErr);
 
 		if (System.getenv().getOrDefault(ENV_KEY, "").equals(ENV_VALUE) == false) {
-			System.exit(exit_bad_env);
+			System.exit(exitBadEnv);
 		}
 
 		if (System.getenv().containsKey("PATH") == false) {
-			System.exit(exit_bad_import_env);
+			System.exit(exitBadImportEnv);
 		}
 
 		if (args.length != 1) {
-			System.exit(exit_bad_param_len);
+			System.exit(exitBadParamLen);
 		} else {
-			if (args[0].equals(expected_in) == false) {
-				System.exit(exit_bad_param_value);
+			if (args[0].equals(expectedIn) == false) {
+				System.exit(exitBadParamValue);
 			} else {
-				System.exit(exit_ok);
+				System.exit(exitOk);
 			}
 		}
 	}

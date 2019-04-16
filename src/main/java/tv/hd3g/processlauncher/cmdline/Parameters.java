@@ -36,22 +36,22 @@ public class Parameters extends SimpleParameters {
 	/**
 	 * Use "<%" and "%>" by default
 	 */
-	public Parameters(final String bulk_parameters) {
-		super(bulk_parameters);
+	public Parameters(final String bulkParameters) {
+		super(bulkParameters);
 		setVarTags("<%", "%>");
 	}
 
 	/**
 	 * Use "<%" and "%>" by default
 	 */
-	public Parameters(final String... bulk_parameters) {
+	public Parameters(final String... bulkParameters) {
 		super();
 		setVarTags("<%", "%>");
 
-		Objects.requireNonNull(bulk_parameters, "\"bulk_parameters\" can't to be null");
-		Arrays.stream(bulk_parameters).filter(p -> {
+		Objects.requireNonNull(bulkParameters, "\"bulkParameters\" can't to be null");
+		Arrays.stream(bulkParameters).filter(p -> {
 			return p != null;
-		}).forEach(bulk_parameter -> super.addBulkParameters(bulk_parameter));
+		}).forEach(bulkParameter -> super.addBulkParameters(bulkParameter));
 	}
 
 	/**
@@ -62,14 +62,14 @@ public class Parameters extends SimpleParameters {
 		setVarTags("<%", "%>");
 	}
 
-	public Parameters setVarTags(final String start_var_tag, final String end_var_tag) {
-		startVarTag = Objects.requireNonNull(start_var_tag, "\"start_var_tag\" can't to be null");
-		if (start_var_tag.isEmpty()) {
-			throw new NullPointerException("\"start_var_tag\" can't to be empty");
+	public Parameters setVarTags(final String startVarTag, final String endVarTag) {
+		this.startVarTag = Objects.requireNonNull(startVarTag, "\"startVarTag\" can't to be null");
+		if (startVarTag.isEmpty()) {
+			throw new NullPointerException("\"startVarTag\" can't to be empty");
 		}
-		endVarTag = Objects.requireNonNull(end_var_tag, "\"end_var_tag\" can't to be null");
-		if (end_var_tag.isEmpty()) {
-			throw new NullPointerException("\"end_var_tag\" can't to be empty");
+		this.endVarTag = Objects.requireNonNull(endVarTag, "\"endVarTag\" can't to be null");
+		if (endVarTag.isEmpty()) {
+			throw new NullPointerException("\"endVarTag\" can't to be empty");
 		}
 		return this;
 	}
@@ -117,18 +117,18 @@ public class Parameters extends SimpleParameters {
 	}
 
 	/**
-	 * @return var_name
+	 * @return varName
 	 */
-	public String addVariable(final String var_name) {
-		addParameters(startVarTag + var_name + endVarTag);
-		return var_name;
+	public String addVariable(final String varName) {
+		addParameters(startVarTag + varName + endVarTag);
+		return varName;
 	}
 
 	@Override
 	public Parameters clone() {
-		final Parameters new_instance = new Parameters(startVarTag, endVarTag);
-		new_instance.importParametersFrom(this);
-		return new_instance;
+		final Parameters newInstance = new Parameters(startVarTag, endVarTag);
+		newInstance.importParametersFrom(this);
+		return newInstance;
 	}
 
 }

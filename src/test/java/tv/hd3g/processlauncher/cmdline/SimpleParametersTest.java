@@ -27,9 +27,9 @@ import junit.framework.TestCase;
 public class SimpleParametersTest extends TestCase {
 
 	public void testParams() {
-		final String test_chaotic_line = "-aa 1  -single --cc 3 -U  \"dsfdsf sdf s  -e foo\" -g 2 42 -f=f -h=i;j,k:l -m Ah! -l \"u \" m ";
+		final String testChaoticLine = "-aa 1  -single --cc 3 -U  \"dsfdsf sdf s  -e foo\" -g 2 42 -f=f -h=i;j,k:l -m Ah! -l \"u \" m ";
 
-		SimpleParameters pu = new SimpleParameters(test_chaotic_line);
+		SimpleParameters pu = new SimpleParameters(testChaoticLine);
 
 		assertEquals("-", pu.getParametersKeysStartsWith());
 		assertFalse(pu.getParameters().isEmpty());
@@ -37,7 +37,7 @@ public class SimpleParametersTest extends TestCase {
 
 		final String actual = pu.toString();
 		pu = new SimpleParameters();
-		pu.addBulkParameters(test_chaotic_line);
+		pu.addBulkParameters(testChaoticLine);
 		assertEquals(actual, pu.toString());
 
 		final List<String> compare = Arrays.asList("-aa", "1", "-single", "--cc", "3", "-U", "dsfdsf sdf s  -e foo", "-g", "2", "42", "-f=f", "-h=i;j,k:l", "-m", "Ah!", "-l", "u ", "m");

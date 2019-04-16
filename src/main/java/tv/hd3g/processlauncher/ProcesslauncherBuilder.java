@@ -25,7 +25,7 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 	private final File executable;
 	private final List<String> parameters;
 	private final LinkedHashMap<String, String> environment;
-	private File working_directory;
+	private File workingDirectory;
 
 	private boolean execCodeMustBeZero;
 	private final List<ExecutionCallbacker> executionCallbackers;
@@ -101,20 +101,20 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 	}
 
 	public File getWorkingDirectory() {
-		return working_directory;
+		return workingDirectory;
 	}
 
-	public ProcesslauncherBuilder setWorkingDirectory(final File working_directory) throws IOException {
-		Objects.requireNonNull(working_directory, "\"working_directory\" can't to be null");
+	public ProcesslauncherBuilder setWorkingDirectory(final File workingDirectory) throws IOException {
+		Objects.requireNonNull(workingDirectory, "\"workingDirectory\" can't to be null");
 
-		if (working_directory.exists() == false) {
-			throw new FileNotFoundException("\"" + working_directory.getPath() + "\" in filesytem");
-		} else if (working_directory.canRead() == false) {
-			throw new IOException("Can't read working_directory \"" + working_directory.getPath() + "\"");
-		} else if (working_directory.isDirectory() == false) {
-			throw new FileNotFoundException("\"" + working_directory.getPath() + "\" is not a directory");
+		if (workingDirectory.exists() == false) {
+			throw new FileNotFoundException("\"" + workingDirectory.getPath() + "\" in filesytem");
+		} else if (workingDirectory.canRead() == false) {
+			throw new IOException("Can't read workingDirectory \"" + workingDirectory.getPath() + "\"");
+		} else if (workingDirectory.isDirectory() == false) {
+			throw new FileNotFoundException("\"" + workingDirectory.getPath() + "\" is not a directory");
 		}
-		this.working_directory = working_directory;
+		this.workingDirectory = workingDirectory;
 		return this;
 	}
 
@@ -192,13 +192,13 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		fullCommandLine.add(executable.getPath());
 		fullCommandLine.addAll(parameters);
 
-		final ProcessBuilder process_builder = new ProcessBuilder(fullCommandLine);
-		process_builder.environment().putAll(environment);
+		final ProcessBuilder processBuilder = new ProcessBuilder(fullCommandLine);
+		processBuilder.environment().putAll(environment);
 
-		if (working_directory != null) {
-			process_builder.directory(working_directory);
+		if (workingDirectory != null) {
+			processBuilder.directory(workingDirectory);
 		}
-		return process_builder;
+		return processBuilder;
 	}
 
 	static final Function<String, String> addQuotesIfSpaces = s -> {
