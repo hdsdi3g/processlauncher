@@ -27,10 +27,6 @@ import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 
 public class Processlauncher {
 
-	/*
-	TODO refactor: eclipse coll
-	 */
-
 	private final boolean execCodeMustBeZero;
 	private final List<ExecutionCallbacker> executionCallbackers;
 	private final Optional<ExecutionTimeLimiter> executionTimeLimiter;
