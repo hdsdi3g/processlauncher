@@ -16,6 +16,8 @@
 */
 package tv.hd3g.processlauncher;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -42,9 +44,10 @@ public class Exec {
 	private final Map<String, String> varsToInject;
 	private boolean removeParamsIfNoVarToInject;
 
-	public Exec(final String execName, final ExecutableFinder executableFinder) {
+	public Exec(final String execName, final ExecutableFinder executableFinder) throws FileNotFoundException {
 		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
+		executableFinder.get(execName);
 		parameters = new Parameters();
 		varsToInject = new HashMap<>();
 	}
@@ -64,6 +67,18 @@ public class Exec {
 
 	public Parameters getParameters() {
 		return parameters;
+	}
+
+	public String getExecName() {
+		return execName;
+	}
+
+	public ExecutableFinder getExecutableFinder() {
+		return executableFinder;
+	}
+
+	public File getExecutableFile() throws FileNotFoundException {
+		return executableFinder.get(execName);
 	}
 
 	/**

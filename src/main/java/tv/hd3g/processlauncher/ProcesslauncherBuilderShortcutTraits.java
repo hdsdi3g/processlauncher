@@ -17,7 +17,7 @@
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -33,14 +33,14 @@ public interface ProcesslauncherBuilderShortcutTraits {
 	/**
 	 * Shortcut for CaptureStandardOutputText
 	 */
-	default ProcesslauncherBuilder setCaptureStandardOutput(final ExecutorService outStreamWatcher, final CapturedStdOutErrTextRetention textRetention) {
+	default ProcesslauncherBuilder setCaptureStandardOutput(final Executor outStreamWatcher, final CapturedStdOutErrTextRetention textRetention) {
 		return setCaptureStandardOutput(new CaptureStandardOutputText(outStreamWatcher, textRetention));
 	}
 
 	/**
 	 * Shortcut for CaptureStandardOutputText
 	 */
-	default ProcesslauncherBuilder setCaptureStandardOutput(final ExecutorService outStreamWatcher, final CapturedStdOutErrTextInteractive textInteractive) {
+	default ProcesslauncherBuilder setCaptureStandardOutput(final Executor outStreamWatcher, final CapturedStdOutErrTextInteractive textInteractive) {
 		return setCaptureStandardOutput(new CaptureStandardOutputText(outStreamWatcher, textInteractive));
 	}
 

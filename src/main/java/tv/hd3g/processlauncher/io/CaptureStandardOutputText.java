@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,12 +36,12 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 
 	private final CapturedStreams captureOutStreamsBehavior;
 	private final List<CapturedStdOutErrTextObserver> observers;
-	private final ExecutorService executorConsumer;
+	private final Executor executorConsumer;
 
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
+	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final Executor executorConsumer, final CapturedStdOutErrTextObserver... observers) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
 
 		this.observers = new ArrayList<>();
@@ -58,7 +58,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final ExecutorService executorConsumer, final CapturedStdOutErrTextObserver... observers) {
+	public CaptureStandardOutputText(final Executor executorConsumer, final CapturedStdOutErrTextObserver... observers) {
 		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer, observers);
 	}
 
