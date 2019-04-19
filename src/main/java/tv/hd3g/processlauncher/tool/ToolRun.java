@@ -16,9 +16,7 @@
 */
 package tv.hd3g.processlauncher.tool;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -28,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
+import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
@@ -49,19 +48,18 @@ public class ToolRun {
 	}
 
 	public <T extends ExecutableTool> CompletableFuture<RunningTool<T>> execute(final T execTool) {
+		final Executor executorStdOutWatchers = r -> {
+			final Thread t = new Thread(r);
+			t.setDaemon(true);
+			t.setName("Executable sysouterr watcher for " + execTool.getExecutableName());
+			t.start();
+		};
+
 		return CompletableFuture.supplyAsync(() -> {
 			final String executableName = execTool.getExecutableName();
-			final List<String> commandLineParameters = execTool.getCommandLineParameters();
 			try {
-				final File executable = executableFinder.get(executableName);
-				final Executor executorStdOutWatchers = r -> {
-					final Thread t = new Thread(r);
-					t.setDaemon(true);
-					t.setName("Executable sysouterr watcher for " + executableName);
-					t.start();
-				};
-
-				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(executable, commandLineParameters);
+				final CommandLine cmd = new CommandLine(executableName, execTool.getParameters(), executableFinder);
+				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 				builder.setCaptureStandardOutput(executorStdOutWatchers, textRetention);
 				execTool.beforeRun(builder);

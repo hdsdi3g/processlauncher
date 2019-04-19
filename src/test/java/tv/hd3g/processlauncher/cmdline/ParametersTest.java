@@ -16,6 +16,11 @@
 */
 package tv.hd3g.processlauncher.cmdline;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class ParametersTest extends TestCase {
@@ -51,4 +56,54 @@ public class ParametersTest extends TestCase {
 		assertNull(clp.extractVarNameFromTaggedParameter("%>"));
 		assertNull(clp.extractVarNameFromTaggedParameter("nope"));
 	}
+
+	public void testInjectVarKeepEmptyParam() {
+		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		final HashMap<String, String> vars = new HashMap<>();
+		vars.put("var1", "value1");
+		vars.put("var2", "value2");
+		p.getParametersInjectVars(vars, false);
+
+		Assert.assertEquals("-a value1 value2 -b -c", p.toString());
+	}
+
+	public void testRemoveVarsKeepEmptyParam() {
+		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		p.getParametersRemoveVars(false);
+
+		Assert.assertEquals("-a -b -c", p.toString());
+	}
+
+	public void testInjectVarRemoveEmptyParam() {
+		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		final HashMap<String, String> vars = new HashMap<>();
+		vars.put("var1", "value1");
+		vars.put("var2", "value2");
+		p.getParametersInjectVars(vars, true);
+
+		Assert.assertEquals("-a value1 value2 -c", p.toString());
+	}
+
+	public void testRemoveVarsRemoveEmptyParam() {
+		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		p.getParametersRemoveVars(true);
+		Assert.assertEquals("-c", p.toString());
+	}
+
+	public void testInjectParamsAroundVariable() throws IOException {
+		Parameters p = new Parameters("-before <%myvar%> -after");
+
+		p.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
+		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -after", p.toString());
+
+		p = new Parameters("-before <%myvar%> <%myvar%> -after");
+		p.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
+		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -addedbefore 1 <%myvar%> -addedafter 2 -after", p.toString());
+
+		p = new Parameters("-before <%myvar1%> <%myvar2%> -after");
+		p.injectParamsAroundVariable("myvar1", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
+		p.injectParamsAroundVariable("myvar2", Arrays.asList("-addedbefore", "3"), Arrays.asList("-addedafter", "4"));
+		Assert.assertEquals("-before -addedbefore 1 <%myvar1%> -addedafter 2 -addedbefore 3 <%myvar2%> -addedafter 4 -after", p.toString());
+	}
+
 }

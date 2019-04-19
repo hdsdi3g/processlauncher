@@ -16,13 +16,12 @@
 */
 package tv.hd3g.processlauncher.tool;
 
-import java.util.List;
-
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
+import tv.hd3g.processlauncher.cmdline.Parameters;
 
 public interface ExecutableTool {
 
-	List<String> getCommandLineParameters();
+	Parameters getParameters();
 
 	/**
 	 * See by ExecutableFinder

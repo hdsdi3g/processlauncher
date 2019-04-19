@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -31,12 +30,13 @@ import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.tool.ExecutableTool;
 
 /**
- * Shortcut for alls classes
+ * Shortcut for some classes
  * Reusable
  */
-public class Exec {
+public class Exec implements ExecutableTool {
 
 	private final String execName;
 	private final ExecutableFinder executableFinder;
@@ -65,11 +65,13 @@ public class Exec {
 		return removeParamsIfNoVarToInject;
 	}
 
+	@Override
 	public Parameters getParameters() {
 		return parameters;
 	}
 
-	public String getExecName() {
+	@Override
+	public String getExecutableName() {
 		return execName;
 	}
 
@@ -85,9 +87,15 @@ public class Exec {
 	 * Blocking
 	 */
 	public CapturedStdOutErrTextRetention runWaitGetText(final Consumer<ProcesslauncherBuilder> beforeRun) throws IOException {
-		final CommandLine commandLine = new CommandLine(execName, parameters, executableFinder);
-		final List<String> params = commandLine.getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
-		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(commandLine.getExecutable(), params, executableFinder);
+		final Parameters currentParameters;
+		if (varsToInject.isEmpty()) {
+			currentParameters = parameters.clone().getParametersRemoveVars(removeParamsIfNoVarToInject);
+		} else {
+			currentParameters = parameters.clone().getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
+		}
+
+		final CommandLine commandLine = new CommandLine(execName, currentParameters, executableFinder);
+		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(commandLine);
 
 		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();

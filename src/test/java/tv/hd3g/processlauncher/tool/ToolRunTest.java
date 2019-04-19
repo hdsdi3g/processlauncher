@@ -16,7 +16,6 @@
 */
 package tv.hd3g.processlauncher.tool;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +25,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.Exec;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
+import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
 public class ToolRunTest extends TestCase {
@@ -57,8 +57,8 @@ public class ToolRunTest extends TestCase {
 			}
 
 			@Override
-			public List<String> getCommandLineParameters() {
-				return exec.getParameters().getParameters();
+			public Parameters getParameters() {
+				return exec.getParameters();
 			}
 		};
 

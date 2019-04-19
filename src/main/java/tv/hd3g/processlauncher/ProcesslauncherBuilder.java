@@ -65,11 +65,8 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		this(executable, parameters, null);
 	}
 
-	/**
-	 * @param commandLine with getParametersRemoveVars(false) ; don't manage param vars
-	 */
 	public ProcesslauncherBuilder(final CommandLine commandLine) {
-		this(commandLine.getExecutable(), commandLine.getParametersRemoveVars(false), commandLine.getExecutableFinder().orElseGet(() -> new ExecutableFinder()));
+		this(commandLine.getExecutable(), commandLine.getParameters().getParameters(), commandLine.getExecutableFinder().orElseGet(() -> new ExecutableFinder()));
 	}
 
 	/**

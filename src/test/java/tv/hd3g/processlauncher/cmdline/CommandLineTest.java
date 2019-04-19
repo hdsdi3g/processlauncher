@@ -18,10 +18,6 @@ package tv.hd3g.processlauncher.cmdline;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -30,35 +26,15 @@ public class CommandLineTest extends TestCase {
 
 	private final ExecutableFinder ef;
 	private final CommandLine cmd;
+	private final Parameters parametersSource;
 
 	public CommandLineTest() throws IOException {
+		parametersSource = new Parameters("-a");
 		ExecutableFinderTest.patchTestExec();
 
 		ef = new ExecutableFinder();
-		cmd = new CommandLine("test-exec", "-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c", ef);
-	}
-
-	public void testInjectVarKeepEmptyParam() {
-		final HashMap<String, String> vars = new HashMap<>();
-		vars.put("var1", "value1");
-		vars.put("var2", "value2");
-
-		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-a", "value1", "value2", "-b", "-c"), cmd.getParametersInjectVars(vars, false)));
-	}
-
-	public void testRemoveVarsKeepEmptyParam() {
-		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-a", "-b", "-c"), cmd.getParametersRemoveVars(false)));
-	}
-
-	public void testInjectVarRemoveEmptyParam() {
-		final HashMap<String, String> vars = new HashMap<>();
-		vars.put("var1", "value1");
-		vars.put("var2", "value2");
-		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-a", "value1", "value2", "-c"), cmd.getParametersInjectVars(vars, true)));
-	}
-
-	public void testRemoveVarsRemoveEmptyParam() {
-		Assert.assertTrue(CollectionUtils.isEqualCollection(Arrays.asList("-c"), cmd.getParametersRemoveVars(true)));
+		cmd = new CommandLine("test-exec", parametersSource, ef);
+		parametersSource.addParameters("-b");
 	}
 
 	public void testGetExecutableFinder() {
@@ -69,19 +45,9 @@ public class CommandLineTest extends TestCase {
 		Assert.assertEquals(ef.get("test-exec"), cmd.getExecutable());
 	}
 
-	public void testInjectParamsAroundVariable() throws IOException {
-		CommandLine cl = new CommandLine("test-exec", "-before <%myvar%> -after", ef);
-
-		cl.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -after", cl.getParametersToString());
-
-		cl = new CommandLine("test-exec", "-before <%myvar%> <%myvar%> -after", ef);
-		cl.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -addedbefore 1 <%myvar%> -addedafter 2 -after", cl.getParametersToString());
-
-		cl = new CommandLine("test-exec", "-before <%myvar1%> <%myvar2%> -after", ef);
-		cl.injectParamsAroundVariable("myvar1", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		cl.injectParamsAroundVariable("myvar2", Arrays.asList("-addedbefore", "3"), Arrays.asList("-addedafter", "4"));
-		Assert.assertEquals("-before -addedbefore 1 <%myvar1%> -addedafter 2 -addedbefore 3 <%myvar2%> -addedafter 4 -after", cl.getParametersToString());
+	public void testGetParameters() {
+		Assert.assertNotSame(parametersSource, cmd.getParameters());
+		Assert.assertFalse(parametersSource.toString().equals(cmd.getParameters().toString()));
 	}
+
 }

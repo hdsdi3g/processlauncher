@@ -16,11 +16,21 @@
 */
 package tv.hd3g.processlauncher.cmdline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Parameters extends SimpleParameters {
+
+	private static final BinaryOperator<List<String>> LIST_COMBINER = (list1, list2) -> Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toUnmodifiableList());
 
 	private String startVarTag;
 	private String endVarTag;
@@ -129,6 +139,83 @@ public class Parameters extends SimpleParameters {
 		final Parameters newInstance = new Parameters(startVarTag, endVarTag);
 		newInstance.importParametersFrom(this);
 		return newInstance;
+	}
+
+	/**
+	 * @return true if the update is done
+	 */
+	public boolean injectParamsAroundVariable(final String varName, final Collection<String> addBefore, final Collection<String> addAfter) {
+		Objects.requireNonNull(varName, "\"varName\" can't to be null");
+		Objects.requireNonNull(addBefore, "\"addBefore\" can't to be null");
+		Objects.requireNonNull(addAfter, "\"addAfter\" can't to be null");
+
+		final AtomicBoolean isDone = new AtomicBoolean(false);
+
+		final List<String> newParameters = getParameters().stream().reduce(Collections.unmodifiableList(new ArrayList<String>()), (list, arg) -> {
+			if (isTaggedParameter(arg)) {
+				final String currentVarName = extractVarNameFromTaggedParameter(arg);
+				if (currentVarName.equals(varName)) {
+					isDone.set(true);
+					return Stream.concat(list.stream(), Stream.concat(Stream.concat(addBefore.stream(), Stream.of(arg)), addAfter.stream())).collect(Collectors.toUnmodifiableList());
+				}
+			}
+
+			return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors.toUnmodifiableList());
+		}, LIST_COMBINER);
+
+		getParameters().clear();
+		getParameters().addAll(newParameters);
+
+		return isDone.get();
+	}
+
+	/**
+	 * @param removeParamsIfNoVarToInject if true, for "-a -b ? -d" -> "-a -d", else "-a -b -d"
+	 * @return this
+	 */
+	public Parameters getParametersRemoveVars(final boolean removeParamsIfNoVarToInject) {// TODO rename
+		return getParametersInjectVars(Collections.emptyMap(), removeParamsIfNoVarToInject);
+	}
+
+	/**
+	 * @param removeParamsIfNoVarToInject if true, for "-a -b c -d" -> "-a -d", else "-a -b -d"
+	 * @return this
+	 */
+	public Parameters getParametersInjectVars(final Map<String, String> varsToInject, final boolean removeParamsIfNoVarToInject) {// TODO rename
+		final List<String> newParameters;
+		if (removeParamsIfNoVarToInject) {
+			newParameters = getParameters().stream().reduce(Collections.unmodifiableList(new ArrayList<String>()), (list, arg) -> {
+				if (isTaggedParameter(arg)) {
+					final String varName = extractVarNameFromTaggedParameter(arg);
+					if (varsToInject.containsKey(varName)) {
+						return Stream.concat(list.stream(), Stream.of(varsToInject.get(varName))).collect(Collectors.toUnmodifiableList());
+					} else {
+						if (list.isEmpty()) {
+							return list;
+						} else if (isParameterArgIsAParametersKey(list.get(list.size() - 1))) {
+							return list.stream().limit(list.size() - 1).collect(Collectors.toUnmodifiableList());
+						} else {
+							return list;
+						}
+					}
+				} else {
+					return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors.toUnmodifiableList());
+				}
+			}, LIST_COMBINER);
+		} else {
+			newParameters = getParameters().stream().map(arg -> {
+				final String varName = extractVarNameFromTaggedParameter(arg);
+				if (varName != null) {
+					return varsToInject.get(varName);
+				} else {
+					return arg;
+				}
+			}).filter(arg -> arg != null).collect(Collectors.toUnmodifiableList());
+		}
+
+		getParameters().clear();
+		getParameters().addAll(newParameters);
+		return this;
 	}
 
 }
