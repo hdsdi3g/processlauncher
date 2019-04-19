@@ -64,6 +64,12 @@ public class ExecTest extends TestCase {
 		Assert.assertTrue(exec.getParameters().getParameters().isEmpty());
 	}
 
+	public void testGetReadyToRunParameters() {
+		Assert.assertNotNull(exec.getReadyToRunParameters());
+		Assert.assertTrue(exec.getReadyToRunParameters().getParameters().isEmpty());
+		Assert.assertNotSame(exec.getReadyToRunParameters(), exec.getParameters());
+	}
+
 	public void testRunWaitGetText() throws IOException {
 		exec.getParameters().addParameters("-version");
 

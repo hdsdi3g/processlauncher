@@ -21,7 +21,7 @@ import tv.hd3g.processlauncher.cmdline.Parameters;
 
 public interface ExecutableTool {
 
-	Parameters getParameters();
+	Parameters getReadyToRunParameters();
 
 	/**
 	 * See by ExecutableFinder

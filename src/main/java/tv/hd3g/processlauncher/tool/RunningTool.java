@@ -22,6 +22,9 @@ import java.util.concurrent.Executor;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
+/**
+ * @see ToolRun
+ */
 public interface RunningTool<T> {
 
 	CapturedStdOutErrTextRetention getTextRetention();

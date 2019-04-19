@@ -30,7 +30,7 @@ import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
-public class ToolRun {
+public class ToolRun {// TODO rename to ToolRunner
 
 	private final ExecutableFinder executableFinder;
 	private final ThreadPoolExecutor executor;
@@ -58,7 +58,7 @@ public class ToolRun {
 		return CompletableFuture.supplyAsync(() -> {
 			final String executableName = execTool.getExecutableName();
 			try {
-				final CommandLine cmd = new CommandLine(executableName, execTool.getParameters(), executableFinder);
+				final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(), executableFinder);
 				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 				builder.setCaptureStandardOutput(executorStdOutWatchers, textRetention);

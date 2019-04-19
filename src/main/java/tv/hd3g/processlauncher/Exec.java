@@ -43,6 +43,7 @@ public class Exec implements ExecutableTool {
 	private final Parameters parameters;
 	private final Map<String, String> varsToInject;
 	private boolean removeParamsIfNoVarToInject;
+	private final Consumer<ProcesslauncherBuilder> preBeforeRun;
 
 	public Exec(final String execName, final ExecutableFinder executableFinder) throws FileNotFoundException {
 		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
@@ -50,6 +51,19 @@ public class Exec implements ExecutableTool {
 		executableFinder.get(execName);
 		parameters = new Parameters();
 		varsToInject = new HashMap<>();
+		preBeforeRun = processBuilder -> {
+		};
+	}
+
+	public Exec(final ExecutableTool tool, final ExecutableFinder executableFinder) throws FileNotFoundException {// TODO test
+		execName = Objects.requireNonNull(tool.getExecutableName(), "\"tool#getExecutableName\" can't to be null");
+		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
+		executableFinder.get(execName);
+		parameters = tool.getReadyToRunParameters();
+		varsToInject = new HashMap<>();
+		preBeforeRun = processBuilder -> {
+			tool.beforeRun(processBuilder);
+		};
 	}
 
 	public Map<String, String> getVarsToInject() {
@@ -65,9 +79,17 @@ public class Exec implements ExecutableTool {
 		return removeParamsIfNoVarToInject;
 	}
 
-	@Override
 	public Parameters getParameters() {
 		return parameters;
+	}
+
+	@Override
+	public Parameters getReadyToRunParameters() {
+		if (varsToInject.isEmpty()) {
+			return parameters.clone().getParametersRemoveVars(removeParamsIfNoVarToInject);
+		} else {
+			return parameters.clone().getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
+		}
 	}
 
 	@Override
@@ -85,23 +107,22 @@ public class Exec implements ExecutableTool {
 
 	/**
 	 * Blocking
+	 * @param beforeRun can be null
+	 * @throws InvalidExecution
 	 */
 	public CapturedStdOutErrTextRetention runWaitGetText(final Consumer<ProcesslauncherBuilder> beforeRun) throws IOException {
-		final Parameters currentParameters;
-		if (varsToInject.isEmpty()) {
-			currentParameters = parameters.clone().getParametersRemoveVars(removeParamsIfNoVarToInject);
-		} else {
-			currentParameters = parameters.clone().getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
-		}
-
-		final CommandLine commandLine = new CommandLine(execName, currentParameters, executableFinder);
+		final CommandLine commandLine = new CommandLine(execName, getReadyToRunParameters(), executableFinder);
 		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(commandLine);
 
 		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 		builder.setCaptureStandardOutput(outStreamWatcher, textRetention);
 
-		beforeRun.accept(builder);
+		preBeforeRun.accept(builder);
+		if (beforeRun != null) {// TODO test
+			beforeRun.accept(builder);
+		}
+
 		builder.addExecutionCallbacker(new ExecutionCallbacker() {
 			@Override
 			public void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
@@ -109,7 +130,12 @@ public class Exec implements ExecutableTool {
 			}
 		});
 
-		builder.start().checkExecution();
+		try {
+			builder.start().checkExecution();
+		} catch (final InvalidExecution e) {
+			e.setStdErr(textRetention.getStderr(false, " / "));// TODO test
+			throw e;
+		}
 
 		return textRetention;
 	}

@@ -191,10 +191,16 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @return never null
+	 * @return internal list, never null
 	 */
 	public List<String> getParameters() {
 		return parameters;
+	}
+
+	public SimpleParameters replaceParameters(final Collection<? extends String> newParameters) {
+		parameters.clear();
+		parameters.addAll(newParameters);
+		return this;
 	}
 
 	/**
@@ -249,8 +255,7 @@ class SimpleParameters {
 		Objects.requireNonNull(params, "\"params\" can't to be null");
 
 		final List<String> newList = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(Collectors.toUnmodifiableList());
-		parameters.clear();
-		parameters.addAll(newList);
+		replaceParameters(newList);
 
 		log.trace("Prepend parameters: {}", () -> params);
 

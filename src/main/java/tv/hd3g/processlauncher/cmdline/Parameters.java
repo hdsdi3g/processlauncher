@@ -163,9 +163,7 @@ public class Parameters extends SimpleParameters {
 			return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors.toUnmodifiableList());
 		}, LIST_COMBINER);
 
-		getParameters().clear();
-		getParameters().addAll(newParameters);
-
+		replaceParameters(newParameters);
 		return isDone.get();
 	}
 
@@ -213,8 +211,7 @@ public class Parameters extends SimpleParameters {
 			}).filter(arg -> arg != null).collect(Collectors.toUnmodifiableList());
 		}
 
-		getParameters().clear();
-		getParameters().addAll(newParameters);
+		replaceParameters(newParameters);
 		return this;
 	}
 

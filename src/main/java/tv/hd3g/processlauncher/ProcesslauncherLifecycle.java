@@ -241,11 +241,12 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 
 	/**
 	 * waitForEnd and checks isCorrectlyDone
+	 * @throws InvalidExecution
 	 */
 	public ProcesslauncherLifecycle checkExecution() {
 		waitForEnd();
 		if (isCorrectlyDone() == false) {
-			throw new RuntimeException("Can't execute correcly " + fullCommandLine + "; " + getEndStatus() + " [" + getExitCode() + "]");
+			throw new InvalidExecution(this);
 		}
 		return this;
 	}
@@ -257,4 +258,7 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 		return stdInInjection;
 	}
 
+	String getFullCommandLine() {
+		return fullCommandLine;
+	}
 }

@@ -57,8 +57,8 @@ public class ToolRunTest extends TestCase {
 			}
 
 			@Override
-			public Parameters getParameters() {
-				return exec.getParameters();
+			public Parameters getReadyToRunParameters() {
+				return exec.getReadyToRunParameters();
 			}
 		};
 
