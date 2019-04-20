@@ -31,6 +31,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 		lineEntries = new LinkedBlockingQueue<>();
 	}
 
+	// TODO add external observer + test + impl with ToolRun
 	/**
 	 * With BOTH_STDOUT_STDERR
 	 */

@@ -71,7 +71,7 @@ public class ToolRunTest extends TestCase {
 		Assert.assertNotNull(capturedStdOutErrTextRetention);
 		Assert.assertNotNull(result.getLifecyle());
 
-		Assert.assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText(r -> r.run()).get());
+		Assert.assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText());
 		Assert.assertEquals(result, result.waitForEnd(r -> r.run()).get());
 
 		Assert.assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> {

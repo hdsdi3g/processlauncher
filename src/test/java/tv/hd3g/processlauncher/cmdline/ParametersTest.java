@@ -62,14 +62,14 @@ public class ParametersTest extends TestCase {
 		final HashMap<String, String> vars = new HashMap<>();
 		vars.put("var1", "value1");
 		vars.put("var2", "value2");
-		p.getParametersInjectVars(vars, false);
+		p.injectVariables(vars, false);
 
 		Assert.assertEquals("-a value1 value2 -b -c", p.toString());
 	}
 
 	public void testRemoveVarsKeepEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
-		p.getParametersRemoveVars(false);
+		p.removeVariables(false);
 
 		Assert.assertEquals("-a -b -c", p.toString());
 	}
@@ -79,14 +79,14 @@ public class ParametersTest extends TestCase {
 		final HashMap<String, String> vars = new HashMap<>();
 		vars.put("var1", "value1");
 		vars.put("var2", "value2");
-		p.getParametersInjectVars(vars, true);
+		p.injectVariables(vars, true);
 
 		Assert.assertEquals("-a value1 value2 -c", p.toString());
 	}
 
 	public void testRemoveVarsRemoveEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
-		p.getParametersRemoveVars(true);
+		p.removeVariables(true);
 		Assert.assertEquals("-c", p.toString());
 	}
 

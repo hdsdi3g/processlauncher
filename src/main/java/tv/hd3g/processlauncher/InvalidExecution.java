@@ -30,7 +30,7 @@ public class InvalidExecution extends RuntimeException {
 		// exitCode = processlauncherLifecycle.getExitCode();
 	}
 
-	InvalidExecution setStdErr(final String stdErr) {
+	public InvalidExecution setStdErr(final String stdErr) {
 		this.stdErr = stdErr;
 		return this;
 	}

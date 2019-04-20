@@ -90,4 +90,7 @@ public class ToolRun {// TODO rename to ToolRunner
 		}, executor);
 	}
 
+	public ExecutableFinder getExecutableFinder() {
+		return executableFinder;
+	}
 }

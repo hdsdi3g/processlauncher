@@ -171,15 +171,15 @@ public class Parameters extends SimpleParameters {
 	 * @param removeParamsIfNoVarToInject if true, for "-a -b ? -d" -> "-a -d", else "-a -b -d"
 	 * @return this
 	 */
-	public Parameters getParametersRemoveVars(final boolean removeParamsIfNoVarToInject) {// TODO rename
-		return getParametersInjectVars(Collections.emptyMap(), removeParamsIfNoVarToInject);
+	public Parameters removeVariables(final boolean removeParamsIfNoVarToInject) {
+		return injectVariables(Collections.emptyMap(), removeParamsIfNoVarToInject);
 	}
 
 	/**
-	 * @param removeParamsIfNoVarToInject if true, for "-a -b c -d" -> "-a -d", else "-a -b -d"
+	 * @param removeParamsIfNoVarToInject if true, for "-a -b ? -d" -> "-a -d", else "-a -b -d"
 	 * @return this
 	 */
-	public Parameters getParametersInjectVars(final Map<String, String> varsToInject, final boolean removeParamsIfNoVarToInject) {// TODO rename
+	public Parameters injectVariables(final Map<String, String> varsToInject, final boolean removeParamsIfNoVarToInject) {
 		final List<String> newParameters;
 		if (removeParamsIfNoVarToInject) {
 			newParameters = getParameters().stream().reduce(Collections.unmodifiableList(new ArrayList<String>()), (list, arg) -> {

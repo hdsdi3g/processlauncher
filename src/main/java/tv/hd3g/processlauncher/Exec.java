@@ -86,9 +86,9 @@ public class Exec implements ExecutableTool {
 	@Override
 	public Parameters getReadyToRunParameters() {
 		if (varsToInject.isEmpty()) {
-			return parameters.clone().getParametersRemoveVars(removeParamsIfNoVarToInject);
+			return parameters.clone().removeVariables(removeParamsIfNoVarToInject);
 		} else {
-			return parameters.clone().getParametersInjectVars(varsToInject, removeParamsIfNoVarToInject);
+			return parameters.clone().injectVariables(varsToInject, removeParamsIfNoVarToInject);
 		}
 	}
 

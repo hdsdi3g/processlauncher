@@ -19,6 +19,7 @@ package tv.hd3g.processlauncher.tool;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
@@ -31,12 +32,18 @@ public interface RunningTool<T> {
 
 	ProcesslauncherLifecycle getLifecyle();
 
-	default CompletableFuture<CapturedStdOutErrTextRetention> checkExecutionGetText(final Executor executor) {
-		return CompletableFuture.runAsync(() -> {
+	/**
+	 * Can throw an InvalidExecution, with stderr embedded.
+	 * Usage example: toolRun.execute(myExecTool).thenApply(RunningTool::checkExecutionGetText))
+	 */
+	default CapturedStdOutErrTextRetention checkExecutionGetText() {
+		try {
 			getLifecyle().checkExecution();
-		}, executor).thenApplyAsync(v -> {
-			return getTextRetention();
-		}, executor);
+		} catch (final InvalidExecution e) {
+			e.setStdErr(getTextRetention().getStderr(false, " / "));
+			throw e;
+		}
+		return getTextRetention();
 	}
 
 	/**
