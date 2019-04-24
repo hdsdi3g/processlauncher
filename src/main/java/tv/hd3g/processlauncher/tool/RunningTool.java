@@ -18,6 +18,7 @@ package tv.hd3g.processlauncher.tool;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
@@ -26,11 +27,13 @@ import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 /**
  * @see ToolRun
  */
-public interface RunningTool<T> {
+public interface RunningTool<T extends ExecutableTool> {
 
 	CapturedStdOutErrTextRetention getTextRetention();
 
 	ProcesslauncherLifecycle getLifecyle();
+
+	T getExecutableToolSource();
 
 	/**
 	 * Can throw an InvalidExecution, with stderr embedded.
@@ -40,7 +43,7 @@ public interface RunningTool<T> {
 		try {
 			getLifecyle().checkExecution();
 		} catch (final InvalidExecution e) {
-			e.setStdErr(getTextRetention().getStderr(false, " / "));
+			e.setStdErr(getTextRetention().getStderrLines(false).filter(getExecutableToolSource().filterOutErrorLines()).collect(Collectors.joining(" / ")));
 			throw e;
 		}
 		return getTextRetention();
@@ -56,6 +59,4 @@ public interface RunningTool<T> {
 			return this;
 		}, executor);
 	}
-
-	T getExecutableToolSource();
 }

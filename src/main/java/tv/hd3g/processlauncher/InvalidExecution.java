@@ -16,6 +16,8 @@
 */
 package tv.hd3g.processlauncher;
 
+import java.util.Optional;
+
 public class InvalidExecution extends RuntimeException {
 
 	// private final String fullCommandLine;
@@ -24,18 +26,24 @@ public class InvalidExecution extends RuntimeException {
 	private String stdErr;
 
 	InvalidExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
-		super("Can't execute correcly " + processlauncherLifecycle.getFullCommandLine() + "; " + processlauncherLifecycle.getEndStatus() + " [" + processlauncherLifecycle.getExitCode() + "]");
+		super("Can't execute correcly " + processlauncherLifecycle.getFullCommandLine() + " [" + processlauncherLifecycle.getEndStatus() + "#" + processlauncherLifecycle.getExitCode() + "]");
 		// fullCommandLine = processlauncherLifecycle.getFullCommandLine();
 		// endStatus = processlauncherLifecycle.getEndStatus();
 		// exitCode = processlauncherLifecycle.getExitCode();
 	}
 
-	public InvalidExecution setStdErr(final String stdErr) {
+	public synchronized InvalidExecution setStdErr(final String stdErr) {
 		this.stdErr = stdErr;
 		return this;
 	}
 
-	public String getStdErr() {
+	public synchronized String getStdErr() {
 		return stdErr;
 	}
+
+	@Override
+	public String getMessage() {
+		return super.getMessage() + Optional.ofNullable(stdErr).filter(s -> s.isEmpty() == false).map(s -> " return \"" + s + "\"").orElse("");
+	}
+
 }
