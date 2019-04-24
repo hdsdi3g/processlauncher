@@ -30,12 +30,12 @@ import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
-public class ToolRun {// TODO rename to ToolRunner
+public class ToolRunner {
 
 	private final ExecutableFinder executableFinder;
 	private final ThreadPoolExecutor executor;
 
-	public ToolRun(final ExecutableFinder executableFinder, final int maximumInParallel) {
+	public ToolRunner(final ExecutableFinder executableFinder, final int maximumInParallel) {
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
 
 		executor = new ThreadPoolExecutor(1, maximumInParallel, 1l, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), r -> {

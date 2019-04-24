@@ -1,5 +1,5 @@
 /*
- * This file is part of fflauncher.
+ * This file is part of processlauncher.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -11,19 +11,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * Copyright (C) hdsdi3g for hd3g.tv 2018
+ * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
 */
 package tv.hd3g.processlauncher.io;
 
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
-
 @FunctionalInterface
-public interface CapturedStdOutErrTextObserver { // TODO can multiple ?
+public interface CapturedStreamsObserver {
+	// TODO remove and replace by CapturedStdOutErrTextObserver
 
-	void onText(LineEntry lineEntry);
-
-	default void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr) {
-	}
+	void onTextCaptured(LineEntry lineEntry);
 
 }

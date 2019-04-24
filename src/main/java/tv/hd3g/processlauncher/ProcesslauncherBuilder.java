@@ -214,6 +214,10 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		return sb.toString().trim();
 	}
 
+	public String getExecutableName() {// TODO test
+		return executable.getName();
+	}
+
 	/**
 	 * @return getFullCommandLine()
 	 */

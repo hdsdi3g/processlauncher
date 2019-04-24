@@ -25,7 +25,7 @@ import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 
 /**
- * @see ToolRun
+ * @see ToolRunner
  */
 public interface RunningTool<T extends ExecutableTool> {
 
@@ -43,7 +43,7 @@ public interface RunningTool<T extends ExecutableTool> {
 		try {
 			getLifecyle().checkExecution();
 		} catch (final InvalidExecution e) {
-			e.setStdErr(getTextRetention().getStderrLines(false).filter(getExecutableToolSource().filterOutErrorLines()).collect(Collectors.joining(" / ")));
+			e.setStdErr(getTextRetention().getStderrLines(false).filter(getExecutableToolSource().filterOutErrorLines()).map(String::trim).collect(Collectors.joining("|")));
 			throw e;
 		}
 		return getTextRetention();

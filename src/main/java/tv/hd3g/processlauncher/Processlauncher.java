@@ -35,6 +35,7 @@ public class Processlauncher {
 	private final ProcessBuilder processBuilder;
 	private final String fullCommandLine;
 	private final ProcesslauncherBuilder processlauncherBuilder;
+	private final String executableName;
 
 	public Processlauncher(final ProcesslauncherBuilder processlauncherBuilder) {
 		this.processlauncherBuilder = Objects.requireNonNull(processlauncherBuilder, "\"processlauncherBuilder\" can't to be null");
@@ -46,6 +47,7 @@ public class Processlauncher {
 		externalProcessStartup = processlauncherBuilder.getExternalProcessStartup();
 		processBuilder = processlauncherBuilder.makeProcessBuilder();
 		fullCommandLine = processlauncherBuilder.getFullCommandLine();
+		executableName = processlauncherBuilder.getExecutableName();
 	}
 
 	public ProcesslauncherLifecycle start() throws IOException {
@@ -93,5 +95,9 @@ public class Processlauncher {
 
 	public ProcesslauncherBuilder getProcesslauncherBuilder() {
 		return processlauncherBuilder;
+	}
+
+	public String getExecutableName() {// TODO test
+		return executableName;
 	}
 }

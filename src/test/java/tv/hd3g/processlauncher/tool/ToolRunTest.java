@@ -47,7 +47,7 @@ public class ToolRunTest extends TestCase {
 	}
 
 	public void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
-		final ToolRun toolRun = new ToolRun(executableFinder, 1);
+		final ToolRunner toolRun = new ToolRunner(executableFinder, 1);
 
 		final ExecutableTool executableTool = new ExecutableTool() {
 

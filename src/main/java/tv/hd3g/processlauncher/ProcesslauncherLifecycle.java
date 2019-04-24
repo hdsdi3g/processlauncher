@@ -101,7 +101,7 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 	@Override
 	public String toString() {
 		if (process.isAlive()) {
-			return "Process #" + getPID() + " " + fullCommandLine + " ; since " + getUptime(TimeUnit.SECONDS) + " sec";
+			return "Process" + getPID().map(pid -> " #" + pid).orElse("") + " " + fullCommandLine + " ; since " + getUptime(TimeUnit.SECONDS) + " sec";
 		} else {
 			return "Exec " + getEndStatus() + " " + fullCommandLine;
 		}
