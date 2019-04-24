@@ -16,6 +16,8 @@
 */
 package tv.hd3g.processlauncher.tool;
 
+import java.util.function.Predicate;
+
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 
@@ -31,4 +33,11 @@ public interface ExecutableTool {
 	default void beforeRun(final ProcesslauncherBuilder processBuilder) {
 	}
 
+	/**
+	 * No filter by default.
+	 * @return A filter for the error capture post-process, applied on standard error outputed by process.
+	 */
+	default Predicate<String> filterOutErrorLines() {
+		return p -> true;
+	}
 }
