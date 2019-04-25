@@ -17,31 +17,40 @@
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 import tv.hd3g.processlauncher.io.CaptureStandardOutputText;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextInteractive;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.io.CapturedStreams;
 
 public interface ProcesslauncherBuilderShortcutTraits {
 
 	ProcesslauncherBuilder setCaptureStandardOutput(final CaptureStandardOutput captureStandardOutput);
 
+	Optional<CaptureStandardOutput> getCaptureStandardOutput();
+
 	/**
-	 * Shortcut for CaptureStandardOutputText
+	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
 	 */
-	default ProcesslauncherBuilder setCaptureStandardOutput(final Executor outStreamWatcher, final CapturedStdOutErrTextRetention textRetention) {
-		return setCaptureStandardOutput(new CaptureStandardOutputText(outStreamWatcher, textRetention));
+	default CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior, final Executor defaultExecutorConsumer) {
+		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(() -> {
+			return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior, defaultExecutorConsumer);
+		});
+
+		setCaptureStandardOutput(csot);
+		return csot;
 	}
 
 	/**
-	 * Shortcut for CaptureStandardOutputText
+	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
+	 * Capture all, in the ForkJoinPool.
 	 */
-	default ProcesslauncherBuilder setCaptureStandardOutput(final Executor outStreamWatcher, final CapturedStdOutErrTextInteractive textInteractive) {
-		return setCaptureStandardOutput(new CaptureStandardOutputText(outStreamWatcher, textInteractive));
+	default CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText() {
+		return getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, ForkJoinPool.commonPool());
 	}
 
 	/**

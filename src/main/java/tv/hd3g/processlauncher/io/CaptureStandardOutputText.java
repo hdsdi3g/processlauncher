@@ -21,10 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,14 +40,9 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final Executor executorConsumer, final CapturedStdOutErrTextObserver... observers) {
+	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final Executor executorConsumer) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
-
-		this.observers = new ArrayList<>();
-		if (observers != null) {
-			this.observers.addAll(Arrays.stream(observers).filter(o -> o != null).collect(Collectors.toUnmodifiableList()));
-		}
-
+		observers = new ArrayList<>();
 		this.executorConsumer = executorConsumer;
 		if (executorConsumer == null) {
 			throw new NullPointerException("\"executorConsumer\" can't to be null");
@@ -58,8 +52,12 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final Executor executorConsumer, final CapturedStdOutErrTextObserver... observers) {
-		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer, observers);
+	public CaptureStandardOutputText(final Executor executorConsumer) {
+		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer);
+	}
+
+	public synchronized List<CapturedStdOutErrTextObserver> getObservers() {
+		return observers;
 	}
 
 	@Override
@@ -77,6 +75,11 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	}
 
 	private void parseStream(final InputStream processStream, final boolean isStdErr, final ProcesslauncherLifecycle source) {
+		final List<CapturedStdOutErrTextObserver> finalObservers;
+		synchronized (this) {
+			finalObservers = Collections.unmodifiableList(new ArrayList<>(observers));
+		}
+
 		executorConsumer.execute(() -> {
 			try {
 				final BufferedReader reader = new BufferedReader(new InputStreamReader(processStream));
@@ -84,7 +87,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 					String line = "";
 					while ((line = reader.readLine()) != null) {
 						final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr, source);
-						observers.forEach(observer -> {
+						finalObservers.forEach(observer -> {
 							try {
 								observer.onText(lineEntry);
 							} catch (final RuntimeException e) {
@@ -112,8 +115,8 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 			} catch (final IOException ioe) {
 				log.error("Trouble opening process streams: " + toString(), ioe);
 			} finally {
-				observers.forEach(observer -> {
-					observer.onProcessCloseStream(source, isStdErr);
+				finalObservers.forEach(observer -> {
+					observer.onProcessCloseStream(source, isStdErr, captureOutStreamsBehavior);
 				});
 			}
 		});

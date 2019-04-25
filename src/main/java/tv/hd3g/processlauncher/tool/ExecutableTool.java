@@ -40,4 +40,5 @@ public interface ExecutableTool {
 	default Predicate<String> filterOutErrorLines() {
 		return p -> true;
 	}
+
 }

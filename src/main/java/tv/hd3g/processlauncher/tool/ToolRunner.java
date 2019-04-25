@@ -29,6 +29,7 @@ import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.io.CapturedStreams;
 
 public class ToolRunner {
 
@@ -61,7 +62,8 @@ public class ToolRunner {
 				final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(), executableFinder);
 				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
-				builder.setCaptureStandardOutput(executorStdOutWatchers, textRetention);
+				builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, executorStdOutWatchers).getObservers().add(textRetention);
+
 				execTool.beforeRun(builder);
 				final ProcesslauncherLifecycle lifecyle = builder.start();
 

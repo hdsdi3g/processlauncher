@@ -30,6 +30,7 @@ import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.io.CapturedStreams;
 import tv.hd3g.processlauncher.tool.ExecutableTool;
 
 /**
@@ -116,7 +117,7 @@ public class Exec implements ExecutableTool {
 
 		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
-		builder.setCaptureStandardOutput(outStreamWatcher, textRetention);
+		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers().add(textRetention);
 
 		preBeforeRun.accept(builder);
 		if (beforeRun != null) {// TODO test

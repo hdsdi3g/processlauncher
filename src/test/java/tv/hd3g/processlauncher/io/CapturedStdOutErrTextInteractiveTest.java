@@ -60,7 +60,7 @@ public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 		final CapturedStdOutErrTextInteractive csoeti = new CapturedStdOutErrTextInteractive(interactive, onDone);
 		final LineEntry added = new LineEntry(0, "My text", true, source);
 		csoeti.onText(added);
-		csoeti.onProcessCloseStream(source, true);
+		csoeti.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
 
 		Assert.assertEquals(1, capturedLe.size());
 		Assert.assertEquals(added, capturedLe.get(0));

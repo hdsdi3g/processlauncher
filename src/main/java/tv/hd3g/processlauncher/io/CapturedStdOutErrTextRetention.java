@@ -16,37 +16,19 @@
 */
 package tv.hd3g.processlauncher.io;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObserver {
-	private static Logger log = LogManager.getLogger();
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
-	@Deprecated
-	private final List<CapturedStreamsObserver> observers;
 
 	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
 		this.streamToKeep = Objects.requireNonNull(streamToKeep, "\"streamToKeep\" can't to be null");
 		lineEntries = new LinkedBlockingQueue<>();
-		observers = Collections.synchronizedList(new ArrayList<>());
-	}
-
-	/**
-	 * @return synchronizedList
-	 */
-	@Deprecated
-	public List<CapturedStreamsObserver> getObservers() { // TODO test
-		return observers;
 	}
 
 	/**
@@ -62,14 +44,6 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 			return;
 		}
 		lineEntries.add(lineEntry);
-
-		observers.forEach(o -> {
-			try {
-				o.onTextCaptured(lineEntry);
-			} catch (final Exception e) {
-				log.error("Can't callback observer " + o, e);
-			}
-		});
 	}
 
 	/**

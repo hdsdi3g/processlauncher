@@ -47,7 +47,8 @@ public class CaptureStandardOutputTextTest extends TestCase {
 			capturedlines.add(lineEntry);
 		};
 
-		final CaptureStandardOutputText csot = new CaptureStandardOutputText(executorConsumer, csoeto);
+		final CaptureStandardOutputText csot = new CaptureStandardOutputText(executorConsumer);
+		csot.getObservers().add(csoeto);
 
 		final List<String> textLinesStdOut = Arrays.asList("Line 1", "Line 2", "", "\tline 4");
 		final ByteArrayInputStream processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(Collectors.joining("\n")).getBytes());

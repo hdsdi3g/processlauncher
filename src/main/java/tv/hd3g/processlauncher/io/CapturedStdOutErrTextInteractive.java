@@ -83,7 +83,7 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 	}
 
 	@Override
-	public void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr) {
+	public void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr, final CapturedStreams streamToKeepPolicy) {
 		eventExecutor.execute(() -> {
 			onProcessClosedStream.accept(source, isStdErr);
 		});

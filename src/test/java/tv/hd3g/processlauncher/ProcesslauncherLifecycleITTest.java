@@ -48,6 +48,7 @@ import tv.hd3g.processlauncher.demo.DemoExecSubProcess;
 import tv.hd3g.processlauncher.demo.DemoExecWorkingdir;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextInteractive;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.io.CapturedStreams;
 import tv.hd3g.processlauncher.io.LineEntry;
 
 public class ProcesslauncherLifecycleITTest extends TestCase {
@@ -76,7 +77,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	private ProcesslauncherLifecycle captureTextAndStart(final ProcesslauncherBuilder pb) throws IOException {
-		return pb.setCaptureStandardOutput(outStreamWatcher, textRetention).start();
+		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers().add(textRetention);
+		return pb.start();
 	}
 
 	public void testSimpleExec() throws IOException {
@@ -272,7 +274,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 				onProcessClosedStreamCountOut.incrementAndGet();
 			}
 		};
-		ept.setCaptureStandardOutput(outStreamWatcher, new CapturedStdOutErrTextInteractive(interactive, onProcessClosedStream));
+		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers().add(new CapturedStdOutErrTextInteractive(interactive, onProcessClosedStream));
 
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
