@@ -93,4 +93,9 @@ public class ProcesslauncherTest extends TestCase {
 	public void testToString() {
 		Assert.assertEquals(fullCommandLine, pl.toString());
 	}
+
+	public void testGetExecutableName() {
+		Assert.assertEquals(processlauncherBuilder.getExecutableName(), pl.getExecutableName());
+	}
+
 }

@@ -162,4 +162,8 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		Assert.assertEquals(pb.getFullCommandLine(), pb.toString());
 	}
 
+	public void testGetExecutableName() {
+		Assert.assertEquals(execFile.getName(), pb.getExecutableName());
+	}
+
 }

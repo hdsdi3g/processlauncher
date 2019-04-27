@@ -56,7 +56,7 @@ public class Exec implements ExecutableTool {
 		};
 	}
 
-	public Exec(final ExecutableTool tool, final ExecutableFinder executableFinder) throws FileNotFoundException {// TODO test
+	public Exec(final ExecutableTool tool, final ExecutableFinder executableFinder) throws FileNotFoundException {
 		execName = Objects.requireNonNull(tool.getExecutableName(), "\"tool#getExecutableName\" can't to be null");
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
 		executableFinder.get(execName);
@@ -108,6 +108,14 @@ public class Exec implements ExecutableTool {
 
 	/**
 	 * Blocking
+	 * @throws InvalidExecution
+	 */
+	public CapturedStdOutErrTextRetention runWaitGetText() throws IOException {
+		return runWaitGetText(null);
+	}
+
+	/**
+	 * Blocking
 	 * @param beforeRun can be null
 	 * @throws InvalidExecution
 	 */
@@ -120,7 +128,7 @@ public class Exec implements ExecutableTool {
 		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers().add(textRetention);
 
 		preBeforeRun.accept(builder);
-		if (beforeRun != null) {// TODO test
+		if (beforeRun != null) {
 			beforeRun.accept(builder);
 		}
 
@@ -134,7 +142,7 @@ public class Exec implements ExecutableTool {
 		try {
 			builder.start().checkExecution();
 		} catch (final InvalidExecution e) {
-			e.setStdErr(textRetention.getStderr(false, " / "));// TODO test
+			e.setStdErr(textRetention.getStderr(false, " / "));
 			throw e;
 		}
 

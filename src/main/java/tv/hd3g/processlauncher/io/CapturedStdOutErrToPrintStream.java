@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 
-public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObserver { // TODO test
+public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObserver {
 
 	private final PrintStream printStreamStdOut;
 	private final PrintStream printStreamStdErr;
@@ -57,6 +57,9 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObse
 
 	}
 
+	static final String stdOutSeparator = "\t> ";
+	static final String stdErrSeparator = "\t! ";
+
 	@Override
 	public void onText(final LineEntry lineEntry) {
 		if (filter.map(f -> f.test(lineEntry)).orElse(true) == false) {
@@ -81,9 +84,9 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObse
 			out.print("s ");
 		}*/
 		if (lineEntry.isStdErr()) {
-			out.print("\t! ");
+			out.print(stdErrSeparator);
 		} else {
-			out.print("\t> ");
+			out.print(stdOutSeparator);
 		}
 
 		out.println(lineEntry.getLine());

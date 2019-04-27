@@ -97,7 +97,7 @@ public class Processlauncher {
 		return processlauncherBuilder;
 	}
 
-	public String getExecutableName() {// TODO test
+	public String getExecutableName() {
 		return executableName;
 	}
 }

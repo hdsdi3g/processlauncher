@@ -180,6 +180,7 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		return this;
 	}
 
+	@Override
 	public Optional<CaptureStandardOutput> getCaptureStandardOutput() {
 		return captureStandardOutput;
 	}
@@ -214,7 +215,7 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		return sb.toString().trim();
 	}
 
-	public String getExecutableName() {// TODO test
+	public String getExecutableName() {
 		return executable.getName();
 	}
 
