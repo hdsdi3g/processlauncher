@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2018
  *
-*/
+ */
 package tv.hd3g.processlauncher.cmdline;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public class ExecutableFinder {
 	private static final Logger log = LogManager.getLogger();
 
 	/**
-	 * @return exists && isDirectory && canRead
+	 * Return exists and isDirectory and canRead
 	 */
 	public static final Predicate<File> isValidDirectory = f -> {
 		return f.exists() && f.isDirectory() && f.canRead();
@@ -66,7 +66,8 @@ public class ExecutableFinder {
 			 */
 			final String pathExt = System.getenv("PATHEXT");
 			if (pathExt.indexOf(";") > 0) {
-				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.stream(pathExt.split(";")).map(ext -> ext.toLowerCase().substring(1)).collect(Collectors.toUnmodifiableList()));
+				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.stream(pathExt.split(";")).map(ext -> ext
+				        .toLowerCase().substring(1)).collect(Collectors.toUnmodifiableList()));
 			} else {
 				log.warn("Invalid PATHEXT env.: " + pathExt);
 				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.asList("exe", "com", "cmd", "bat"));
@@ -76,9 +77,12 @@ public class ExecutableFinder {
 		}
 
 		if (System.getProperty("execfinder.searchdir", "").equals("") == false) {
-			GLOBAL_DECLARED_DIRS = Collections.unmodifiableList(Arrays.stream(System.getProperty("execfinder.searchdir").split(File.pathSeparator)).map(File::new).filter(isValidDirectory).map(File::getAbsoluteFile).collect(Collectors.toList()));
+			GLOBAL_DECLARED_DIRS = Collections.unmodifiableList(Arrays.stream(System.getProperty("execfinder.searchdir")
+			        .split(File.pathSeparator)).map(File::new).filter(isValidDirectory).map(File::getAbsoluteFile)
+			        .collect(Collectors.toList()));
 
-			log.debug("Specific executable path declared via system property: " + GLOBAL_DECLARED_DIRS.stream().map(File::getPath).collect(Collectors.joining(", ")));
+			log.debug("Specific executable path declared via system property: " + GLOBAL_DECLARED_DIRS.stream().map(
+			        File::getPath).collect(Collectors.joining(", ")));
 		} else {
 			GLOBAL_DECLARED_DIRS = Collections.emptyList();
 		}
@@ -118,7 +122,8 @@ public class ExecutableFinder {
 			return new File(p);
 		}).filter(isValidDirectory).collect(Collectors.toUnmodifiableList()));
 
-		paths.addAll(Arrays.stream(System.getenv("PATH").split(File.pathSeparator)).map(p -> new File(p)).filter(isValidDirectory).collect(Collectors.toUnmodifiableList()));
+		paths.addAll(Arrays.stream(System.getenv("PATH").split(File.pathSeparator)).map(p -> new File(p)).filter(
+		        isValidDirectory).collect(Collectors.toUnmodifiableList()));
 
 		/**
 		 * Remove duplicate entries
@@ -128,7 +133,8 @@ public class ExecutableFinder {
 		paths.addAll(newList);
 
 		if (log.isTraceEnabled()) {
-			log.trace("Full path: " + paths.stream().map(f -> f.getPath()).collect(Collectors.joining(File.pathSeparator)));
+			log.trace("Full path: " + paths.stream().map(f -> f.getPath()).collect(Collectors.joining(
+			        File.pathSeparator)));
 		}
 	}
 
@@ -191,7 +197,8 @@ public class ExecutableFinder {
 
 	public ExecutableFinder registerExecutable(final String name, final File fullPath) throws IOException {
 		if (validExec(fullPath) == false) {
-			throw new IOException("Invalid declaredInConfiguration executable: " + name + " can't be correctly found in " + fullPath);
+			throw new IOException("Invalid declaredInConfiguration executable: " + name
+			                      + " can't be correctly found in " + fullPath);
 		}
 		declaredInConfiguration.put(name, fullPath);
 		return this;
@@ -250,7 +257,8 @@ public class ExecutableFinder {
 					    /**
 					     * Try with lower/upper case extensions.
 					     */
-					    return Stream.of(new File(file + "." + ext.toLowerCase()), new File(file + "." + ext.toUpperCase()));
+					    return Stream.of(new File(file + "." + ext.toLowerCase()), new File(file + "." + ext
+					            .toUpperCase()));
 					}).filter(fileExt -> {
 						return validExec(fileExt);
 					});

@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.io.File;
@@ -155,7 +155,8 @@ public class ProcesslauncherBuilderTest extends TestCase {
 	}
 
 	public void testGetFullCommandLine() {
-		Assert.assertEquals(ProcesslauncherBuilder.addQuotesIfSpaces.apply(execFile.getAbsolutePath()) + " p", pb.getFullCommandLine());
+		Assert.assertEquals(ProcesslauncherBuilder.addQuotesIfSpaces.apply(execFile.getAbsolutePath()) + " p", pb
+		        .getFullCommandLine());
 	}
 
 	public void testToString() {

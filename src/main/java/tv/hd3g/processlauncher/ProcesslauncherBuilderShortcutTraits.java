@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
@@ -36,10 +36,14 @@ public interface ProcesslauncherBuilderShortcutTraits {
 	/**
 	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
 	 */
-	default CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior, final Executor defaultExecutorConsumer) {
-		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(() -> {
-			return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior, defaultExecutorConsumer);
-		});
+	default CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior,
+	                                                                          final Executor defaultExecutorConsumer) {
+		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(
+		        cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(
+		                () -> {
+			                return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior,
+			                        defaultExecutorConsumer);
+		                });
 
 		setCaptureStandardOutput(csot);
 		return csot;
@@ -70,7 +74,9 @@ public interface ProcesslauncherBuilderShortcutTraits {
 	/**
 	 * Shortcut for setExecutionTimeLimiter
 	 */
-	default ProcesslauncherBuilder setExecutionTimeLimiter(final long maxExecTime, final TimeUnit unit, final ScheduledExecutorService maxExecTimeScheduler) {
+	default ProcesslauncherBuilder setExecutionTimeLimiter(final long maxExecTime,
+	                                                       final TimeUnit unit,
+	                                                       final ScheduledExecutorService maxExecTimeScheduler) {
 		return setExecutionTimeLimiter(new ExecutionTimeLimiter(maxExecTime, unit, maxExecTimeScheduler));
 	}
 

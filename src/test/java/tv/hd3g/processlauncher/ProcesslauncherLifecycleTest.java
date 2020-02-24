@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
@@ -39,7 +39,8 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 
 	public ProcesslauncherLifecycleTest() throws IOException {
 		beforeStartDate = System.currentTimeMillis() - 100;
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class.getName());
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class
+		        .getName());
 		final CommandLine cmd = new CommandLine("java", parameters, new ExecutableFinder());
 		processlauncherBuilder = new ProcesslauncherBuilder(cmd);
 		launcher = new Processlauncher(processlauncherBuilder);

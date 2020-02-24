@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.util.Collection;
@@ -92,7 +92,8 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		}
 
 		@Override
-		public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		public Void get(final long timeout,
+		                final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 			throw new UnsupportedOperationException();
 		}
 	}
@@ -157,7 +158,9 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		}
 
 		@Override
-		public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
+		public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks,
+		                                     final long timeout,
+		                                     final TimeUnit unit) throws InterruptedException {
 			throw new UnsupportedOperationException();
 		}
 
@@ -167,7 +170,9 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		}
 
 		@Override
-		public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		public <T> T invokeAny(final Collection<? extends Callable<T>> tasks,
+		                       final long timeout,
+		                       final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 			throw new UnsupportedOperationException();
 		}
 
@@ -182,12 +187,18 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		}
 
 		@Override
-		public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay, final long period, final TimeUnit unit) {
+		public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command,
+		                                              final long initialDelay,
+		                                              final long period,
+		                                              final TimeUnit unit) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command, final long initialDelay, final long delay, final TimeUnit unit) {
+		public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command,
+		                                                 final long initialDelay,
+		                                                 final long delay,
+		                                                 final TimeUnit unit) {
 			throw new UnsupportedOperationException();
 		}
 

@@ -33,15 +33,18 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 	private Optional<CaptureStandardOutput> captureStandardOutput;
 	private Optional<ExternalProcessStartup> externalProcessStartup;
 
-	public ProcesslauncherBuilder(final File executable, final Collection<String> parameters, final ExecutableFinder execFinder) {
+	public ProcesslauncherBuilder(final File executable, final Collection<String> parameters,
+	                              final ExecutableFinder execFinder) {
 		this.executable = Objects.requireNonNull(executable, "\"executable\" can't to be null");
-		this.parameters = Collections.unmodifiableList(new ArrayList<>(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")));
+		this.parameters = Collections.unmodifiableList(new ArrayList<>(Objects.requireNonNull(parameters,
+		        "\"parameters\" can't to be null")));
 
 		environment = new LinkedHashMap<>();
 
 		environment.putAll(System.getenv());
 		if (environment.containsKey("LANG") == false) {
-			environment.put("LANG", Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + "." + Charset.forName("UTF-8"));
+			environment.put("LANG", Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + "."
+			                        + Charset.forName("UTF-8"));
 		}
 		if (execFinder != null) {
 			environment.put("PATH", execFinder.getFullPathToString());
@@ -66,7 +69,8 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 	}
 
 	public ProcesslauncherBuilder(final CommandLine commandLine) {
-		this(commandLine.getExecutable(), commandLine.getParameters().getParameters(), commandLine.getExecutableFinder().orElseGet(() -> new ExecutableFinder()));
+		this(commandLine.getExecutable(), commandLine.getParameters().getParameters(), commandLine.getExecutableFinder()
+		        .orElseGet(() -> new ExecutableFinder()));
 	}
 
 	/**

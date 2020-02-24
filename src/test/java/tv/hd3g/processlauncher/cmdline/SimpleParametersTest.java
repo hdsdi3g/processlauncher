@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2018
  *
-*/
+ */
 package tv.hd3g.processlauncher.cmdline;
 
 import java.util.Arrays;
@@ -40,7 +40,8 @@ public class SimpleParametersTest extends TestCase {
 		pu.addBulkParameters(testChaoticLine);
 		assertEquals(actual, pu.toString());
 
-		final List<String> compare = Arrays.asList("-aa", "1", "-single", "--cc", "3", "-U", "dsfdsf sdf s  -e foo", "-g", "2", "42", "-f=f", "-h=i;j,k:l", "-m", "Ah!", "-l", "u ", "m");
+		final List<String> compare = Arrays.asList("-aa", "1", "-single", "--cc", "3", "-U", "dsfdsf sdf s  -e foo",
+		        "-g", "2", "42", "-f=f", "-h=i;j,k:l", "-m", "Ah!", "-l", "u ", "m");
 
 		assertTrue(Arrays.equals(compare.toArray(), pu.getParameters().toArray()));
 		assertEquals(1, pu.getValues("-l").size());
@@ -53,21 +54,26 @@ public class SimpleParametersTest extends TestCase {
 		assertEquals(0, pu.getValues("-h=i;j,k:l").size());
 		assertNull(pu.getValues("-NOPE"));
 
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-a", "2", "-a", "3").toArray(), new SimpleParameters("-a 1 -a 2 -a 3").getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-a", "2", "-a", "3").toArray(), new SimpleParameters(
+		        "-a 1 -a 2 -a 3").getParameters().toArray()));
 
-		assertTrue(Arrays.equals(Arrays.asList("1", "2", "3").toArray(), new SimpleParameters("-a 1 -a 2 -a 3").getValues("-a").toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("1", "2", "3").toArray(), new SimpleParameters("-a 1 -a 2 -a 3")
+		        .getValues("-a").toArray()));
 		assertTrue(new SimpleParameters("-a 1 -a 2 -b -a 3").getValues("-b").isEmpty());
 
 		pu = new SimpleParameters("-a 1 -c 4 -a 2 -a 3 -b");
 		assertTrue(pu.removeParameter("-a", 0));
-		assertTrue(Arrays.equals(Arrays.asList("-c", "4", "-a", "2", "-a", "3", "-b").toArray(), pu.getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-c", "4", "-a", "2", "-a", "3", "-b").toArray(), pu.getParameters()
+		        .toArray()));
 
 		pu = new SimpleParameters("-a 1 -c 4 -a 2 -a 3 -b");
 		assertTrue(pu.removeParameter("-a", 1));
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "3", "-b").toArray(), pu.getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "3", "-b").toArray(), pu.getParameters()
+		        .toArray()));
 		assertFalse(pu.removeParameter("-a", 2));
 		assertFalse(pu.removeParameter("-N", 0));
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "3", "-b").toArray(), pu.getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "3", "-b").toArray(), pu.getParameters()
+		        .toArray()));
 		assertTrue(pu.removeParameter("-a", 0));
 		assertTrue(pu.removeParameter("-a", 0));
 		assertTrue(Arrays.equals(Arrays.asList("-c", "4", "-b").toArray(), pu.getParameters().toArray()));
@@ -82,10 +88,12 @@ public class SimpleParametersTest extends TestCase {
 
 		pu = new SimpleParameters("-a 1 -c 4 -a 2 -a 3 -b");
 		assertTrue(pu.alterParameter("-a", "Z2", 1));
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "Z2", "-a", "3", "-b").toArray(), pu.getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "Z2", "-a", "3", "-b").toArray(), pu
+		        .getParameters().toArray()));
 		assertFalse(pu.alterParameter("-a", "Z2", 3));
 		assertFalse(pu.alterParameter("-N", "Z2", 0));
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "Z2", "-a", "3", "-b").toArray(), pu.getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-c", "4", "-a", "Z2", "-a", "3", "-b").toArray(), pu
+		        .getParameters().toArray()));
 
 		pu = new SimpleParameters("-a -b");
 		assertTrue(pu.alterParameter("-a", "1", 0));
@@ -97,7 +105,8 @@ public class SimpleParametersTest extends TestCase {
 		assertTrue(pu.alterParameter("-a", "1", 0));
 		assertTrue(pu.alterParameter("-a", "2", 1));
 		assertTrue(pu.alterParameter("-a", "3", 2));
-		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-a", "2", "-a", "3").toArray(), pu.getParameters().toArray()));
+		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "-a", "2", "-a", "3").toArray(), pu.getParameters()
+		        .toArray()));
 
 		pu.clear();
 		assertTrue(pu.getParameters().isEmpty());

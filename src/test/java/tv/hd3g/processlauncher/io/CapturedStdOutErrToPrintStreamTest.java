@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.io;
 
 import java.io.ByteArrayOutputStream;
@@ -82,8 +82,10 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 		capture.onText(le1out);
 		capture.onText(le1err);
 
-		Assert.assertEquals(execName + "#" + pid + outSep + le1out.getLine() + System.lineSeparator(), outStreamContent.toString(StandardCharsets.UTF_8));
-		Assert.assertEquals(execName + "#" + pid + errSep + le1err.getLine() + System.lineSeparator(), errStreamContent.toString(StandardCharsets.UTF_8));
+		Assert.assertEquals(execName + "#" + pid + outSep + le1out.getLine() + System.lineSeparator(), outStreamContent
+		        .toString(StandardCharsets.UTF_8));
+		Assert.assertEquals(execName + "#" + pid + errSep + le1err.getLine() + System.lineSeparator(), errStreamContent
+		        .toString(StandardCharsets.UTF_8));
 	}
 
 	public void testOnFilteredText() {

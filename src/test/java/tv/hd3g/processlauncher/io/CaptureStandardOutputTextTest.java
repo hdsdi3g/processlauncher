@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.io;
 
 import java.io.ByteArrayInputStream;
@@ -51,10 +51,12 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		csot.getObservers().add(csoeto);
 
 		final List<String> textLinesStdOut = Arrays.asList("Line 1", "Line 2", "", "\tline 4");
-		final ByteArrayInputStream processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(Collectors.joining("\n")).getBytes());
+		final ByteArrayInputStream processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(
+		        Collectors.joining("\n")).getBytes());
 
 		final List<String> textLinesStdErr = Arrays.asList("Line 5", "Line 6", "", "\tline 8");
-		final ByteArrayInputStream processInputStreamErr = new ByteArrayInputStream(textLinesStdErr.stream().collect(Collectors.joining("\r\n")).getBytes());
+		final ByteArrayInputStream processInputStreamErr = new ByteArrayInputStream(textLinesStdErr.stream().collect(
+		        Collectors.joining("\r\n")).getBytes());
 
 		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
 		csot.stdOutStreamConsumer(processInputStreamOut, source);
@@ -63,8 +65,10 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		Assert.assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
 		Assert.assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));
 
-		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(le -> le.getLine()).collect(Collectors.toList());
-		final List<String> capturedlinesErr = capturedlines.stream().filter(le -> le.isStdErr()).map(le -> le.getLine()).collect(Collectors.toList());
+		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(le -> le
+		        .getLine()).collect(Collectors.toList());
+		final List<String> capturedlinesErr = capturedlines.stream().filter(le -> le.isStdErr()).map(le -> le.getLine())
+		        .collect(Collectors.toList());
 
 		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdOut, capturedlinesOut));
 		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdErr, capturedlinesErr));
@@ -128,7 +132,9 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		}
 
 		@Override
-		public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
+		public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks,
+		                                     final long timeout,
+		                                     final TimeUnit unit) throws InterruptedException {
 			throw new UnsupportedOperationException();
 		}
 
@@ -138,7 +144,9 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		}
 
 		@Override
-		public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		public <T> T invokeAny(final Collection<? extends Callable<T>> tasks,
+		                       final long timeout,
+		                       final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 			throw new UnsupportedOperationException();
 		}
 	}

@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.util.Optional;
@@ -26,7 +26,8 @@ public class InvalidExecution extends RuntimeException {
 	private String stdErr;
 
 	InvalidExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
-		super("Can't execute correcly " + processlauncherLifecycle.getFullCommandLine() + " [" + processlauncherLifecycle.getEndStatus() + "#" + processlauncherLifecycle.getExitCode() + "]");
+		super("Can't execute correcly " + processlauncherLifecycle.getFullCommandLine() + " ["
+		      + processlauncherLifecycle.getEndStatus() + "#" + processlauncherLifecycle.getExitCode() + "]");
 		// fullCommandLine = processlauncherLifecycle.getFullCommandLine();
 		// endStatus = processlauncherLifecycle.getEndStatus();
 		// exitCode = processlauncherLifecycle.getExitCode();
@@ -43,7 +44,9 @@ public class InvalidExecution extends RuntimeException {
 
 	@Override
 	public String getMessage() {
-		return super.getMessage() + Optional.ofNullable(stdErr).filter(s -> s.isEmpty() == false).map(s -> " return \"" + s + "\"").orElse("");
+		return super.getMessage() + Optional.ofNullable(stdErr).filter(s -> s.isEmpty() == false).map(s -> " return \""
+		                                                                                                   + s + "\"")
+		        .orElse("");
 	}
 
 }

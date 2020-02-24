@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.tool;
 
 import java.io.IOException;
@@ -39,13 +39,14 @@ public class ToolRunner {
 	public ToolRunner(final ExecutableFinder executableFinder, final int maximumInParallel) {
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
 
-		executor = new ThreadPoolExecutor(1, maximumInParallel, 1l, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), r -> {
-			final Thread t = new Thread(r);
-			t.setPriority(Thread.MIN_PRIORITY);
-			t.setDaemon(false);
-			t.setName("Executable starter");
-			return t;
-		});
+		executor = new ThreadPoolExecutor(1, maximumInParallel, 1l, TimeUnit.SECONDS,
+		        new LinkedBlockingQueue<Runnable>(), r -> {
+			        final Thread t = new Thread(r);
+			        t.setPriority(Thread.MIN_PRIORITY);
+			        t.setDaemon(false);
+			        t.setName("Executable starter");
+			        return t;
+		        });
 	}
 
 	public <T extends ExecutableTool> CompletableFuture<RunningTool<T>> execute(final T execTool) {
@@ -59,10 +60,12 @@ public class ToolRunner {
 		return CompletableFuture.supplyAsync(() -> {
 			final String executableName = execTool.getExecutableName();
 			try {
-				final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(), executableFinder);
+				final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(),
+				        executableFinder);
 				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
-				builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, executorStdOutWatchers).getObservers().add(textRetention);
+				builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR,
+				        executorStdOutWatchers).getObservers().add(textRetention);
 
 				execTool.beforeRun(builder);
 				final ProcesslauncherLifecycle lifecyle = builder.start();

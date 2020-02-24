@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
@@ -101,7 +101,8 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 	@Override
 	public String toString() {
 		if (process.isAlive()) {
-			return "Process" + getPID().map(pid -> " #" + pid).orElse("") + " " + fullCommandLine + " ; since " + getUptime(TimeUnit.SECONDS) + " sec";
+			return "Process" + getPID().map(pid -> " #" + pid).orElse("") + " " + fullCommandLine + " ; since "
+			       + getUptime(TimeUnit.SECONDS) + " sec";
 		} else {
 			return "Exec " + getEndStatus() + " " + fullCommandLine;
 		}
@@ -109,7 +110,9 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 
 	private static String processHandleToString(final ProcessHandle processHandle, final boolean verbose) {
 		if (verbose) {
-			return processHandle.info().command().orElse("<?>") + " #" + processHandle.pid() + " by " + processHandle.info().user().orElse("<?>") + " since " + processHandle.info().totalCpuDuration().orElse(Duration.ZERO).getSeconds() + " sec";
+			return processHandle.info().command().orElse("<?>") + " #" + processHandle.pid() + " by " + processHandle
+			        .info().user().orElse("<?>") + " since " + processHandle.info().totalCpuDuration().orElse(
+			                Duration.ZERO).getSeconds() + " sec";
 		} else {
 			return processHandle.info().commandLine().orElse("<?>") + " #" + processHandle.pid();
 		}
@@ -147,7 +150,8 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 			if (process.toHandle().destroy() == false) {
 				log.info("Force to close process " + processHandleToString(process.toHandle(), true));
 				if (process.toHandle().destroyForcibly() == false) {
-					throw new RuntimeException("Can't close process " + processHandleToString(process.toHandle(), true));
+					throw new RuntimeException("Can't close process " + processHandleToString(process.toHandle(),
+					        true));
 				}
 			}
 		}
@@ -156,7 +160,8 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 			cantKill.forEach(processHandle -> {
 				log.error("Can't force close process " + processHandleToString(processHandle, true));
 			});
-			throw new RuntimeException("Can't close process " + toString() + " for PID " + cantKill.stream().map(p -> p.pid()).map(pid -> String.valueOf(pid)).collect(Collectors.joining(", ")));
+			throw new RuntimeException("Can't close process " + toString() + " for PID " + cantKill.stream().map(p -> p
+			        .pid()).map(pid -> String.valueOf(pid)).collect(Collectors.joining(", ")));
 		}
 	}
 

@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.cmdline;
 
 import java.io.File;
@@ -46,7 +46,8 @@ public class CommandLine {
 	/**
 	 * @param parameters will be clone here
 	 */
-	public CommandLine(final String execName, final Parameters parameters, final ExecutableFinder executableFinder) throws IOException {
+	public CommandLine(final String execName, final Parameters parameters,
+	                   final ExecutableFinder executableFinder) throws IOException {
 		Objects.requireNonNull(execName, "\"execName\" can't to be null");
 		this.executableFinder = executableFinder;
 		if (executableFinder != null) {
@@ -66,8 +67,10 @@ public class CommandLine {
 		this(executable, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")));
 	}
 
-	public CommandLine(final String execName, final String parameters, final ExecutableFinder executableFinder) throws IOException {
-		this(execName, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")), executableFinder);
+	public CommandLine(final String execName, final String parameters,
+	                   final ExecutableFinder executableFinder) throws IOException {
+		this(execName, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")),
+		        executableFinder);
 	}
 
 	@Override

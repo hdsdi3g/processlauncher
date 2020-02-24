@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.util.ArrayList;
@@ -51,7 +51,8 @@ public class ProcesslauncherTest extends TestCase {
 		Mockito.when(processlauncherBuilder.getExecutionCallbackers()).thenReturn(executionCallbackers);
 		Mockito.when(processlauncherBuilder.getExecutionTimeLimiter()).thenReturn(Optional.of(executionTimeLimiter));
 		Mockito.when(processlauncherBuilder.getCaptureStandardOutput()).thenReturn(Optional.of(captureStandardOutput));
-		Mockito.when(processlauncherBuilder.getExternalProcessStartup()).thenReturn(Optional.of(externalProcessStartup));
+		Mockito.when(processlauncherBuilder.getExternalProcessStartup()).thenReturn(Optional.of(
+		        externalProcessStartup));
 		Mockito.when(processlauncherBuilder.makeProcessBuilder()).thenReturn(processBuilder);
 		Mockito.when(processlauncherBuilder.getFullCommandLine()).thenReturn(fullCommandLine);
 

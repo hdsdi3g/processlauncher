@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.io.File;
@@ -77,7 +77,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	private ProcesslauncherLifecycle captureTextAndStart(final ProcesslauncherBuilder pb) throws IOException {
-		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers().add(textRetention);
+		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers()
+		        .add(textRetention);
 		return pb.start();
 	}
 
@@ -128,7 +129,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	public void testResultValues() throws Exception {
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecIOText.class.getName());
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecIOText.class
+		        .getName());
 		parameters.addParameters(DemoExecIOText.expectedIn);
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
 		final ProcesslauncherBuilder ept = new ProcesslauncherBuilder(cmd);
@@ -156,7 +158,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - startTime;
 
-		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION + 300)); /** 300 is a "startup time bonus" */
+		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION
+		                                                     + 300)); /** 300 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.TOO_LONG_EXECUTION_TIME, result.getEndStatus());
 
 		Assert.assertTrue(result.isTooLongTime());
@@ -179,7 +182,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		final long duration = System.currentTimeMillis() - startTime;
 
-		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION + 300)); /** 300 is a "startup time bonus" */
+		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION
+		                                                     + 300)); /** 300 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
 
 		Assert.assertFalse(result.isTooLongTime());
@@ -234,7 +238,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	public void testInteractiveHandler() throws Exception {
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecInteractive.class.getName());
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"),
+		        DemoExecInteractive.class.getName());
 		parameters.addParameters("foo");
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
 		final ProcesslauncherBuilder ept = new ProcesslauncherBuilder(cmd);
@@ -274,7 +279,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 				onProcessClosedStreamCountOut.incrementAndGet();
 			}
 		};
-		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers().add(new CapturedStdOutErrTextInteractive(interactive, onProcessClosedStream));
+		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers()
+		        .add(new CapturedStdOutErrTextInteractive(interactive, onProcessClosedStream));
 
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
@@ -308,7 +314,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	public void testCheckExecutionOk() throws InterruptedException, ExecutionException, IOException {
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecExitCode.class.getName());
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"),
+		        DemoExecExitCode.class.getName());
 		parameters.addParameters("0");
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
 		final ProcesslauncherBuilder ept1 = new ProcesslauncherBuilder(cmd);
@@ -317,7 +324,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	public void testCheckExecutionError() throws InterruptedException, ExecutionException, IOException {
-		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecExitCode.class.getName());
+		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"),
+		        DemoExecExitCode.class.getName());
 		parameters.addParameters("1");
 		final CommandLine cmd = new CommandLine("java", parameters, executableFinder);
 		final ProcesslauncherLifecycle result = new ProcesslauncherBuilder(cmd).start();

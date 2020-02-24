@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.io;
 
 import java.io.IOException;
@@ -38,31 +38,36 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 
 	/**
 	 * @param interactive function return null if nothing to send.
-	 * @param onProcessClosedStream -> source, isStdErr
+	 * @param onProcessClosedStream -&gt; source, isStdErr
 	 * @param destCharset used for injected String to byte[] in stream
 	 */
-	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream, final Charset destCharset, final Executor eventExecutor) {
+	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive,
+	                                        final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream,
+	                                        final Charset destCharset, final Executor eventExecutor) {
 		this.eventExecutor = Objects.requireNonNull(eventExecutor, "\"eventExecutor\" can't to be null");
 		this.interactive = Objects.requireNonNull(interactive, "\"interactive\" can't to be null");
-		this.onProcessClosedStream = Objects.requireNonNull(onProcessClosedStream, "\"onProcessClosedStream\" can't to be null");
+		this.onProcessClosedStream = Objects.requireNonNull(onProcessClosedStream,
+		        "\"onProcessClosedStream\" can't to be null");
 		this.destCharset = Objects.requireNonNull(destCharset, "\"destCharset\" can't to be null");
 	}
 
 	/**
 	 * @param interactive function return null if nothing to send.
-	 * @param onProcessClosedStream -> source, isStdErr
-	 * @param destCharset used for injected String to byte[] in stream
+	 * @param onProcessClosedStream -&gt; source, isStdErr
 	 */
-	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream, final Executor eventExecutor) {
+	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive,
+	                                        final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream,
+	                                        final Executor eventExecutor) {
 		this(interactive, onProcessClosedStream, Charset.defaultCharset(), eventExecutor);
 	}
 
 	/**
 	 * Sync (blocking) execution.
 	 * @param interactive function return null if nothing to send.
-	 * @param onProcessClosedStream -> source, isStdErr
+	 * @param onProcessClosedStream -&gt; source, isStdErr
 	 */
-	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive, final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream) {
+	public CapturedStdOutErrTextInteractive(final Function<LineEntry, String> interactive,
+	                                        final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream) {
 		this(interactive, onProcessClosedStream, Charset.defaultCharset(), r -> r.run());
 	}
 
@@ -83,7 +88,9 @@ public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextOb
 	}
 
 	@Override
-	public void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr, final CapturedStreams streamToKeepPolicy) {
+	public void onProcessCloseStream(final ProcesslauncherLifecycle source,
+	                                 final boolean isStdErr,
+	                                 final CapturedStreams streamToKeepPolicy) {
 		eventExecutor.execute(() -> {
 			onProcessClosedStream.accept(source, isStdErr);
 		});

@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.cmdline;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ class SimpleParameters {
 
 	private final Function<String, Stream<ParameterArg>> filterAnTransformParameter = p -> {
 	    /**
-	     * Split >-a -b "c d" e< to [-a, -b, c d, e]
+	     * Split >-a -b "c d" e-&gt; to [-a, -b, c d, e]
 	     */
 	    return p.trim().chars().mapToObj(i -> (char) i).reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
 		    if (list.isEmpty()) {
@@ -137,12 +137,12 @@ class SimpleParameters {
 				    } else {
 					    if (lastEntry.isEmpty() == false) {
 						    /**
-						     * New space -> new ParameterArg (and ignore space)
+						     * New space -&gt; new ParameterArg (and ignore space)
 						     */
 						    list.add(new ParameterArg(false));
 					    } else {
 						    /**
-						     * Space between ParameterArgs > ignore it
+						     * Space between ParameterArgs -&gt; ignore it
 						     */
 					    }
 				    }
@@ -179,7 +179,7 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @see SimpleParameters#hasParameters()
+	 * See SimpleParameters#hasParameters()
 	 */
 	public SimpleParameters ifHasNotParameter(final Runnable toDoIfMissing, final String... inParameters) {
 		Objects.requireNonNull(toDoIfMissing, "\"toDoIfMissing\" can't to be null");
@@ -234,7 +234,7 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @param params transform spaces in each param to new params: "a b c d" -> ["a", "b", "c", "d"], and it manage " but not tabs.
+	 * @param params transform spaces in each param to new params: "a b c d" -&gt; ["a", "b", "c", "d"], and it manage " but not tabs.
 	 */
 	public SimpleParameters addBulkParameters(final String params) {
 		Objects.requireNonNull(params, "\"params\" can't to be null");
@@ -254,7 +254,8 @@ class SimpleParameters {
 	public SimpleParameters prependParameters(final Collection<String> params) {
 		Objects.requireNonNull(params, "\"params\" can't to be null");
 
-		final List<String> newList = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(Collectors.toUnmodifiableList());
+		final List<String> newList = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(
+		        Collectors.toUnmodifiableList());
 		replaceParameters(newList);
 
 		log.trace("Prepend parameters: {}", () -> params);
@@ -276,7 +277,7 @@ class SimpleParameters {
 	}
 
 	/**
-	 * @param params params add all in front of command line, transform spaces in each param to new params: "a b c d" -> ["a", "b", "c", "d"], and it manage " but not tabs.
+	 * @param params params add all in front of command line, transform spaces in each param to new params: "a b c d" -&gt; ["a", "b", "c", "d"], and it manage " but not tabs.
 	 */
 	public SimpleParameters prependBulkParameters(final String params) {
 		Objects.requireNonNull(params, "\"params\" can't to be null");
@@ -325,7 +326,7 @@ class SimpleParameters {
 
 	/**
 	 * @param parameterKey can have "-" or not (it will be added).
-	 * @return For "-param val1 -param val2 -param val3" -> val1, val2, val3 ; null if parameterKey can't be found, empty if not values for param
+	 * @return For "-param val1 -param val2 -param val3" -&gt; val1, val2, val3 ; null if parameterKey can't be found, empty if not values for param
 	 */
 	public List<String> getValues(final String parameterKey) {
 		Objects.requireNonNull(parameterKey, "\"parameterKey\" can't to be null");

@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher;
 
 import java.io.IOException;
@@ -38,10 +38,12 @@ public class Processlauncher {
 	private final String executableName;
 
 	public Processlauncher(final ProcesslauncherBuilder processlauncherBuilder) {
-		this.processlauncherBuilder = Objects.requireNonNull(processlauncherBuilder, "\"processlauncherBuilder\" can't to be null");
+		this.processlauncherBuilder = Objects.requireNonNull(processlauncherBuilder,
+		        "\"processlauncherBuilder\" can't to be null");
 
 		execCodeMustBeZero = processlauncherBuilder.isExecCodeMustBeZero();
-		executionCallbackers = Collections.unmodifiableList(new ArrayList<>(processlauncherBuilder.getExecutionCallbackers()));
+		executionCallbackers = Collections.unmodifiableList(new ArrayList<>(processlauncherBuilder
+		        .getExecutionCallbackers()));
 		executionTimeLimiter = processlauncherBuilder.getExecutionTimeLimiter();
 		captureStandardOutput = processlauncherBuilder.getCaptureStandardOutput();
 		externalProcessStartup = processlauncherBuilder.getExternalProcessStartup();

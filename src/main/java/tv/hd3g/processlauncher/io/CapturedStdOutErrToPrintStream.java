@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
-*/
+ */
 package tv.hd3g.processlauncher.io;
 
 import java.io.PrintStream;
@@ -49,7 +49,8 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObse
 	private static String getExecNameWithoutExt(final ProcesslauncherLifecycle source) {
 		final String execName = source.getLauncher().getExecutableName();
 
-		if (ExecutableFinder.WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> execName.toLowerCase().endsWith(ext.toLowerCase()))) {
+		if (ExecutableFinder.WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> execName.toLowerCase().endsWith(ext
+		        .toLowerCase()))) {
 			return execName.substring(0, execName.length() - 4);
 		} else {
 			return execName;
@@ -94,7 +95,9 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObse
 	}
 
 	@Override
-	public void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr, final CapturedStreams streamToKeepPolicy) {
+	public void onProcessCloseStream(final ProcesslauncherLifecycle source,
+	                                 final boolean isStdErr,
+	                                 final CapturedStreams streamToKeepPolicy) {
 		if (CapturedStreams.BOTH_STDOUT_STDERR.equals(streamToKeepPolicy)) {
 			if (source.isCorrectlyDone() & isStdErr) {
 				return;

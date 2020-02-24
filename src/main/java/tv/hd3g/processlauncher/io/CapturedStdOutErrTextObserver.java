@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * Copyright (C) hdsdi3g for hd3g.tv 2018
  *
-*/
+ */
 package tv.hd3g.processlauncher.io;
 
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
@@ -23,7 +23,9 @@ public interface CapturedStdOutErrTextObserver {
 
 	void onText(LineEntry lineEntry);
 
-	default void onProcessCloseStream(final ProcesslauncherLifecycle source, final boolean isStdErr, final CapturedStreams streamToKeepPolicy) {
+	default void onProcessCloseStream(final ProcesslauncherLifecycle source,
+	                                  final boolean isStdErr,
+	                                  final CapturedStreams streamToKeepPolicy) {
 	}
 
 }
