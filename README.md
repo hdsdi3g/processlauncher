@@ -2,7 +2,7 @@
 
 Start process with Java, with more pratical tools. 
 
-Tested on Windows 10 and Linux. Should be on on macOS.
+Tested on Windows 10 and Linux. Should be ok on macOS.
 
 Please use Maven and Java 11 (OpenJDK) for build and test.
 

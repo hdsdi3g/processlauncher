@@ -5,17 +5,17 @@
 
 	<groupId>tv.hd3g</groupId>
 	<artifactId>processlauncher</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.0</version>
 	<packaging>jar</packaging>
 
 	<name>processlauncher</name>
 	<url>https://github.com/hdsdi3g/processlauncher</url>
+	<description>Another lib to start process in Java</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
+		<maven.compiler.release>11</maven.compiler.release>
+		<java.version>11</java.version>
 	</properties>
 
 	<dependencies>
@@ -59,6 +59,14 @@
 		<name>hd3g.tv</name>
 		<url>https://hd3g.tv</url>
 	</organization>
+    <developers>
+        <developer>
+            <name>hdsdi3g</name>
+            <email>admin@hd3g.tv</email>
+            <organization>hd3g.tv</organization>
+            <organizationUrl>https://hd3g.tv</organizationUrl>
+        </developer>
+    </developers>   
 	<scm>
 		<connection>scm:git:https://github.com/hdsdi3g/processlauncher.git</connection>
 		<developerConnection>scm:git:https://github.com/hdsdi3g/processlauncher.git</developerConnection>
@@ -69,7 +77,6 @@
 		<url>https://github.com/hdsdi3g/processlauncher/issues</url>
 		<system>GitHub</system>
 	</issueManagement>
-
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License, Version 3</name>
@@ -83,39 +90,88 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
+				<version>3.0.0-M1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<release>11</release>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>false</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+							<passphraseServerId>${gpg.keyname}</passphraseServerId>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.8</version>
-			</extension>
-		</extensions>
 	</build>
-
-	<repositories>
+	<distributionManagement>
 		<repository>
-			<id>hd3gtv</id>
-			<url>https://maven.hd3g.tv/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
-	</repositories>
-
+	</distributionManagement>
 </project>
