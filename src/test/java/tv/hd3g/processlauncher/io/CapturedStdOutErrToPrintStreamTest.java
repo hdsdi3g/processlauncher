@@ -104,7 +104,7 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 
 		capture.onProcessCloseStream(source, false, CapturedStreams.BOTH_STDOUT_STDERR);
 		capture.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
-		Assert.assertTrue(outStreamContent.size() > 0);
+		Assert.assertEquals(0, outStreamContent.size());
 		Assert.assertEquals(0, errStreamContent.size());
 
 		capture.onProcessCloseStream(source, false, CapturedStreams.ONLY_STDOUT);
@@ -121,11 +121,11 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 
 		capture.onProcessCloseStream(source, false, CapturedStreams.BOTH_STDOUT_STDERR);
 		capture.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
-		Assert.assertEquals(0, outStreamContent.size());
+		Assert.assertTrue(outStreamContent.size() > 0);
 		Assert.assertTrue(errStreamContent.size() > 0);
 
 		capture.onProcessCloseStream(source, true, CapturedStreams.ONLY_STDERR);
-		Assert.assertEquals(0, outStreamContent.size());
+		Assert.assertTrue(outStreamContent.size() > 0);
 		Assert.assertTrue(errStreamContent.size() > 0);
 	}
 

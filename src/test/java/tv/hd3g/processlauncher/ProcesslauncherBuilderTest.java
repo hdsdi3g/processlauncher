@@ -78,7 +78,7 @@ public class ProcesslauncherBuilderTest extends TestCase {
 	}
 
 	public void testGetSetWorkingDirectory() throws IOException {
-		Assert.assertTrue(pb.getWorkingDirectory().exists() && pb.getWorkingDirectory().isDirectory());
+		Assert.assertNull(pb.getWorkingDirectory());
 		pb.setWorkingDirectory(new File("."));
 		Assert.assertEquals(new File("."), pb.getWorkingDirectory());
 
