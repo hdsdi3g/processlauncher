@@ -33,6 +33,10 @@ See `tv.hd3g.processlauncher.Exec` for shortcuts examples.
 
 Use maven and Junit for run internal UT and IT.
 
+## API organisation and relation
+
+[![Java diagram](https://github.com/hdsdi3g/processlauncher/raw/doc/code-organization.png "Java diagram")](https://github.com/hdsdi3g/processlauncher/raw/doc/code-organization.png)
+
 ## Licence
 
 LGPL v3
