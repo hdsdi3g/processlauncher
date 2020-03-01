@@ -99,9 +99,7 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObse
 	                                 final boolean isStdErr,
 	                                 final CapturedStreams streamToKeepPolicy) {
 		if (CapturedStreams.BOTH_STDOUT_STDERR.equals(streamToKeepPolicy)) {
-			if (source.isCorrectlyDone() & isStdErr) {
-				return;
-			} else if (source.isCorrectlyDone() == false & isStdErr == false) {
+			if (source.isCorrectlyDone()) {
 				return;
 			}
 		}

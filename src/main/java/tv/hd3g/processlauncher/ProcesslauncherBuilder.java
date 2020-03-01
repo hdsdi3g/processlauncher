@@ -56,12 +56,6 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		executionTimeLimiter = Optional.empty();
 		captureStandardOutput = Optional.empty();
 		externalProcessStartup = Optional.empty();
-
-		try {
-			setWorkingDirectory(new File(System.getProperty("java.io.tmpdir", "")));
-		} catch (final IOException e) {
-			throw new RuntimeException("Invalid java.io.tmpdir", e);
-		}
 	}
 
 	public ProcesslauncherBuilder(final File executable, final Collection<String> parameters) {
@@ -197,8 +191,10 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		final ProcessBuilder processBuilder = new ProcessBuilder(fullCommandLine);
 		processBuilder.environment().putAll(environment);
 
-		if (workingDirectory != null) {
+		if (workingDirectory != null && workingDirectory.exists() && workingDirectory.isDirectory()) {
 			processBuilder.directory(workingDirectory);
+		} else {
+			processBuilder.directory(new File(System.getProperty("user.dir", new File(".").getAbsolutePath())));
 		}
 		return processBuilder;
 	}
