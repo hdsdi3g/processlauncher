@@ -20,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -46,10 +48,8 @@ public class ToolRunTest extends TestCase {
 		exec.getParameters().addParameters("-version");
 	}
 
-	public void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
-		final ToolRunner toolRun = new ToolRunner(executableFinder, 1);
-
-		final ExecutableTool executableTool = new ExecutableTool() {
+	private ExecutableTool makeExecutableTool() {
+		return new ExecutableTool() {
 
 			@Override
 			public String getExecutableName() {
@@ -61,6 +61,12 @@ public class ToolRunTest extends TestCase {
 				return exec.getReadyToRunParameters();
 			}
 		};
+	}
+
+	public void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
+		final ToolRunner toolRun = new ToolRunner(executableFinder, 1);
+
+		final ExecutableTool executableTool = makeExecutableTool();
 
 		final CompletableFuture<RunningTool<ExecutableTool>> cfResult = toolRun.execute(executableTool);
 		Assert.assertNotNull(cfResult);
@@ -78,4 +84,31 @@ public class ToolRunTest extends TestCase {
 			return line.contains("version");
 		}));
 	}
+
+	public void testMassiveParallelExecute() throws InterruptedException, ExecutionException, TimeoutException {
+		final var cpuCount = Runtime.getRuntime().availableProcessors();
+		final ToolRunner toolRun = new ToolRunner(executableFinder, cpuCount);
+		if (cpuCount == 1) {
+			return;
+		}
+
+		final var startList = IntStream.range(0, cpuCount * 20).parallel().mapToObj(i -> {
+			return toolRun.execute(makeExecutableTool());
+		}).collect(Collectors.toUnmodifiableList());
+
+		startList.stream().map(cfResult -> {
+			try {
+				return cfResult.get(2, TimeUnit.MINUTES).waitForEnd(r -> r.run()).get();
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				throw new IllegalArgumentException(e);
+			}
+		}).forEach(result -> {
+			final var content = result.getTextRetention().getStdouterrLines(false)
+			        .collect(Collectors.toUnmodifiableList());
+			Assert.assertTrue("Fail content: " + content, content.stream().anyMatch(line -> {
+				return line.contains("version");
+			}));
+		});
+	}
+
 }

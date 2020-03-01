@@ -28,8 +28,25 @@ public interface ProcesslauncherLifecycleShortcutTraits {
 		return getEndStatus().equals(EndStatus.CORRECTLY_DONE);
 	}
 
+	/**
+	 * Blocking call until process is really done.
+	 * Correct: https://github.com/hdsdi3g/processlauncher/issues/1
+	 */
 	default Integer getExitCode() {
-		return getProcess().exitValue();
+		while (getProcess().isAlive()) {
+			Thread.onSpinWait();
+		}
+
+		while (true) {
+			try {
+				return getProcess().exitValue();
+			} catch (final IllegalThreadStateException e) {
+				if (e.getMessage().equalsIgnoreCase("process has not exited") == false) {
+					throw e;
+				}
+			}
+			Thread.onSpinWait();
+		}
 	}
 
 	/**
