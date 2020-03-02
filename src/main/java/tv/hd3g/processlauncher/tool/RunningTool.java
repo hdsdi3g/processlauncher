@@ -37,17 +37,22 @@ public interface RunningTool<T extends ExecutableTool> {
 
 	/**
 	 * Can throw an InvalidExecution, with stderr embedded.
+	 * Blocking call (with CapturedStdOutErrTextRetention::waitForClosedStream)
 	 * Usage example: toolRun.execute(myExecTool).thenApply(RunningTool::checkExecutionGetText))
 	 */
 	default CapturedStdOutErrTextRetention checkExecutionGetText() {
+		final var lifecyle = getLifecyle();
 		try {
-			getLifecyle().checkExecution();
+			lifecyle.checkExecution();
+			final var textRetention = getTextRetention();
+			textRetention.waitForClosedStream(lifecyle);
+			return textRetention;
 		} catch (final InvalidExecution e) {
-			e.setStdErr(getTextRetention().getStderrLines(false).filter(getExecutableToolSource().filterOutErrorLines())
+			e.setStdErr(getTextRetention().getStderrLines(false)
+			        .filter(getExecutableToolSource().filterOutErrorLines())
 			        .map(String::trim).collect(Collectors.joining("|")));
 			throw e;
 		}
-		return getTextRetention();
 	}
 
 	/**

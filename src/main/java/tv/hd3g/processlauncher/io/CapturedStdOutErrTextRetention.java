@@ -16,19 +16,42 @@
  */
 package tv.hd3g.processlauncher.io;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObserver {
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
+	private final Set<ProcesslauncherLifecycle> closedProcess;
 
 	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
 		this.streamToKeep = Objects.requireNonNull(streamToKeep, "\"streamToKeep\" can't to be null");
 		lineEntries = new LinkedBlockingQueue<>();
+		closedProcess = Collections.synchronizedSet(new HashSet<>());
+	}
+
+	@Override
+	public void onProcessCloseStream(final ProcesslauncherLifecycle source,
+	                                 final boolean isStdErr,
+	                                 final CapturedStreams streamToKeepPolicy) {
+		closedProcess.add(source);
+	}
+
+	/**
+	 * Blocking
+	 */
+	public void waitForClosedStream(final ProcesslauncherLifecycle source) {
+		while (closedProcess.contains(source) == false) {
+			Thread.onSpinWait();
+		}
 	}
 
 	/**

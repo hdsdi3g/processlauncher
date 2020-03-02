@@ -229,7 +229,9 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 	public ProcesslauncherLifecycle waitForEnd() {
 		try {
 			process.waitFor();
-			// Thread.sleep(10);
+			while (process.isAlive()) {
+				Thread.onSpinWait();
+			}
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("Can't wait the end of " + fullCommandLine, e);
 		}
