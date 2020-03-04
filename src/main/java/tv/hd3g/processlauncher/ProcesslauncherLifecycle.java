@@ -241,7 +241,6 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 	public ProcesslauncherLifecycle waitForEnd(final long timeout, final TimeUnit unit) {
 		try {
 			process.waitFor(timeout, unit);
-			// Thread.sleep(100);
 		} catch (final InterruptedException e) {
 			throw new RuntimeException("Can't wait the end of " + fullCommandLine, e);
 		}

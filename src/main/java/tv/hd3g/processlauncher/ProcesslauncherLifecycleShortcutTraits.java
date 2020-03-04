@@ -36,7 +36,6 @@ public interface ProcesslauncherLifecycleShortcutTraits {
 		while (getProcess().isAlive()) {
 			Thread.onSpinWait();
 		}
-
 		while (true) {
 			try {
 				return getProcess().exitValue();

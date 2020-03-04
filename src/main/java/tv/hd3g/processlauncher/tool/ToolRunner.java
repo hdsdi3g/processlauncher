@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
@@ -35,10 +36,11 @@ public class ToolRunner {
 
 	private final ExecutableFinder executableFinder;
 	private final ThreadPoolExecutor executor;
+	private final AtomicLong executorWatcherId;
 
 	public ToolRunner(final ExecutableFinder executableFinder, final int maximumInParallel) {
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
-
+		executorWatcherId = new AtomicLong();
 		executor = new ThreadPoolExecutor(1, maximumInParallel, 1l, TimeUnit.SECONDS,
 		        new LinkedBlockingQueue<Runnable>(), r -> {
 			        final Thread t = new Thread(r);
@@ -49,11 +51,43 @@ public class ToolRunner {
 		        });
 	}
 
+	private class LocalRunningTool<T extends ExecutableTool> implements RunningTool<T> {
+
+		private final CapturedStdOutErrTextRetention textRetention;
+		private final ProcesslauncherLifecycle lifecyle;
+		private final T execTool;
+
+		private LocalRunningTool(final CapturedStdOutErrTextRetention textRetention,
+		                         final ProcesslauncherLifecycle lifecyle,
+		                         final T execTool) {
+			this.textRetention = textRetention;
+			this.lifecyle = lifecyle;
+			this.execTool = execTool;
+		}
+
+		@Override
+		public CapturedStdOutErrTextRetention getTextRetention() {
+			return textRetention;
+		}
+
+		@Override
+		public ProcesslauncherLifecycle getLifecyle() {
+			return lifecyle;
+		}
+
+		@Override
+		public T getExecutableToolSource() {
+			return execTool;
+		}
+	}
+
 	public <T extends ExecutableTool> CompletableFuture<RunningTool<T>> execute(final T execTool) {
 		final Executor executorStdOutWatchers = r -> {
 			final Thread t = new Thread(r);
 			t.setDaemon(true);
-			t.setName("Executable sysouterr watcher for " + execTool.getExecutableName());
+			t.setName("Executable sysouterr watcher for "
+			          + execTool.getExecutableName()
+			          + " TId#" + executorWatcherId.getAndAdd(1));
 			t.start();
 		};
 
@@ -64,31 +98,15 @@ public class ToolRunner {
 				        executableFinder);
 				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
-				builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR,
-				        executorStdOutWatchers).getObservers().add(textRetention);
+				builder.getSetCaptureStandardOutputAsOutputText(
+				        CapturedStreams.BOTH_STDOUT_STDERR, executorStdOutWatchers)
+				        .getObservers()
+				        .add(textRetention);
 
 				execTool.beforeRun(builder);
 				final ProcesslauncherLifecycle lifecyle = builder.start();
 
-				class LocalRunningTool implements RunningTool<T> {
-
-					@Override
-					public CapturedStdOutErrTextRetention getTextRetention() {
-						return textRetention;
-					}
-
-					@Override
-					public ProcesslauncherLifecycle getLifecyle() {
-						return lifecyle;
-					}
-
-					@Override
-					public T getExecutableToolSource() {
-						return execTool;
-					}
-
-				}
-				return new LocalRunningTool();
+				return new LocalRunningTool<>(textRetention, lifecyle, execTool);
 			} catch (final IOException e) {
 				throw new RuntimeException("Can't start " + executableName, e);
 			}

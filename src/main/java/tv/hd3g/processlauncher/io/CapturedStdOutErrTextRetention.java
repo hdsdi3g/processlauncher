@@ -16,11 +16,9 @@
  */
 package tv.hd3g.processlauncher.io;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,26 +28,32 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
-	private final Set<ProcesslauncherLifecycle> closedProcess;
+	private final AtomicBoolean closedStdoutProcess;
+	private final AtomicBoolean closedStderrProcess;
 
 	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
 		this.streamToKeep = Objects.requireNonNull(streamToKeep, "\"streamToKeep\" can't to be null");
 		lineEntries = new LinkedBlockingQueue<>();
-		closedProcess = Collections.synchronizedSet(new HashSet<>());
+		closedStdoutProcess = new AtomicBoolean(streamToKeep.canCaptureStdout() == false);
+		closedStderrProcess = new AtomicBoolean(streamToKeep.canCaptureStderr() == false);
 	}
 
 	@Override
 	public void onProcessCloseStream(final ProcesslauncherLifecycle source,
 	                                 final boolean isStdErr,
 	                                 final CapturedStreams streamToKeepPolicy) {
-		closedProcess.add(source);
+		if (isStdErr) {
+			closedStderrProcess.set(true);
+		} else {
+			closedStdoutProcess.set(true);
+		}
 	}
 
 	/**
 	 * Blocking
 	 */
 	public void waitForClosedStream(final ProcesslauncherLifecycle source) {
-		while (closedProcess.contains(source) == false) {
+		while (closedStdoutProcess.get() == false && closedStderrProcess.get() == false) {
 			Thread.onSpinWait();
 		}
 	}
@@ -65,6 +69,13 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObse
 	public void onText(final LineEntry lineEntry) {
 		if (lineEntry.canUseThis(streamToKeep) == false) {
 			return;
+		}
+		if (lineEntry.isStdErr() && closedStderrProcess.get()) {
+			throw new IllegalStateException("A new line try to be added in the internal stderr list: \""
+			                                + lineEntry.getLine() + "\"");
+		} else if (lineEntry.isStdErr() == false && closedStdoutProcess.get()) {
+			throw new IllegalStateException("A new line try to be added in the internal stdout list: \""
+			                                + lineEntry.getLine() + "\"");
 		}
 		lineEntries.add(lineEntry);
 	}

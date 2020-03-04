@@ -85,14 +85,14 @@ public class ToolRunTest extends TestCase {
 		}));
 	}
 
-	public void testMassiveParallelExecute() throws InterruptedException, ExecutionException, TimeoutException {
+	public void testParallelExecute() throws InterruptedException, ExecutionException, TimeoutException {
 		final var cpuCount = Runtime.getRuntime().availableProcessors();
 		final ToolRunner toolRun = new ToolRunner(executableFinder, cpuCount);
 		if (cpuCount == 1) {
 			return;
 		}
 
-		final var startList = IntStream.range(0, cpuCount * 20).parallel().mapToObj(i -> {
+		final var startList = IntStream.range(0, cpuCount * 2).parallel().mapToObj(i -> {
 			return toolRun.execute(makeExecutableTool());
 		}).collect(Collectors.toUnmodifiableList());
 
