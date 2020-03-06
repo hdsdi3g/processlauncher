@@ -18,11 +18,9 @@ package tv.hd3g.processlauncher.tool;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -33,73 +31,83 @@ import tv.hd3g.processlauncher.io.CapturedStreams;
 public class ToolRunner {
 
 	private final ExecutableFinder executableFinder;
-	private final ThreadPoolExecutor executor;
 
-	public ToolRunner(final ExecutableFinder executableFinder, final int maximumInParallel) {
+	public ToolRunner(final ExecutableFinder executableFinder) {
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
-		executor = new ThreadPoolExecutor(1, maximumInParallel, 1l, TimeUnit.SECONDS,
-		        new LinkedBlockingQueue<Runnable>(), r -> {
-			        final Thread t = new Thread(r);
-			        t.setPriority(Thread.MIN_PRIORITY);
-			        t.setDaemon(false);
-			        t.setName("Executable starter");
-			        return t;
-		        });
 	}
 
-	private class LocalRunningTool<T extends ExecutableTool> implements RunningTool<T> {
+	public ExecutableFinder getExecutableFinder() {
+		return executableFinder;
+	}
 
+	public <T extends ExecutableTool> RunningTool<T> execute(final T execTool) {
+		final String executableName = execTool.getExecutableName();
+		try {
+			final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(),
+			        executableFinder);
+			final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
+			final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
+			builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
+			        .getObservers()
+			        .add(textRetention);
+			execTool.beforeRun(builder);
+			return new RunningTool<>(textRetention, builder.start(), execTool);
+		} catch (final IOException e) {
+			throw new RuntimeException("Can't start " + executableName, e);
+		}
+	}
+
+	public class RunningTool<T extends ExecutableTool> {
 		private final CapturedStdOutErrTextRetention textRetention;
 		private final ProcesslauncherLifecycle lifecyle;
 		private final T execTool;
 
-		private LocalRunningTool(final CapturedStdOutErrTextRetention textRetention,
-		                         final ProcesslauncherLifecycle lifecyle,
-		                         final T execTool) {
+		private RunningTool(final CapturedStdOutErrTextRetention textRetention,
+		                    final ProcesslauncherLifecycle lifecyle,
+		                    final T execTool) {
 			this.textRetention = textRetention;
 			this.lifecyle = lifecyle;
 			this.execTool = execTool;
 		}
 
-		@Override
 		public CapturedStdOutErrTextRetention getTextRetention() {
 			return textRetention;
 		}
 
-		@Override
 		public ProcesslauncherLifecycle getLifecyle() {
 			return lifecyle;
 		}
 
-		@Override
 		public T getExecutableToolSource() {
 			return execTool;
 		}
-	}
 
-		return CompletableFuture.supplyAsync(() -> {
-			final String executableName = execTool.getExecutableName();
+		/**
+		 * Can throw an InvalidExecution, with stderr embedded.
+		 * Blocking call (with CapturedStdOutErrTextRetention::waitForClosedStream)
+		 */
+		public CapturedStdOutErrTextRetention checkExecutionGetText() {
+			final var lifecyle = getLifecyle();
 			try {
-				final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(),
-				        executableFinder);
-				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
-				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
-				builder.getSetCaptureStandardOutputAsOutputText(
-				        CapturedStreams.BOTH_STDOUT_STDERR)
-				        .getObservers()
-				        .add(textRetention);
-
-				execTool.beforeRun(builder);
-				final ProcesslauncherLifecycle lifecyle = builder.start();
-
-				return new LocalRunningTool<>(textRetention, lifecyle, execTool);
-			} catch (final IOException e) {
-				throw new RuntimeException("Can't start " + executableName, e);
+				lifecyle.checkExecution();
+				final var textRetention = getTextRetention();
+				textRetention.waitForClosedStream(lifecyle);
+				return textRetention;
+			} catch (final InvalidExecution e) {
+				e.setStdErr(getTextRetention().getStderrLines(false)
+				        .filter(getExecutableToolSource().filterOutErrorLines())
+				        .map(String::trim).collect(Collectors.joining("|")));
+				throw e;
 			}
-		}, executor);
-	}
+		}
 
-	public ExecutableFinder getExecutableFinder() {
-		return executableFinder;
+		/**
+		 * Don't checks end status (ok/error).
+		 * @return this
+		 */
+		public RunningTool<T> waitForEnd() {
+			getLifecyle().waitForEnd();
+			return this;
+		}
 	}
 }

@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -123,7 +121,6 @@ public class Exec implements ExecutableTool {
 		final CommandLine commandLine = new CommandLine(execName, getReadyToRunParameters(), executableFinder);
 		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(commandLine);
 
-		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
 		        .getObservers().add(textRetention);
@@ -132,13 +129,6 @@ public class Exec implements ExecutableTool {
 		if (beforeRun != null) {
 			beforeRun.accept(builder);
 		}
-
-		builder.addExecutionCallbacker(new ExecutionCallbacker() {
-			@Override
-			public void onEndExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
-				outStreamWatcher.shutdown();
-			}
-		});
 
 		try {
 			builder.start().checkExecution();

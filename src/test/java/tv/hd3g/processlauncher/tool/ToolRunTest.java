@@ -16,12 +16,8 @@
  */
 package tv.hd3g.processlauncher.tool;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -29,6 +25,7 @@ import tv.hd3g.processlauncher.Exec;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.tool.ToolRunner.RunningTool;
 
 public class ToolRunTest extends TestCase {
 
@@ -64,13 +61,11 @@ public class ToolRunTest extends TestCase {
 	}
 
 	public void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
-		final ToolRunner toolRun = new ToolRunner(executableFinder, 1);
+		final ToolRunner toolRun = new ToolRunner(executableFinder);
 
 		final ExecutableTool executableTool = makeExecutableTool();
 
-		final CompletableFuture<RunningTool<ExecutableTool>> cfResult = toolRun.execute(executableTool);
-		Assert.assertNotNull(cfResult);
-		final RunningTool<ExecutableTool> result = cfResult.get(10, TimeUnit.SECONDS);
+		final RunningTool<ExecutableTool> result = toolRun.execute(executableTool);
 		Assert.assertEquals(executableTool, result.getExecutableToolSource());
 
 		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = result.getTextRetention();
@@ -78,37 +73,9 @@ public class ToolRunTest extends TestCase {
 		Assert.assertNotNull(result.getLifecyle());
 
 		Assert.assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText());
-		Assert.assertEquals(result, result.waitForEnd(r -> r.run()).get());
-
 		Assert.assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> {
 			return line.contains("version");
 		}));
-	}
-
-	public void testParallelExecute() throws InterruptedException, ExecutionException, TimeoutException {
-		final var cpuCount = Runtime.getRuntime().availableProcessors();
-		final ToolRunner toolRun = new ToolRunner(executableFinder, cpuCount);
-		if (cpuCount == 1) {
-			return;
-		}
-
-		final var startList = IntStream.range(0, cpuCount * 2).parallel().mapToObj(i -> {
-			return toolRun.execute(makeExecutableTool());
-		}).collect(Collectors.toUnmodifiableList());
-
-		startList.stream().map(cfResult -> {
-			try {
-				return cfResult.get(2, TimeUnit.MINUTES).waitForEnd(r -> r.run()).get();
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				throw new IllegalArgumentException(e);
-			}
-		}).forEach(result -> {
-			final var content = result.getTextRetention().getStdouterrLines(false)
-			        .collect(Collectors.toUnmodifiableList());
-			Assert.assertTrue("Fail content: " + content, content.stream().anyMatch(line -> {
-				return line.contains("version");
-			}));
-		});
 	}
 
 }

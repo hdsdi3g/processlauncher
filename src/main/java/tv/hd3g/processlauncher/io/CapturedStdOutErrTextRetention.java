@@ -28,7 +28,7 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrText {
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
-	private final AtomicBoolean closedStdoutProcess;
+	private final AtomicBoolean closedStdoutProcess;// TODO close locks ??
 	private final AtomicBoolean closedStderrProcess;
 
 	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
