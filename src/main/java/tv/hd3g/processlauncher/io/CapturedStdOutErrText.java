@@ -19,7 +19,7 @@ package tv.hd3g.processlauncher.io;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 @FunctionalInterface
-public interface CapturedStdOutErrTextObserver {
+public interface CapturedStdOutErrText {
 
 	void onText(LineEntry lineEntry);
 

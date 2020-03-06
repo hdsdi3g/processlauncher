@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
-public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrTextObserver {
+public class CapturedStdOutErrTextInteractive implements CapturedStdOutErrText {
 	private static Logger log = LogManager.getLogger();
 
 	private final Function<LineEntry, String> interactive;

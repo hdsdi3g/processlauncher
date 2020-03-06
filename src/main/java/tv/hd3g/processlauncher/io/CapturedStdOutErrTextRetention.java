@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
-public class CapturedStdOutErrTextRetention implements CapturedStdOutErrTextObserver {
+public class CapturedStdOutErrTextRetention implements CapturedStdOutErrText {
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;

@@ -43,7 +43,7 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		final ExecutorService executorConsumer = new ThreadlessExecutorService();
 
 		final List<LineEntry> capturedlines = new ArrayList<>();
-		final CapturedStdOutErrTextObserver csoeto = lineEntry -> {
+		final CapturedStdOutErrText csoeto = lineEntry -> {
 			capturedlines.add(lineEntry);
 		};
 

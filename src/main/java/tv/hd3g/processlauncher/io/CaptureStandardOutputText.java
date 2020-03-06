@@ -34,7 +34,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	private static Logger log = LogManager.getLogger();
 
 	private final CapturedStreams captureOutStreamsBehavior;
-	private final List<CapturedStdOutErrTextObserver> observers;
+	private final List<CapturedStdOutErrText> observers;
 	private final Executor executorConsumer;
 
 	/**
@@ -56,7 +56,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer);
 	}
 
-	public synchronized List<CapturedStdOutErrTextObserver> getObservers() {
+	public synchronized List<CapturedStdOutErrText> getObservers() {
 		return observers;
 	}
 
@@ -77,7 +77,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	private void parseStream(final InputStream processStream,
 	                         final boolean isStdErr,
 	                         final ProcesslauncherLifecycle source) {
-		final List<CapturedStdOutErrTextObserver> finalObservers;
+		final List<CapturedStdOutErrText> finalObservers;
 		synchronized (this) {
 			finalObservers = Collections.unmodifiableList(new ArrayList<>(observers));
 		}

@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 
-public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrTextObserver {
+public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrText {
 
 	private final PrintStream printStreamStdOut;
 	private final PrintStream printStreamStdErr;
