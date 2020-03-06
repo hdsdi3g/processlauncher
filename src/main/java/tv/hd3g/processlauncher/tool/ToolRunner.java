@@ -19,7 +19,6 @@ package tv.hd3g.processlauncher.tool;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -81,16 +80,6 @@ public class ToolRunner {
 		}
 	}
 
-	public <T extends ExecutableTool> CompletableFuture<RunningTool<T>> execute(final T execTool) {
-		final Executor executorStdOutWatchers = r -> {
-			final Thread t = new Thread(r);
-			t.setDaemon(true);
-			t.setName("Executable sysouterr watcher for "
-			          + execTool.getExecutableName()
-			          + " TId#" + executorWatcherId.getAndAdd(1));
-			t.start();
-		};
-
 		return CompletableFuture.supplyAsync(() -> {
 			final String executableName = execTool.getExecutableName();
 			try {
@@ -99,7 +88,7 @@ public class ToolRunner {
 				final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 				final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 				builder.getSetCaptureStandardOutputAsOutputText(
-				        CapturedStreams.BOTH_STDOUT_STDERR, executorStdOutWatchers)
+				        CapturedStreams.BOTH_STDOUT_STDERR)
 				        .getObservers()
 				        .add(textRetention);
 

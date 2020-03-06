@@ -24,14 +24,14 @@ public interface CaptureStandardOutput {
 
 	/**
 	 * Called one time juste after process starts.
-	 * @param processInputStream consuming should be in another and dedicated thread.
+	 * @return the watcher thread
 	 */
-	void stdOutStreamConsumer(InputStream processInputStream, ProcesslauncherLifecycle source);
+	Thread stdOutStreamConsumer(InputStream processInputStream, ProcesslauncherLifecycle source);
 
 	/**
 	 * Called one time juste after process starts.
-	 * @param processInputStream consuming should be in another and dedicated thread.
+	 * @return the watcher thread
 	 */
-	void stdErrStreamConsumer(InputStream processInputStream, ProcesslauncherLifecycle source);
+	Thread stdErrStreamConsumer(InputStream processInputStream, ProcesslauncherLifecycle source);
 
 }

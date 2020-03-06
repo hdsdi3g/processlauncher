@@ -19,8 +19,6 @@ package tv.hd3g.processlauncher;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -54,12 +52,10 @@ import tv.hd3g.processlauncher.io.LineEntry;
 public class ProcesslauncherLifecycleITTest extends TestCase {
 
 	private final ExecutableFinder executableFinder;
-	private final ExecutorService outStreamWatcher;
 	private final ScheduledThreadPoolExecutor scheduledThreadPool;
 
 	public ProcesslauncherLifecycleITTest() {
 		executableFinder = new ExecutableFinder();
-		outStreamWatcher = Executors.newCachedThreadPool();
 		scheduledThreadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
 	}
 
@@ -77,7 +73,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	private ProcesslauncherLifecycle captureTextAndStart(final ProcesslauncherBuilder pb) throws IOException {
-		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers()
+		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR).getObservers()
 		        .add(textRetention);
 		return pb.start();
 	}
@@ -279,7 +275,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 				onProcessClosedStreamCountOut.incrementAndGet();
 			}
 		};
-		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher).getObservers()
+		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR).getObservers()
 		        .add(new CapturedStdOutErrTextInteractive(interactive, onProcessClosedStream));
 
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();

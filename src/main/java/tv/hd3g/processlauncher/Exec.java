@@ -125,7 +125,7 @@ public class Exec implements ExecutableTool {
 
 		final ExecutorService outStreamWatcher = Executors.newFixedThreadPool(2);
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
-		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, outStreamWatcher)
+		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
 		        .getObservers().add(textRetention);
 
 		preBeforeRun.accept(builder);

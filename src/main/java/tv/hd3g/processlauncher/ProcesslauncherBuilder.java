@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -240,13 +238,11 @@ public class ProcesslauncherBuilder {
 	/**
 	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
 	 */
-	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior,
-	                                                                         final Executor defaultExecutorConsumer) {
+	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior) {
 		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(
 		        cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(
 		                () -> {
-			                return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior,
-			                        defaultExecutorConsumer);
+			                return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior);
 		                });
 
 		setCaptureStandardOutput(csot);
@@ -258,7 +254,7 @@ public class ProcesslauncherBuilder {
 	 * Capture all, in the ForkJoinPool.
 	 */
 	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText() {
-		return getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, ForkJoinPool.commonPool());
+		return getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR);
 	}
 
 	/**

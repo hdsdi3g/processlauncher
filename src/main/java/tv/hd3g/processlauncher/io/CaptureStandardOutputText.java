@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,62 +33,90 @@ import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 public class CaptureStandardOutputText implements CaptureStandardOutput {
 	private static Logger log = LogManager.getLogger();
 
+	private static final AtomicLong CREATED_THREAD_COUNTER = new AtomicLong(-1);
+
 	private final CapturedStreams captureOutStreamsBehavior;
 	private final List<CapturedStdOutErrText> observers;
-	private final Executor executorConsumer;
 
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior, final Executor executorConsumer) {
+	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
 		observers = new ArrayList<>();
-		this.executorConsumer = executorConsumer;
-		if (executorConsumer == null) {
-			throw new NullPointerException("\"executorConsumer\" can't to be null");
-		}
 	}
 
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final Executor executorConsumer) {
-		this(CapturedStreams.BOTH_STDOUT_STDERR, executorConsumer);
+	public CaptureStandardOutputText() {
+		this(CapturedStreams.BOTH_STDOUT_STDERR);
 	}
 
-	public synchronized List<CapturedStdOutErrText> getObservers() {
+	public synchronized List<CapturedStdOutErrText> getObservers() {// TODO move observers to parseStream ?
 		return observers;
 	}
 
 	@Override
-	public void stdOutStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
+	public StreamParser stdOutStreamConsumer(final InputStream processInputStream,
+	                                         final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStdout()) {
-			parseStream(processInputStream, false, source);
+			final var t = new StreamParser(processInputStream, false, source);
+			t.start();
+			return t;
 		}
+		return null;
 	}
 
 	@Override
-	public void stdErrStreamConsumer(final InputStream processInputStream, final ProcesslauncherLifecycle source) {
+	public StreamParser stdErrStreamConsumer(final InputStream processInputStream,
+	                                         final ProcesslauncherLifecycle source) {
 		if (captureOutStreamsBehavior.canCaptureStderr()) {
-			parseStream(processInputStream, true, source);
+			final var t = new StreamParser(processInputStream, true, source);
+			t.start();
+			return t;
 		}
+		return null;
 	}
 
-	private void parseStream(final InputStream processStream,
-	                         final boolean isStdErr,
-	                         final ProcesslauncherLifecycle source) {
-		final List<CapturedStdOutErrText> finalObservers;
-		synchronized (this) {
-			finalObservers = Collections.unmodifiableList(new ArrayList<>(observers));
+	public class StreamParser extends Thread {
+
+		private final InputStream processStream;
+		private final boolean isStdErr;
+		private final ProcesslauncherLifecycle source;
+
+		private StreamParser(final InputStream processStream,
+		                     final boolean isStdErr,
+		                     final ProcesslauncherLifecycle source) {
+			this.processStream = processStream;
+			this.isStdErr = isStdErr;
+			this.source = source;
+			setDaemon(true);
+			setPriority(MAX_PRIORITY);
+
+			final var execName = source.getLauncher().getExecutableName();
+			if (isStdErr) {
+				setName("Executable syserr watcher for " + execName + " TId#"
+				        + CREATED_THREAD_COUNTER.incrementAndGet());
+			} else {
+				setName("Executable sysout watcher for " + execName + " TId#"
+				        + CREATED_THREAD_COUNTER.incrementAndGet());
+			}
 		}
 
-		executorConsumer.execute(() -> {
+		@Override
+		public void run() {
+			final List<CapturedStdOutErrText> finalObservers;
+			synchronized (this) {
+				finalObservers = Collections.unmodifiableList(new ArrayList<>(observers));
+			}
 			try {
 				final BufferedReader reader = new BufferedReader(new InputStreamReader(processStream));
 				try {
 					String line = "";
 					while ((line = reader.readLine()) != null) {
-						final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr, source);
+						final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr,
+						        source);
 						finalObservers.forEach(observer -> {
 							try {
 								observer.onText(lineEntry);
@@ -121,7 +149,8 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 					observer.onProcessCloseStream(source, isStdErr, captureOutStreamsBehavior);
 				});
 			}
-		});
+		}
+
 	}
 
 }
