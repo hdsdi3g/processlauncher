@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 import tv.hd3g.processlauncher.io.StdInInjection;
 
-public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcutTraits {
+public class ProcesslauncherLifecycle {
 	private static Logger log = LogManager.getLogger();
 
 	private final Processlauncher launcher;
@@ -169,12 +169,10 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 		return launcher;
 	}
 
-	@Override
 	public Process getProcess() {
 		return process;
 	}
 
-	@Override
 	public EndStatus getEndStatus() {
 		if (process.isAlive()) {
 			return EndStatus.NOT_YET_DONE;
@@ -268,5 +266,48 @@ public class ProcesslauncherLifecycle implements ProcesslauncherLifecycleShortcu
 
 	String getFullCommandLine() {
 		return fullCommandLine;
+	}
+
+	public boolean isCorrectlyDone() {
+		return getEndStatus().equals(EndStatus.CORRECTLY_DONE);
+	}
+
+	/**
+	 * Blocking call until process is really done.
+	 * Correct: https://github.com/hdsdi3g/processlauncher/issues/1
+	 */
+	public Integer getExitCode() {
+		while (getProcess().isAlive()) {
+			Thread.onSpinWait();
+		}
+		while (true) {
+			try {
+				return getProcess().exitValue();
+			} catch (final IllegalThreadStateException e) {
+				if (e.getMessage().equalsIgnoreCase("process has not exited") == false) {
+					throw e;
+				}
+			}
+			Thread.onSpinWait();
+		}
+	}
+
+	/**
+	 * on Windows, return like "HOST_or_DOMAIN"\"username"
+	 */
+	public Optional<String> getUserExec() {
+		return getProcess().info().user();
+	}
+
+	public Optional<Long> getPID() {
+		try {
+			return Optional.of(getProcess().pid());
+		} catch (final UnsupportedOperationException e) {
+			return Optional.empty();
+		}
+	}
+
+	public Boolean isRunning() {
+		return getProcess().isAlive();
 	}
 }

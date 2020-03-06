@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,8 +23,10 @@ import java.util.stream.Collectors;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.io.CaptureStandardOutput;
+import tv.hd3g.processlauncher.io.CaptureStandardOutputText;
+import tv.hd3g.processlauncher.io.CapturedStreams;
 
-public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTraits {
+public class ProcesslauncherBuilder {
 
 	private final File executable;
 	private final List<String> parameters;
@@ -157,7 +163,6 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		return executionTimeLimiter;
 	}
 
-	@Override
 	public ProcesslauncherBuilder setExecutionTimeLimiter(final ExecutionTimeLimiter executionTimeLimiter) {
 		this.executionTimeLimiter = Optional.ofNullable(executionTimeLimiter);
 		return this;
@@ -172,13 +177,11 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 		return this;
 	}
 
-	@Override
 	public ProcesslauncherBuilder setCaptureStandardOutput(final CaptureStandardOutput captureStandardOutput) {
 		this.captureStandardOutput = Optional.ofNullable(captureStandardOutput);
 		return this;
 	}
 
-	@Override
 	public Optional<CaptureStandardOutput> getCaptureStandardOutput() {
 		return captureStandardOutput;
 	}
@@ -230,9 +233,48 @@ public class ProcesslauncherBuilder implements ProcesslauncherBuilderShortcutTra
 	/**
 	 * @return new Processlauncher(this)
 	 */
-	@Override
 	public Processlauncher toProcesslauncher() {
 		return new Processlauncher(this);
+	}
+
+	/**
+	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
+	 */
+	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior,
+	                                                                         final Executor defaultExecutorConsumer) {
+		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(
+		        cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(
+		                () -> {
+			                return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior,
+			                        defaultExecutorConsumer);
+		                });
+
+		setCaptureStandardOutput(csot);
+		return csot;
+	}
+
+	/**
+	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
+	 * Capture all, in the ForkJoinPool.
+	 */
+	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText() {
+		return getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR, ForkJoinPool.commonPool());
+	}
+
+	/**
+	 * @return toProcesslauncher().start()
+	 */
+	public ProcesslauncherLifecycle start() throws IOException {
+		return toProcesslauncher().start();
+	}
+
+	/**
+	 * Shortcut for setExecutionTimeLimiter
+	 */
+	public ProcesslauncherBuilder setExecutionTimeLimiter(final long maxExecTime,
+	                                                      final TimeUnit unit,
+	                                                      final ScheduledExecutorService maxExecTimeScheduler) {
+		return setExecutionTimeLimiter(new ExecutionTimeLimiter(maxExecTime, unit, maxExecTimeScheduler));
 	}
 
 }
