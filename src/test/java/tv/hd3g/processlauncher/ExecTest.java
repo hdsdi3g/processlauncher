@@ -25,7 +25,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.tool.ExecutableTool;
 
 public class ExecTest extends TestCase {

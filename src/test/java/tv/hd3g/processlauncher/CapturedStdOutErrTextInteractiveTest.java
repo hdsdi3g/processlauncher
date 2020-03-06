@@ -14,20 +14,21 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import tv.hd3g.processlauncher.CapturedStdOutErrTextInteractive;
+import tv.hd3g.processlauncher.LineEntry;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
+import tv.hd3g.processlauncher.StdInInjection;
 
 public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 
@@ -49,22 +50,13 @@ public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 			return le.getLine().toUpperCase();
 		};
 
-		final AtomicInteger done = new AtomicInteger(0);
-		final BiConsumer<ProcesslauncherLifecycle, Boolean> onDone = (pl, isDone) -> {
-			if (pl.equals(source) == false) {
-				throw new RuntimeException("Invalid source");
-			}
-			done.getAndIncrement();
-		};
-
-		final CapturedStdOutErrTextInteractive csoeti = new CapturedStdOutErrTextInteractive(interactive, onDone);
+		final CapturedStdOutErrTextInteractive csoeti = new CapturedStdOutErrTextInteractive(interactive);
 		final LineEntry added = new LineEntry(0, "My text", true, source);
 		csoeti.onText(added);
-		csoeti.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
+		// csoeti.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
 
 		Assert.assertEquals(1, capturedLe.size());
 		Assert.assertEquals(added, capturedLe.get(0));
-		Assert.assertEquals(1, done.get());
 		Assert.assertEquals("My text".toUpperCase() + System.lineSeparator(), new String(baos.toByteArray()));
 	}
 }

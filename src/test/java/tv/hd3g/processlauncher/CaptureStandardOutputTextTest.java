@@ -14,12 +14,14 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -27,6 +29,9 @@ import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import tv.hd3g.processlauncher.CaptureStandardOutputText;
+import tv.hd3g.processlauncher.CapturedStdOutErrText;
+import tv.hd3g.processlauncher.LineEntry;
 import tv.hd3g.processlauncher.Processlauncher;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
@@ -34,12 +39,19 @@ public class CaptureStandardOutputTextTest extends TestCase {
 
 	public void test() throws InterruptedException {
 		final List<LineEntry> capturedlines = new ArrayList<>();
-		final CapturedStdOutErrText csoeto = lineEntry -> {
-			capturedlines.add(lineEntry);
+
+		final CountDownLatch cdl = new CountDownLatch(2);
+		final CapturedStdOutErrText csoeto = new CapturedStdOutErrText() {
+
+			@Override
+			public void onText(final LineEntry lineEntry) {
+				capturedlines.add(lineEntry);
+			}
+
 		};
 
 		final CaptureStandardOutputText csot = new CaptureStandardOutputText();
-		csot.getObservers().add(csoeto);
+		csot.addObserver(csoeto);
 
 		final List<String> textLinesStdOut = Arrays.asList("Line 1", "Line 2", "", "\tline 4");
 		final ByteArrayInputStream processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(
@@ -54,11 +66,10 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		Mockito.when(source.getLauncher()).thenReturn(launcher);
 		Mockito.when(launcher.getExecutableName()).thenReturn("some-exec");
 
-		final var tOut = csot.stdOutStreamConsumer(processInputStreamOut, source);
-		final var tErr = csot.stdErrStreamConsumer(processInputStreamErr, source);
+		csot.stdOutStreamConsumer(processInputStreamOut, source);
+		csot.stdErrStreamConsumer(processInputStreamErr, source);
 
-		tOut.join(1000);
-		tErr.join(1000);
+		cdl.await(1, TimeUnit.SECONDS);
 
 		Assert.assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
 		Assert.assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));

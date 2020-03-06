@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import tv.hd3g.processlauncher.io.CaptureStandardOutput;
-
 public class Processlauncher {
 
 	private final boolean execCodeMustBeZero;

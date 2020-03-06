@@ -23,8 +23,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.hamcrest.MatcherAssert;
@@ -44,10 +42,6 @@ import tv.hd3g.processlauncher.demo.DemoExecSimple;
 import tv.hd3g.processlauncher.demo.DemoExecStdinInjection;
 import tv.hd3g.processlauncher.demo.DemoExecSubProcess;
 import tv.hd3g.processlauncher.demo.DemoExecWorkingdir;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextInteractive;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
-import tv.hd3g.processlauncher.io.CapturedStreams;
-import tv.hd3g.processlauncher.io.LineEntry;
 
 public class ProcesslauncherLifecycleITTest extends TestCase {
 
@@ -73,8 +67,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 	}
 
 	private ProcesslauncherLifecycle captureTextAndStart(final ProcesslauncherBuilder pb) throws IOException {
-		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR).getObservers()
-		        .add(textRetention);
+		pb.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR).addObserver(textRetention);
 		return pb.start();
 	}
 
@@ -266,17 +259,8 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 			}
 		};
 
-		final AtomicInteger onProcessClosedStreamCountOut = new AtomicInteger(0);
-		final AtomicInteger onProcessClosedStreamCountErr = new AtomicInteger(0);
-		final BiConsumer<ProcesslauncherLifecycle, Boolean> onProcessClosedStream = (source, isStdErr) -> {
-			if (isStdErr) {
-				onProcessClosedStreamCountErr.incrementAndGet();
-			} else {
-				onProcessClosedStreamCountOut.incrementAndGet();
-			}
-		};
-		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR).getObservers()
-		        .add(new CapturedStdOutErrTextInteractive(interactive, onProcessClosedStream));
+		ept.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
+		        .addObserver(new CapturedStdOutErrTextInteractive(interactive));
 
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
@@ -289,15 +273,6 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 
 		Assert.assertEquals(EndStatus.CORRECTLY_DONE, result.getEndStatus());
 		Assert.assertTrue(result.isCorrectlyDone());
-
-		for (int i = 0; i < 100; i++) {
-			Thread.sleep(10);
-			if (onProcessClosedStreamCountOut.get() == 1) {
-				break;
-			}
-		}
-		Assert.assertEquals(1, onProcessClosedStreamCountOut.get());
-		Assert.assertEquals(1, onProcessClosedStreamCountErr.get());
 	}
 
 	public void testWaitForEnd() throws Exception {

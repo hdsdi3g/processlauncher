@@ -27,8 +27,6 @@ import java.util.function.Consumer;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
-import tv.hd3g.processlauncher.io.CapturedStreams;
 import tv.hd3g.processlauncher.tool.ExecutableTool;
 
 /**
@@ -123,7 +121,7 @@ public class Exec implements ExecutableTool {
 
 		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
-		        .getObservers().add(textRetention);
+		        .addObserver(textRetention);
 
 		preBeforeRun.accept(builder);
 		if (beforeRun != null) {
@@ -131,7 +129,7 @@ public class Exec implements ExecutableTool {
 		}
 
 		final var lifcycle = builder.start();
-		textRetention.waitForClosedStream(lifcycle);
+		textRetention.waitForClosedStreams();
 		try {
 			lifcycle.checkExecution();
 		} catch (final InvalidExecution e) {

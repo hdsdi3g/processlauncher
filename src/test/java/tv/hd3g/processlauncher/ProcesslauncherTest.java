@@ -25,7 +25,6 @@ import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 
 public class ProcesslauncherTest extends TestCase {
 

@@ -21,10 +21,10 @@ import java.util.concurrent.TimeoutException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import tv.hd3g.processlauncher.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.Exec;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.tool.ToolRunner.RunningTool;
 
 public class ToolRunTest extends TestCase {

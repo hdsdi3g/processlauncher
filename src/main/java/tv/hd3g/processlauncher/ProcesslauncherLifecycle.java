@@ -21,16 +21,33 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import tv.hd3g.processlauncher.io.StdInInjection;
+import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 
 public class ProcesslauncherLifecycle {
 	private static Logger log = LogManager.getLogger();
+
+	private final static Executor END_EXEC_CALLBACK;
+	private final static AtomicLong END_EXEC_CALLBACK_COUNT;
+
+	static {
+		END_EXEC_CALLBACK_COUNT = new AtomicLong(0);
+		END_EXEC_CALLBACK = Executors.newCachedThreadPool(r -> {
+			final var t = new Thread(r);
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.setDaemon(true);
+			t.setName("EndProcessExecCallback#" + END_EXEC_CALLBACK_COUNT.getAndIncrement());
+			return t;
+		});
+	}
 
 	private final Processlauncher launcher;
 	private final Process process;
@@ -84,14 +101,44 @@ public class ProcesslauncherLifecycle {
 			cso.stdErrStreamConsumer(process.getErrorStream(), this);
 		});
 
-		process.onExit().thenRun(() -> {
+		process.onExit().thenRunAsync(() -> {
+			final var pName = getExecNameWithoutExt();
+			final var pid = getPID().map(p -> "#" + p).orElse("");
+			final var status = getEndStatus().toString().toLowerCase();
+			String retnr = "";
+			if (isCorrectlyDone() == false) {
+				retnr = " return " + getExitCode();
+			}
+
+			String dur = "";
+			if (getUptime(TimeUnit.SECONDS) == 0) {
+				if (getCPUDuration(TimeUnit.MILLISECONDS) == 0) {
+					dur = getCPUDuration(TimeUnit.MICROSECONDS) + " µsec";
+				} else {
+					dur = getCPUDuration(TimeUnit.MILLISECONDS) + " msec";
+				}
+			} else {
+				dur = getUptime(TimeUnit.SECONDS) + " sec";
+			}
+			log.info("End exec process {}{} {}{} in {} ", pName, pid, status, retnr, dur);
+
 			endDate = System.currentTimeMillis();
 			Runtime.getRuntime().removeShutdownHook(shutdownHook);
 			externalProcessStartup.ifPresent(eps -> eps.onEndProcess(this));
 			executionCallbackers.forEach(ec -> {
 				ec.onEndExecution(this);
 			});
-		});
+		}, END_EXEC_CALLBACK);
+	}
+
+	public String getExecNameWithoutExt() {
+		final String execName = launcher.getExecutableName();
+		if (ExecutableFinder.WINDOWS_EXEC_EXTENSIONS.stream()
+		        .anyMatch(ext -> execName.toLowerCase().endsWith(ext.toLowerCase()))) {
+			return execName.substring(0, execName.length() - 4);
+		} else {
+			return execName;
+		}
 	}
 
 	public long getStartDate() {

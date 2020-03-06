@@ -29,7 +29,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinderTest;
-import tv.hd3g.processlauncher.io.CaptureStandardOutput;
 
 public class ProcesslauncherBuilderTest extends TestCase {
 

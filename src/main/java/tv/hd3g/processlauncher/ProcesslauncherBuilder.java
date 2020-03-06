@@ -20,9 +20,6 @@ import java.util.stream.Collectors;
 
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
-import tv.hd3g.processlauncher.io.CaptureStandardOutput;
-import tv.hd3g.processlauncher.io.CaptureStandardOutputText;
-import tv.hd3g.processlauncher.io.CapturedStreams;
 
 public class ProcesslauncherBuilder {
 
@@ -251,7 +248,6 @@ public class ProcesslauncherBuilder {
 
 	/**
 	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
-	 * Capture all, in the ForkJoinPool.
 	 */
 	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText() {
 		return getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR);

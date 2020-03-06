@@ -14,11 +14,9 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.InputStream;
-
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public interface CaptureStandardOutput {
 

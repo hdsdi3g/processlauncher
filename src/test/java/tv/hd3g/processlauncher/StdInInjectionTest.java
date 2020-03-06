@@ -14,7 +14,7 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import tv.hd3g.processlauncher.StdInInjection;
 
 public class StdInInjectionTest extends TestCase {
 

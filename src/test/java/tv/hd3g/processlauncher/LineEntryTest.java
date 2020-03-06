@@ -14,12 +14,14 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import tv.hd3g.processlauncher.CapturedStreams;
+import tv.hd3g.processlauncher.LineEntry;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class LineEntryTest extends TestCase {

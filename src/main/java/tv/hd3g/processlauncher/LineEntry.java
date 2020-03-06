@@ -14,9 +14,7 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
-
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
+package tv.hd3g.processlauncher;
 
 public class LineEntry {
 
@@ -25,7 +23,7 @@ public class LineEntry {
 	private final boolean stdErr;
 	private final ProcesslauncherLifecycle source;
 
-	public LineEntry(final long date, final String line, final boolean stdErr, final ProcesslauncherLifecycle source) {
+	LineEntry(final long date, final String line, final boolean stdErr, final ProcesslauncherLifecycle source) {
 		this.line = line;
 		this.stdErr = stdErr;
 		this.source = source;

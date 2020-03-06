@@ -14,21 +14,18 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class CaptureStandardOutputText implements CaptureStandardOutput {
 	private static Logger log = LogManager.getLogger();
@@ -41,7 +38,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior) {
+	CaptureStandardOutputText(final CapturedStreams captureOutStreamsBehavior) {
 		this.captureOutStreamsBehavior = captureOutStreamsBehavior;
 		observers = new ArrayList<>();
 	}
@@ -49,12 +46,17 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 	/**
 	 * @param executorConsumer each stream parser will be executed in separate thread, ensure the capacity is sufficient for 2 threads by process.
 	 */
-	public CaptureStandardOutputText() {
+	CaptureStandardOutputText() {
 		this(CapturedStreams.BOTH_STDOUT_STDERR);
 	}
 
-	public synchronized List<CapturedStdOutErrText> getObservers() {// TODO move observers to parseStream ?
-		return observers;
+	/**
+	 * Never add observer AFTER call stdOut/ErrStreamConsumer()
+	 */
+	public void addObserver(final CapturedStdOutErrText observer) {
+		synchronized (observers) {
+			observers.add(observer);
+		}
 	}
 
 	@Override
@@ -63,6 +65,9 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 		if (captureOutStreamsBehavior.canCaptureStdout()) {
 			final var t = new StreamParser(processInputStream, false, source);
 			t.start();
+			synchronized (observers) {
+				observers.forEach(o -> o.setWatchThreadStdout(t));
+			}
 			return t;
 		}
 		return null;
@@ -74,6 +79,9 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 		if (captureOutStreamsBehavior.canCaptureStderr()) {
 			final var t = new StreamParser(processInputStream, true, source);
 			t.start();
+			synchronized (observers) {
+				observers.forEach(o -> o.setWatchThreadStderr(t));
+			}
 			return t;
 		}
 		return null;
@@ -106,10 +114,6 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 
 		@Override
 		public void run() {
-			final List<CapturedStdOutErrText> finalObservers;
-			synchronized (this) {
-				finalObservers = Collections.unmodifiableList(new ArrayList<>(observers));
-			}
 			try {
 				final BufferedReader reader = new BufferedReader(new InputStreamReader(processStream));
 				try {
@@ -117,7 +121,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 					while ((line = reader.readLine()) != null) {
 						final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr,
 						        source);
-						finalObservers.forEach(observer -> {
+						observers.forEach(observer -> {
 							try {
 								observer.onText(lineEntry);
 							} catch (final RuntimeException e) {
@@ -144,13 +148,16 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 				}
 			} catch (final IOException ioe) {
 				log.error("Trouble opening process streams: " + toString(), ioe);
-			} finally {
-				finalObservers.forEach(observer -> {
-					observer.onProcessCloseStream(source, isStdErr, captureOutStreamsBehavior);
-				});
 			}
 		}
 
+		public ProcesslauncherLifecycle getSource() {
+			return source;
+		}
+
+		public boolean isStdErr() {
+			return isStdErr;
+		}
 	}
 
 }

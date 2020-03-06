@@ -14,18 +14,14 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.PrintStream;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
-import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
-
-public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrText {
+public class CapturedStdOutErrToPrintStream extends CapturedStdOutErrText {
 
 	private final PrintStream printStreamStdOut;
 	private final PrintStream printStreamStdErr;
@@ -46,23 +42,11 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrText {
 		return this;
 	}
 
-	private static String getExecNameWithoutExt(final ProcesslauncherLifecycle source) {
-		final String execName = source.getLauncher().getExecutableName();
-
-		if (ExecutableFinder.WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> execName.toLowerCase().endsWith(ext
-		        .toLowerCase()))) {
-			return execName.substring(0, execName.length() - 4);
-		} else {
-			return execName;
-		}
-
-	}
-
 	static final String stdOutSeparator = "\t> ";
 	static final String stdErrSeparator = "\t! ";
 
 	@Override
-	public void onText(final LineEntry lineEntry) {
+	void onText(final LineEntry lineEntry) {
 		if (filter.map(f -> f.test(lineEntry)).orElse(true) == false) {
 			return;
 		}
@@ -75,7 +59,7 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrText {
 		}
 
 		final ProcesslauncherLifecycle source = lineEntry.getSource();
-		out.print(getExecNameWithoutExt(source));
+		out.print(source.getExecNameWithoutExt());
 		out.print(source.getPID().map(pid -> "#" + pid).orElse(""));
 
 		/*final long timeAgo = lineEntry.getTimeAgo();
@@ -94,40 +78,4 @@ public class CapturedStdOutErrToPrintStream implements CapturedStdOutErrText {
 		out.flush();
 	}
 
-	@Override
-	public void onProcessCloseStream(final ProcesslauncherLifecycle source,
-	                                 final boolean isStdErr,
-	                                 final CapturedStreams streamToKeepPolicy) {
-		if (CapturedStreams.BOTH_STDOUT_STDERR.equals(streamToKeepPolicy)) {
-			if (source.isCorrectlyDone()) {
-				return;
-			}
-		}
-
-		final PrintStream out;
-		if (isStdErr) {
-			out = printStreamStdErr;
-		} else {
-			out = printStreamStdOut;
-		}
-		out.print(getExecNameWithoutExt(source));
-		out.print(source.getPID().map(pid -> "#" + pid).orElse(""));
-		out.print(" Ends ");
-		out.print(source.getEndStatus().toString().toLowerCase());
-		if (source.isCorrectlyDone() == false) {
-			out.print(" return ");
-			out.print(source.getExitCode());
-		}
-		out.print(" in ");
-		if (source.getUptime(TimeUnit.SECONDS) == 0) {
-			out.print(source.getCPUDuration(TimeUnit.MILLISECONDS));
-			out.print(" msec.");
-		} else {
-			out.print(source.getUptime(TimeUnit.SECONDS));
-			out.print(" sec.");
-		}
-
-		out.println();
-		out.flush();
-	}
 }

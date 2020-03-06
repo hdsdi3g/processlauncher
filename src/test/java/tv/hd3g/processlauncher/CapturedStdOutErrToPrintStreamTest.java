@@ -14,11 +14,10 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -27,7 +26,9 @@ import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import tv.hd3g.processlauncher.CapturedStdOutErrToPrintStream;
 import tv.hd3g.processlauncher.EndStatus;
+import tv.hd3g.processlauncher.LineEntry;
 import tv.hd3g.processlauncher.Processlauncher;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
@@ -72,22 +73,6 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 		Assert.assertEquals(filter, capture.getFilter().get());
 	}
 
-	private static final String outSep = CapturedStdOutErrToPrintStream.stdOutSeparator;
-	private static final String errSep = CapturedStdOutErrToPrintStream.stdErrSeparator;
-
-	public void testOnText() {
-		final LineEntry le1out = new LineEntry(System.currentTimeMillis(), "content stdout", false, source);
-		final LineEntry le1err = new LineEntry(System.currentTimeMillis(), "content stderr", true, source);
-
-		capture.onText(le1out);
-		capture.onText(le1err);
-
-		Assert.assertEquals(execName + "#" + pid + outSep + le1out.getLine() + System.lineSeparator(), outStreamContent
-		        .toString(StandardCharsets.UTF_8));
-		Assert.assertEquals(execName + "#" + pid + errSep + le1err.getLine() + System.lineSeparator(), errStreamContent
-		        .toString(StandardCharsets.UTF_8));
-	}
-
 	public void testOnFilteredText() {
 		capture.setFilter(l -> l.isStdErr() == false);
 		capture.onText(new LineEntry(System.currentTimeMillis(), "content", true, source));
@@ -102,31 +87,9 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 		Mockito.when(source.getCPUDuration(null)).thenReturn(1l);
 		Mockito.when(source.getUptime(null)).thenReturn(1l);
 
-		capture.onProcessCloseStream(source, false, CapturedStreams.BOTH_STDOUT_STDERR);
-		capture.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
 		Assert.assertEquals(0, outStreamContent.size());
 		Assert.assertEquals(0, errStreamContent.size());
-
-		capture.onProcessCloseStream(source, false, CapturedStreams.ONLY_STDOUT);
-		Assert.assertTrue(outStreamContent.size() > 0);
 		Assert.assertEquals(0, errStreamContent.size());
-	}
-
-	public void testOnProcessCloseStreamExecNok() {
-		Mockito.when(source.isCorrectlyDone()).thenReturn(false);
-		Mockito.when(source.getEndStatus()).thenReturn(EndStatus.DONE_WITH_ERROR);
-		Mockito.when(source.getExitCode()).thenReturn(1);
-		Mockito.when(source.getCPUDuration(null)).thenReturn(1l);
-		Mockito.when(source.getUptime(null)).thenReturn(1l);
-
-		capture.onProcessCloseStream(source, false, CapturedStreams.BOTH_STDOUT_STDERR);
-		capture.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
-		Assert.assertTrue(outStreamContent.size() > 0);
-		Assert.assertTrue(errStreamContent.size() > 0);
-
-		capture.onProcessCloseStream(source, true, CapturedStreams.ONLY_STDERR);
-		Assert.assertTrue(outStreamContent.size() > 0);
-		Assert.assertTrue(errStreamContent.size() > 0);
 	}
 
 }

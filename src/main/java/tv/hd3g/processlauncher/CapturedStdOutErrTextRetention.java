@@ -14,48 +14,25 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.io;
+package tv.hd3g.processlauncher;
 
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class CapturedStdOutErrTextRetention implements CapturedStdOutErrText {
+public class CapturedStdOutErrTextRetention extends CapturedStdOutErrText {
+	private static Logger log = LogManager.getLogger();
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;
-	private final AtomicBoolean closedStdoutProcess;// TODO close locks ??
-	private final AtomicBoolean closedStderrProcess;
 
 	public CapturedStdOutErrTextRetention(final CapturedStreams streamToKeep) {
 		this.streamToKeep = Objects.requireNonNull(streamToKeep, "\"streamToKeep\" can't to be null");
 		lineEntries = new LinkedBlockingQueue<>();
-		closedStdoutProcess = new AtomicBoolean(streamToKeep.canCaptureStdout() == false);
-		closedStderrProcess = new AtomicBoolean(streamToKeep.canCaptureStderr() == false);
-	}
-
-	@Override
-	public void onProcessCloseStream(final ProcesslauncherLifecycle source,
-	                                 final boolean isStdErr,
-	                                 final CapturedStreams streamToKeepPolicy) {
-		if (isStdErr) {
-			closedStderrProcess.set(true);
-		} else {
-			closedStdoutProcess.set(true);
-		}
-	}
-
-	/**
-	 * Blocking
-	 */
-	public void waitForClosedStream(final ProcesslauncherLifecycle source) {
-		while (closedStdoutProcess.get() == false && closedStderrProcess.get() == false) {
-			Thread.onSpinWait();
-		}
 	}
 
 	/**
@@ -66,16 +43,9 @@ public class CapturedStdOutErrTextRetention implements CapturedStdOutErrText {
 	}
 
 	@Override
-	public void onText(final LineEntry lineEntry) {
+	void onText(final LineEntry lineEntry) {
 		if (lineEntry.canUseThis(streamToKeep) == false) {
 			return;
-		}
-		if (lineEntry.isStdErr() && closedStderrProcess.get()) {
-			throw new IllegalStateException("A new line try to be added in the internal stderr list: \""
-			                                + lineEntry.getLine() + "\"");
-		} else if (lineEntry.isStdErr() == false && closedStdoutProcess.get()) {
-			throw new IllegalStateException("A new line try to be added in the internal stdout list: \""
-			                                + lineEntry.getLine() + "\"");
 		}
 		lineEntries.add(lineEntry);
 	}

@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import tv.hd3g.processlauncher.CapturedStdOutErrTextRetention;
+import tv.hd3g.processlauncher.CapturedStreams;
 import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
-import tv.hd3g.processlauncher.io.CapturedStdOutErrTextRetention;
-import tv.hd3g.processlauncher.io.CapturedStreams;
 
 public class ToolRunner {
 
@@ -48,8 +48,7 @@ public class ToolRunner {
 			final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
 			final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
 			builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
-			        .getObservers()
-			        .add(textRetention);
+			        .addObserver(textRetention);
 			execTool.beforeRun(builder);
 			return new RunningTool<>(textRetention, builder.start(), execTool);
 		} catch (final IOException e) {
@@ -91,7 +90,7 @@ public class ToolRunner {
 			try {
 				lifecyle.checkExecution();
 				final var textRetention = getTextRetention();
-				textRetention.waitForClosedStream(lifecyle);
+				textRetention.waitForClosedStreams();
 				return textRetention;
 			} catch (final InvalidExecution e) {
 				e.setStdErr(getTextRetention().getStderrLines(false)
