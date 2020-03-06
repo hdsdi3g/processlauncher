@@ -21,11 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class CapturedStdOutErrTextRetention extends CapturedStdOutErrText {
-	private static Logger log = LogManager.getLogger();
 
 	private final CapturedStreams streamToKeep;
 	private final LinkedBlockingQueue<LineEntry> lineEntries;

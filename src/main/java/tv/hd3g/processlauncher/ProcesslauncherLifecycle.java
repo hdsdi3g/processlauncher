@@ -112,15 +112,16 @@ public class ProcesslauncherLifecycle {
 
 			String dur = "";
 			if (getUptime(TimeUnit.SECONDS) == 0) {
-				if (getCPUDuration(TimeUnit.MILLISECONDS) == 0) {
-					dur = getCPUDuration(TimeUnit.MICROSECONDS) + " µsec";
+				final var msec = getCPUDuration(TimeUnit.MILLISECONDS);
+				if (msec == 0) {
+					dur = "";
 				} else {
-					dur = getCPUDuration(TimeUnit.MILLISECONDS) + " msec";
+					dur = " in " + msec + " msec";
 				}
 			} else {
-				dur = getUptime(TimeUnit.SECONDS) + " sec";
+				dur = " in " + getUptime(TimeUnit.SECONDS) + " sec";
 			}
-			log.info("End exec process {}{} {}{} in {} ", pName, pid, status, retnr, dur);
+			log.info("End exec process {}{} {}{}{}", pName, pid, status, retnr, dur);
 
 			endDate = System.currentTimeMillis();
 			Runtime.getRuntime().removeShutdownHook(shutdownHook);
