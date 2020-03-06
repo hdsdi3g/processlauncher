@@ -22,7 +22,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
@@ -35,11 +34,9 @@ public class ToolRunner {
 
 	private final ExecutableFinder executableFinder;
 	private final ThreadPoolExecutor executor;
-	private final AtomicLong executorWatcherId;
 
 	public ToolRunner(final ExecutableFinder executableFinder, final int maximumInParallel) {
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
-		executorWatcherId = new AtomicLong();
 		executor = new ThreadPoolExecutor(1, maximumInParallel, 1l, TimeUnit.SECONDS,
 		        new LinkedBlockingQueue<Runnable>(), r -> {
 			        final Thread t = new Thread(r);
