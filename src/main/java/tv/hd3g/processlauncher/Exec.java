@@ -130,8 +130,10 @@ public class Exec implements ExecutableTool {
 			beforeRun.accept(builder);
 		}
 
+		final var lifcycle = builder.start();
+		textRetention.waitForClosedStream(lifcycle);
 		try {
-			builder.start().checkExecution();
+			lifcycle.checkExecution();
 		} catch (final InvalidExecution e) {
 			e.setStdErr(textRetention.getStderr(false, " / "));
 			throw e;
