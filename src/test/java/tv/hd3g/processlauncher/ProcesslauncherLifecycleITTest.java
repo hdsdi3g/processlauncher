@@ -172,7 +172,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		final long duration = System.currentTimeMillis() - startTime;
 
 		MatcherAssert.assertThat(duration, Matchers.lessThan(DemoExecLongSleep.MAX_DURATION
-		                                                     + 300)); /** 300 is a "startup time bonus" */
+		                                                     + 1500)); /** 1500 is a "startup time bonus" */
 		Assert.assertEquals(EndStatus.KILLED, result.getEndStatus());
 
 		Assert.assertFalse(result.isTooLongTime());
