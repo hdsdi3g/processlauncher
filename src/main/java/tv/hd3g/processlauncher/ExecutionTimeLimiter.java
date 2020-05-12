@@ -29,7 +29,7 @@ public class ExecutionTimeLimiter {
 	public ExecutionTimeLimiter(final long maxExecTime, final TimeUnit unit,
 	                            final ScheduledExecutorService maxExecTimeScheduler) {
 		if (maxExecTime == 0) {
-			throw new RuntimeException("Invalid maxExecTime value: " + maxExecTime);
+			throw new IllegalArgumentException("Invalid maxExecTime value: " + maxExecTime);
 		}
 		this.maxExecTimeScheduler = Objects.requireNonNull(maxExecTimeScheduler,
 		        "\"maxExecTimeScheduler\" can't to be null");
@@ -41,13 +41,12 @@ public class ExecutionTimeLimiter {
 	}
 
 	void addTimesUp(final ProcesslauncherLifecycle toCallBack, final Process process) {
-		final ScheduledFuture<?> maxExecTimeStopper = maxExecTimeScheduler.schedule(() -> {
-			toCallBack.runningTakesTooLongTimeStopIt();
-		}, maxExecTime, TimeUnit.MILLISECONDS);
+		final Runnable action = toCallBack::runningTakesTooLongTimeStopIt;
 
-		process.onExit().thenRunAsync(() -> {
-			maxExecTimeStopper.cancel(false);
-		}, maxExecTimeScheduler);
+		final ScheduledFuture<?> maxExecTimeStopper = maxExecTimeScheduler.schedule(action,
+		        maxExecTime, TimeUnit.MILLISECONDS);
+
+		process.onExit().thenRunAsync(() -> maxExecTimeStopper.cancel(false), maxExecTimeScheduler);
 	}
 
 }

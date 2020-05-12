@@ -58,9 +58,7 @@ public class Exec implements ExecutableTool {
 		executableFinder.get(execName);
 		parameters = tool.getReadyToRunParameters();
 		varsToInject = new HashMap<>();
-		preBeforeRun = processBuilder -> {
-			tool.beforeRun(processBuilder);
-		};
+		preBeforeRun = tool::beforeRun;
 	}
 
 	public Map<String, String> getVarsToInject() {
@@ -83,9 +81,9 @@ public class Exec implements ExecutableTool {
 	@Override
 	public Parameters getReadyToRunParameters() {
 		if (varsToInject.isEmpty()) {
-			return parameters.clone().removeVariables(removeParamsIfNoVarToInject);
+			return parameters.duplicate().removeVariables(removeParamsIfNoVarToInject);
 		} else {
-			return parameters.clone().injectVariables(varsToInject, removeParamsIfNoVarToInject);
+			return parameters.duplicate().injectVariables(varsToInject, removeParamsIfNoVarToInject);
 		}
 	}
 
@@ -133,8 +131,7 @@ public class Exec implements ExecutableTool {
 		try {
 			lifcycle.checkExecution();
 		} catch (final InvalidExecution e) {
-			e.setStdErr(textRetention.getStderr(false, " / "));
-			throw e;
+			throw e.injectStdErr(textRetention.getStderr(false, " / "));
 		}
 
 		return textRetention;

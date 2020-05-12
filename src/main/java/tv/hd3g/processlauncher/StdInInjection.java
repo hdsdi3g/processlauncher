@@ -67,7 +67,7 @@ public class StdInInjection extends OutputStream {
 	 */
 	public StdInInjection println(final String text, final Charset destCharset) throws IOException {
 		if (log.isTraceEnabled()) {
-			log.trace("Println: \"" + text + "\"");
+			log.trace("Println: \"{}\"", text);
 		}
 		write(text.getBytes(destCharset));
 		write(LINESEPARATOR.getBytes(destCharset));

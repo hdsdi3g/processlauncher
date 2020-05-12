@@ -24,6 +24,7 @@ import java.util.Optional;
 
 public class CommandLine {
 
+	private static final String PARAMETERS_CAN_T_TO_BE_NULL = "\"parameters\" can't to be null";
 	private final File executable;
 	private final ExecutableFinder executableFinder;
 	private final Parameters parameters;
@@ -33,14 +34,14 @@ public class CommandLine {
 	 */
 	public CommandLine(final File executable, final Parameters parameters) throws IOException {
 		this.executable = executable;
-		if (executable.isFile() == false | executable.exists() == false) {
+		if (executable.isFile() == false || executable.exists() == false) {
 			throw new FileNotFoundException("Can't found " + executable);
 		} else if (executable.canExecute() == false) {
 			throw new IOException("Can't execute " + executable);
 		}
 		executableFinder = null;
 
-		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null").clone();
+		this.parameters = Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL).duplicate();
 	}
 
 	/**
@@ -54,22 +55,22 @@ public class CommandLine {
 			executable = executableFinder.get(execName);
 		} else {
 			executable = new File(execName);
-			if (executable.isFile() == false | executable.exists() == false) {
+			if (executable.isFile() == false || executable.exists() == false) {
 				throw new FileNotFoundException("Can't found " + executable);
 			} else if (executable.canExecute() == false) {
 				throw new IOException("Can't execute " + executable);
 			}
 		}
-		this.parameters = Objects.requireNonNull(parameters, "\"parameters\" can't to be null").clone();
+		this.parameters = Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL).duplicate();
 	}
 
 	public CommandLine(final File executable, final String parameters) throws IOException {
-		this(executable, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")));
+		this(executable, new Parameters(Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL)));
 	}
 
 	public CommandLine(final String execName, final String parameters,
 	                   final ExecutableFinder executableFinder) throws IOException {
-		this(execName, new Parameters(Objects.requireNonNull(parameters, "\"parameters\" can't to be null")),
+		this(execName, new Parameters(Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL)),
 		        executableFinder);
 	}
 

@@ -30,6 +30,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 class SimpleParameters {
+	private static final String LOG_ADD_PARAMETERS = "Add parameters: {}";
+
+	private static final String PARAMS_CAN_T_TO_BE_NULL = "\"params\" can't to be null";
+
 	private static Logger log = LogManager.getLogger();
 
 	private static final Character QUOTE = '"';
@@ -79,84 +83,80 @@ class SimpleParameters {
 		parameters.addAll(source.parameters);
 	}
 
-	private final Function<String, Stream<ParameterArg>> filterAnTransformParameter = p -> {
-	    /**
-	     * Split >-a -b "c d" e-&gt; to [-a, -b, c d, e]
-	     */
-	    return p.trim().chars().mapToObj(i -> (char) i).reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
-		    if (list.isEmpty()) {
-			    /**
-			     * First entry
-			     */
-			    if (chr == QUOTE) {
-				    /**
-				     * Start quote zone
-				     */
-				    list.add(new ParameterArg(true));
-			    } else if (chr == SPACE) {
-				    /**
-				     * Trailing space > ignore it
-				     */
-			    } else {
-				    /**
-				     * Start first "classic" ParameterArg
-				     */
-				    list.add(new ParameterArg(false).add(chr));
-			    }
-		    } else {
-			    /**
-			     * Get current entry
-			     */
-			    final int lastPos = list.size() - 1;
-			    final ParameterArg lastEntry = list.get(lastPos);
+	private final Function<String, Stream<ParameterArg>> filterAnTransformParameter = p -> p.trim().chars().mapToObj(
+	        i -> (char) i).reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
+		        if (list.isEmpty()) {
+			        /**
+			         * First entry
+			         */
+			        if (chr.equals(QUOTE)) {
+				        /**
+				         * Start quote zone
+				         */
+				        list.add(new ParameterArg(true));
+			        } else if (chr.equals(SPACE)) {
+				        /**
+				         * Trailing space > ignore it
+				         */
+			        } else {
+				        /**
+				         * Start first "classic" ParameterArg
+				         */
+				        list.add(new ParameterArg(false).add(chr));
+			        }
+		        } else {
+			        /**
+			         * Get current entry
+			         */
+			        final int lastPos = list.size() - 1;
+			        final ParameterArg lastEntry = list.get(lastPos);
 
-			    if (chr == QUOTE) {
-				    if (lastEntry.isInQuotes()) {
-					    /**
-					     * Switch off quote zone
-					     */
-					    list.add(new ParameterArg(false));
-				    } else {
-					    /**
-					     * Switch on quote zone
-					     */
-					    if (lastEntry.isEmpty()) {
-						    /**
-						     * Remove previous empty ParameterArg
-						     */
-						    list.remove(lastPos);
-					    }
-					    list.add(new ParameterArg(true));
-				    }
-			    } else if (chr == SPACE) {
-				    if (lastEntry.isInQuotes()) {
-					    /**
-					     * Add space in quotes
-					     */
-					    lastEntry.add(chr);
-				    } else {
-					    if (lastEntry.isEmpty() == false) {
-						    /**
-						     * New space -&gt; new ParameterArg (and ignore space)
-						     */
-						    list.add(new ParameterArg(false));
-					    } else {
-						    /**
-						     * Space between ParameterArgs -&gt; ignore it
-						     */
-					    }
-				    }
-			    } else {
-				    lastEntry.add(chr);
-			    }
-		    }
-		    return list;
-	    }, (list1, list2) -> {
-		    final ArrayList<ParameterArg> ParameterArgs = new ArrayList<>(list1);
-		    ParameterArgs.addAll(list2);
-		    return ParameterArgs;
-	    }).stream();
-	};
+			        if (chr.equals(QUOTE)) {
+				        if (lastEntry.isInQuotes()) {
+					        /**
+					         * Switch off quote zone
+					         */
+					        list.add(new ParameterArg(false));
+				        } else {
+					        /**
+					         * Switch on quote zone
+					         */
+					        if (lastEntry.isEmpty()) {
+						        /**
+						         * Remove previous empty ParameterArg
+						         */
+						        list.remove(lastPos);
+					        }
+					        list.add(new ParameterArg(true));
+				        }
+			        } else if (chr.equals(SPACE)) {
+				        if (lastEntry.isInQuotes()) {
+					        /**
+					         * Add space in quotes
+					         */
+					        lastEntry.add(chr);
+				        } else {
+					        if (lastEntry.isEmpty() == false) {
+						        /**
+						         * New space -&gt; new ParameterArg (and ignore space)
+						         */
+						        list.add(new ParameterArg(false));
+					        } else {
+						        /**
+						         * Space between ParameterArgs -&gt; ignore it
+						         */
+					        }
+				        }
+			        } else {
+				        lastEntry.add(chr);
+			        }
+		        }
+		        return list;
+	        }, (list1, list2) -> {
+		        final ArrayList<ParameterArg> parameterArgs = new ArrayList<>(list1);
+		        parameterArgs.addAll(list2);
+		        return parameterArgs;
+	        }).stream();
 
 	public SimpleParameters clear() {
 		log.trace("Clear all");
@@ -168,11 +168,9 @@ class SimpleParameters {
 	 * @param params (anyMatch) ; params can have "-" or not (it will be added).
 	 */
 	public boolean hasParameters(final String... params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		return Arrays.stream(params).filter(p -> {
-			return p != null;
-		}).anyMatch(parameter -> {
+		return Arrays.stream(params).filter(Objects::nonNull).anyMatch(parameter -> {
 			final String param = conformParameterKey(parameter);
 			return parameters.contains(param);
 		});
@@ -207,13 +205,11 @@ class SimpleParameters {
 	 * @param params don't alter params
 	 */
 	public SimpleParameters addParameters(final String... params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		parameters.addAll(Arrays.stream(params).filter(p -> {
-			return p != null;
-		}).collect(Collectors.toUnmodifiableList()));
+		parameters.addAll(Arrays.stream(params).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList()));
 
-		log.trace("Add parameters: {}", () -> Arrays.stream(params).collect(Collectors.toUnmodifiableList()));
+		log.trace(LOG_ADD_PARAMETERS, () -> Arrays.stream(params).collect(Collectors.toUnmodifiableList()));
 
 		return this;
 	}
@@ -222,13 +218,11 @@ class SimpleParameters {
 	 * @param params don't alter params
 	 */
 	public SimpleParameters addParameters(final Collection<String> params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		parameters.addAll(params.stream().filter(p -> {
-			return p != null;
-		}).collect(Collectors.toUnmodifiableList()));
+		parameters.addAll(params.stream().filter(Objects::nonNull).collect(Collectors.toUnmodifiableList()));
 
-		log.trace("Add parameters: {}", () -> params);
+		log.trace(LOG_ADD_PARAMETERS, () -> params);
 
 		return this;
 	}
@@ -237,13 +231,12 @@ class SimpleParameters {
 	 * @param params transform spaces in each param to new params: "a b c d" -&gt; ["a", "b", "c", "d"], and it manage " but not tabs.
 	 */
 	public SimpleParameters addBulkParameters(final String params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		parameters.addAll(filterAnTransformParameter.apply(params).map(ParameterArg -> {
-			return ParameterArg.toString();
-		}).collect(Collectors.toUnmodifiableList()));
+		parameters.addAll(filterAnTransformParameter.apply(params).map(ParameterArg::toString).collect(
+		        Collectors.toUnmodifiableList()));
 
-		log.trace("Add parameters: {}", params);
+		log.trace(LOG_ADD_PARAMETERS, params);
 
 		return this;
 	}
@@ -252,10 +245,11 @@ class SimpleParameters {
 	 * @param params don't alter params
 	 */
 	public SimpleParameters prependParameters(final Collection<String> params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		final List<String> newList = Stream.concat(params.stream().filter(p -> p != null), parameters.stream()).collect(
-		        Collectors.toUnmodifiableList());
+		final List<String> newList = Stream.concat(params.stream().filter(Objects::nonNull), parameters.stream())
+		        .collect(
+		                Collectors.toUnmodifiableList());
 		replaceParameters(newList);
 
 		log.trace("Prepend parameters: {}", () -> params);
@@ -267,11 +261,9 @@ class SimpleParameters {
 	 * @param params add all in front of command line, don't alter params
 	 */
 	public SimpleParameters prependParameters(final String... params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		prependParameters(Arrays.stream(params).filter(p -> {
-			return p != null;
-		}).collect(Collectors.toUnmodifiableList()));
+		prependParameters(Arrays.stream(params).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList()));
 
 		return this;
 	}
@@ -280,11 +272,11 @@ class SimpleParameters {
 	 * @param params params add all in front of command line, transform spaces in each param to new params: "a b c d" -&gt; ["a", "b", "c", "d"], and it manage " but not tabs.
 	 */
 	public SimpleParameters prependBulkParameters(final String params) {
-		Objects.requireNonNull(params, "\"params\" can't to be null");
+		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		prependParameters(filterAnTransformParameter.apply(params).map(ParameterArg -> {
-			return ParameterArg.toString();
-		}).collect(Collectors.toUnmodifiableList()));
+		prependParameters(filterAnTransformParameter.apply(params).map(
+		        tv.hd3g.processlauncher.cmdline.ParameterArg::toString).collect(
+		                Collectors.toUnmodifiableList()));
 
 		return this;
 	}
@@ -352,7 +344,7 @@ class SimpleParameters {
 		if (has) {
 			return Collections.unmodifiableList(result);
 		} else {
-			return null;
+			return null;// NOSONAR
 		}
 	}
 
@@ -378,7 +370,7 @@ class SimpleParameters {
 							parameters.remove(pos + 1);
 						}
 					}
-					log.trace("Remove parameter: {}", parameters.remove(pos));
+					log.trace("Remove parameter: {}", parameters.remove(pos));// NOSONAR
 					return true;
 				}
 			}

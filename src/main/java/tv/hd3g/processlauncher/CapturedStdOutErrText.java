@@ -49,7 +49,7 @@ public abstract class CapturedStdOutErrText {
 			if (watchThreadStderr != null) {
 				watchThreadStderr.join();
 			}
-		} catch (final InterruptedException e) {
+		} catch (final InterruptedException e) {// NOSONAR
 			throw new IllegalStateException("Can't wait for join Threads", e);
 		}
 	}
@@ -65,7 +65,7 @@ public abstract class CapturedStdOutErrText {
 			if (watchThreadStderr != null) {
 				watchThreadStderr.join(millis);
 			}
-		} catch (final InterruptedException e) {
+		} catch (final InterruptedException e) {// NOSONAR
 			throw new IllegalStateException("Can't wait for join Threads", e);
 		}
 	}

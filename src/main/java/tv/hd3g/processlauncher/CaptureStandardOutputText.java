@@ -116,38 +116,42 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 		public void run() {
 			try {
 				final BufferedReader reader = new BufferedReader(new InputStreamReader(processStream));
-				try {
-					String line = "";
-					while ((line = reader.readLine()) != null) {
-						final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr,
-						        source);
-						observers.forEach(observer -> {
-							try {
-								observer.onText(lineEntry);
-							} catch (final RuntimeException e) {
-								log.error("Can't callback process text event ", e);
-							}
-						});
-					}
-				} catch (final IOException ioe) {
-					if (ioe.getMessage().equalsIgnoreCase("Bad file descriptor")) {
-						if (log.isTraceEnabled()) {
-							log.trace("Bad file descriptor, " + toString());
+				subRun(reader);
+			} catch (final IOException ioe) {
+				log.error("Trouble opening process streams: {}", this, ioe);
+			}
+		}
+
+		private void subRun(final BufferedReader reader) throws IOException {
+			try {
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr,
+					        source);
+					observers.forEach(observer -> {
+						try {
+							observer.onText(lineEntry);
+						} catch (final RuntimeException e) {
+							log.error("Can't callback process text event ", e);
 						}
-					} else if (ioe.getMessage().equalsIgnoreCase("Stream closed")) {
-						if (log.isTraceEnabled()) {
-							log.trace("Stream closed, " + toString());
-						}
-					} else {
-						throw ioe;
-					}
-				} catch (final Exception e) {
-					log.error("Trouble during process " + toString(), e);
-				} finally {
-					reader.close();
+					});
 				}
 			} catch (final IOException ioe) {
-				log.error("Trouble opening process streams: " + toString(), ioe);
+				if (ioe.getMessage().equalsIgnoreCase("Bad file descriptor")) {
+					if (log.isTraceEnabled()) {
+						log.trace("Bad file descriptor, {}", this);
+					}
+				} else if (ioe.getMessage().equalsIgnoreCase("Stream closed")) {
+					if (log.isTraceEnabled()) {
+						log.trace("Stream closed, {}", this);
+					}
+				} else {
+					throw ioe;
+				}
+			} catch (final Exception e) {
+				log.error("Trouble during process {}", this, e);
+			} finally {
+				reader.close();
 			}
 		}
 

@@ -52,7 +52,7 @@ public class CapturedStdOutErrTextInteractive extends CapturedStdOutErrText {
 		final String result = interactive.apply(lineEntry);
 		final ProcesslauncherLifecycle source = lineEntry.getSource();
 
-		if (result != null & source.isRunning()) {
+		if (result != null && source.isRunning()) {
 			try {
 				source.getStdInInjection().println(result, destCharset);
 			} catch (final IOException e) {

@@ -1,9 +1,10 @@
 package tv.hd3g.processlauncher;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -44,8 +45,8 @@ public class ProcesslauncherBuilder {
 
 		environment.putAll(System.getenv());
 		if (environment.containsKey("LANG") == false) {
-			environment.put("LANG", Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + "."
-			                        + Charset.forName("UTF-8"));
+			environment.put("LANG",
+			        Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + "." + UTF_8);
 		}
 		if (execFinder != null) {
 			environment.put("PATH", execFinder.getFullPathToString());
@@ -65,7 +66,7 @@ public class ProcesslauncherBuilder {
 
 	public ProcesslauncherBuilder(final CommandLine commandLine) {
 		this(commandLine.getExecutable(), commandLine.getParameters().getParameters(), commandLine.getExecutableFinder()
-		        .orElseGet(() -> new ExecutableFinder()));
+		        .orElseGet(ExecutableFinder::new));
 	}
 
 	/**
@@ -197,7 +198,7 @@ public class ProcesslauncherBuilder {
 		return processBuilder;
 	}
 
-	static final Function<String, String> addQuotesIfSpaces = s -> {
+	static final UnaryOperator<String> addQuotesIfSpaces = s -> {
 		if (s.contains(" ")) {
 			return "\"" + s + "\"";
 		} else {
@@ -238,9 +239,7 @@ public class ProcesslauncherBuilder {
 	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior) {
 		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(
 		        cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(
-		                () -> {
-			                return new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior);
-		                });
+		                () -> new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior));
 
 		setCaptureStandardOutput(csot);
 		return csot;

@@ -20,22 +20,25 @@ import java.util.Optional;
 
 public class InvalidExecution extends RuntimeException {
 
-	// private final String fullCommandLine;
-	// private final EndStatus endStatus;
-	// private final int exitCode;
-	private String stdErr;
+	private final String stdErr;
+	private final transient ProcesslauncherLifecycle processlauncherLifecycle;
 
 	InvalidExecution(final ProcesslauncherLifecycle processlauncherLifecycle) {
 		super("Can't execute correcly " + processlauncherLifecycle.getFullCommandLine() + " ["
 		      + processlauncherLifecycle.getEndStatus() + "#" + processlauncherLifecycle.getExitCode() + "]");
-		// fullCommandLine = processlauncherLifecycle.getFullCommandLine();
-		// endStatus = processlauncherLifecycle.getEndStatus();
-		// exitCode = processlauncherLifecycle.getExitCode();
+		this.processlauncherLifecycle = processlauncherLifecycle;
+		stdErr = null;
 	}
 
-	public synchronized InvalidExecution setStdErr(final String stdErr) {
+	InvalidExecution(final ProcesslauncherLifecycle processlauncherLifecycle, final String stdErr) {
+		super("Can't execute correcly " + processlauncherLifecycle.getFullCommandLine() + " ["
+		      + processlauncherLifecycle.getEndStatus() + "#" + processlauncherLifecycle.getExitCode() + "]");
+		this.processlauncherLifecycle = processlauncherLifecycle;
 		this.stdErr = stdErr;
-		return this;
+	}
+
+	public InvalidExecution injectStdErr(final String stdErr) {
+		return new InvalidExecution(processlauncherLifecycle, stdErr);
 	}
 
 	public synchronized String getStdErr() {
@@ -44,8 +47,9 @@ public class InvalidExecution extends RuntimeException {
 
 	@Override
 	public String getMessage() {
-		return super.getMessage() + Optional.ofNullable(stdErr).filter(s -> s.isEmpty() == false).map(s -> " return \""
-		                                                                                                   + s + "\"")
+		return super.getMessage() + Optional.ofNullable(stdErr)
+		        .filter(s -> s.isEmpty() == false)
+		        .map(s -> " return \"" + s + "\"")
 		        .orElse("");
 	}
 

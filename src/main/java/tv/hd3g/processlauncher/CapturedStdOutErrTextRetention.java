@@ -55,11 +55,7 @@ public class CapturedStdOutErrTextRetention extends CapturedStdOutErrText {
 				return true;
 			}
 			return le.getLine().equals("") == false;
-		}).filter(le -> {
-			return le.isStdErr() == false;
-		}).map(le -> {
-			return le.getLine();
-		});
+		}).filter(le -> (le.isStdErr() == false)).map(LineEntry::getLine);
 	}
 
 	/**
@@ -72,11 +68,7 @@ public class CapturedStdOutErrTextRetention extends CapturedStdOutErrText {
 				return true;
 			}
 			return le.getLine().equals("") == false;
-		}).filter(le -> {
-			return le.isStdErr();
-		}).map(le -> {
-			return le.getLine();
-		});
+		}).filter(LineEntry::isStdErr).map(LineEntry::getLine);
 	}
 
 	/**
@@ -89,9 +81,7 @@ public class CapturedStdOutErrTextRetention extends CapturedStdOutErrText {
 				return true;
 			}
 			return le.getLine().equals("") == false;
-		}).map(le -> {
-			return le.getLine();
-		});
+		}).map(LineEntry::getLine);
 	}
 
 	/**

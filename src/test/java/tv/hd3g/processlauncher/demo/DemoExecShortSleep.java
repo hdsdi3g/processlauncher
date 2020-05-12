@@ -19,7 +19,7 @@ package tv.hd3g.processlauncher.demo;
 public class DemoExecShortSleep {
 
 	public static void main(final String[] args) throws InterruptedException {
-		Thread.sleep(200);
+		Thread.sleep(200);// NOSONAR
 	}
 
 }

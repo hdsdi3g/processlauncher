@@ -42,8 +42,8 @@ public class CapturedStdOutErrToPrintStream extends CapturedStdOutErrText {
 		return this;
 	}
 
-	static final String stdOutSeparator = "\t> ";
-	static final String stdErrSeparator = "\t! ";
+	static final String STDOUT_SEPARATOR = "\t> ";
+	static final String STDERR_SEPARATOR = "\t! ";
 
 	@Override
 	void onText(final LineEntry lineEntry) {
@@ -62,16 +62,10 @@ public class CapturedStdOutErrToPrintStream extends CapturedStdOutErrText {
 		out.print(source.getExecNameWithoutExt());
 		out.print(source.getPID().map(pid -> "#" + pid).orElse(""));
 
-		/*final long timeAgo = lineEntry.getTimeAgo();
-		if (timeAgo > 1000) {
-			out.print("\t");
-			out.print(timeAgo / 1000);
-			out.print("s ");
-		}*/
 		if (lineEntry.isStdErr()) {
-			out.print(stdErrSeparator);
+			out.print(STDERR_SEPARATOR);
 		} else {
-			out.print(stdOutSeparator);
+			out.print(STDOUT_SEPARATOR);
 		}
 
 		out.println(lineEntry.getLine());

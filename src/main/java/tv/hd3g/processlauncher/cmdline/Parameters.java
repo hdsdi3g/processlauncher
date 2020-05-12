@@ -60,9 +60,7 @@ public class Parameters extends SimpleParameters {
 		setVarTags("<%", "%>");
 
 		Objects.requireNonNull(bulkParameters, "\"bulkParameters\" can't to be null");
-		Arrays.stream(bulkParameters).filter(p -> {
-			return p != null;
-		}).forEach(bulkParameter -> super.addBulkParameters(bulkParameter));
+		Arrays.stream(bulkParameters).filter(Objects::nonNull).forEach(super::addBulkParameters);
 	}
 
 	/**
@@ -105,12 +103,10 @@ public class Parameters extends SimpleParameters {
 	 */
 	public boolean isTaggedParameter(final String param) {
 		Objects.requireNonNull(param, "\"param\" can't to be null");
-		if (param.isEmpty()) {
-			return false;
-		} else if (param.contains(" ")) {
+		if (param.isEmpty() || param.contains(" ")) {
 			return false;
 		}
-		return param.startsWith(startVarTag) & param.endsWith(endVarTag);
+		return param.startsWith(startVarTag) && param.endsWith(endVarTag);
 	}
 
 	/**
@@ -135,8 +131,7 @@ public class Parameters extends SimpleParameters {
 		return varName;
 	}
 
-	@Override
-	public Parameters clone() {
+	public Parameters duplicate() {
 		final Parameters newInstance = new Parameters(startVarTag, endVarTag);
 		newInstance.importParametersFrom(this);
 		return newInstance;
@@ -200,7 +195,7 @@ public class Parameters extends SimpleParameters {
 						if (list.isEmpty()) {
 							return list;
 						} else if (isParameterArgIsAParametersKey(list.get(list.size() - 1))) {
-							return list.stream().limit(list.size() - 1).collect(Collectors.toUnmodifiableList());
+							return list.stream().limit(list.size() - 1L).collect(Collectors.toUnmodifiableList());
 						} else {
 							return list;
 						}
@@ -217,7 +212,7 @@ public class Parameters extends SimpleParameters {
 				} else {
 					return arg;
 				}
-			}).filter(arg -> arg != null).collect(Collectors.toUnmodifiableList());
+			}).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
 		}
 
 		replaceParameters(newParameters);

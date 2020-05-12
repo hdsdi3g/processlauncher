@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import tv.hd3g.processlauncher.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.CapturedStreams;
 import tv.hd3g.processlauncher.InvalidExecution;
+import tv.hd3g.processlauncher.ProcessLifeCycleException;
 import tv.hd3g.processlauncher.ProcesslauncherBuilder;
 import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
@@ -52,7 +53,7 @@ public class ToolRunner {
 			execTool.beforeRun(builder);
 			return new RunningTool<>(textRetention, builder.start(), execTool);
 		} catch (final IOException e) {
-			throw new RuntimeException("Can't start " + executableName, e);
+			throw new ProcessLifeCycleException("Can't start " + executableName, e);
 		}
 	}
 
@@ -86,17 +87,16 @@ public class ToolRunner {
 		 * Blocking call (with CapturedStdOutErrTextRetention::waitForClosedStream)
 		 */
 		public CapturedStdOutErrTextRetention checkExecutionGetText() {
-			final var lifecyle = getLifecyle();
+			final var currentLifecyle = getLifecyle();
 			try {
-				lifecyle.checkExecution();
-				final var textRetention = getTextRetention();
-				textRetention.waitForClosedStreams();
-				return textRetention;
+				currentLifecyle.checkExecution();
+				final var currentTextRetention = getTextRetention();
+				currentTextRetention.waitForClosedStreams();
+				return currentTextRetention;
 			} catch (final InvalidExecution e) {
-				e.setStdErr(getTextRetention().getStderrLines(false)
+				throw e.injectStdErr(getTextRetention().getStderrLines(false)
 				        .filter(getExecutableToolSource().filterOutErrorLines())
 				        .map(String::trim).collect(Collectors.joining("|")));
-				throw e;
 			}
 		}
 

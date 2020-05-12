@@ -21,7 +21,7 @@ public class DemoExecLongSleep {
 	public static final long MAX_DURATION = 100;
 
 	public static void main(final String[] args) throws Exception {
-		Thread.sleep(MAX_DURATION * 50);
+		Thread.sleep(MAX_DURATION * 50);// NOSONAR
 	}
 
 }

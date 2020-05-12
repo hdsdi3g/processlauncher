@@ -33,10 +33,13 @@ import org.apache.logging.log4j.Logger;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 
 public class ProcesslauncherLifecycle {
+	private static final String LOG_FORCE_TO_CLOSE_PROCESS = "Force to close process {}";
+	private static final String LOG_CLOSE_MANUALLY_PROCESS = "Close manually process {}";
+
 	private static Logger log = LogManager.getLogger();
 
-	private final static Executor END_EXEC_CALLBACK;
-	private final static AtomicLong END_EXEC_CALLBACK_COUNT;
+	private static final Executor END_EXEC_CALLBACK;
+	private static final AtomicLong END_EXEC_CALLBACK_COUNT;
 
 	static {
 		END_EXEC_CALLBACK_COUNT = new AtomicLong(0);
@@ -74,12 +77,12 @@ public class ProcesslauncherLifecycle {
 			Objects.requireNonNull(process, "Can't manage null process");
 		} else {
 			process = pBuilder.start();
-			log.info("Start process #" + process.pid() + " " + fullCommandLine);
+			log.info("Start process # {} {}", process.pid(), fullCommandLine);
 		}
 		startDate = System.currentTimeMillis();
 
 		shutdownHook = new Thread(() -> {
-			log.warn("Try to kill " + toString());
+			log.warn("Try to kill {}", this);
 			killProcessTree(process);
 		});
 		shutdownHook.setDaemon(false);
@@ -87,14 +90,10 @@ public class ProcesslauncherLifecycle {
 		shutdownHook.setName("ShutdownHook for " + toString());
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-		launcher.getExecutionTimeLimiter().ifPresent(etl -> {
-			etl.addTimesUp(this, process);
-		});
+		launcher.getExecutionTimeLimiter().ifPresent(etl -> etl.addTimesUp(this, process));
 
 		final List<ExecutionCallbacker> executionCallbackers = launcher.getExecutionCallbackers();
-		executionCallbackers.forEach(ec -> {
-			ec.postStartupExecution(this);
-		});
+		executionCallbackers.forEach(ec -> ec.postStartupExecution(this));
 
 		launcher.getCaptureStandardOutput().ifPresent(cso -> {
 			cso.stdOutStreamConsumer(process.getInputStream(), this);
@@ -126,9 +125,7 @@ public class ProcesslauncherLifecycle {
 			endDate = System.currentTimeMillis();
 			Runtime.getRuntime().removeShutdownHook(shutdownHook);
 			externalProcessStartup.ifPresent(eps -> eps.onEndProcess(this));
-			executionCallbackers.forEach(ec -> {
-				ec.onEndExecution(this);
-			});
+			executionCallbackers.forEach(ec -> ec.onEndExecution(this));
 		}, END_EXEC_CALLBACK);
 	}
 
@@ -174,42 +171,42 @@ public class ProcesslauncherLifecycle {
 			return;
 		}
 
-		log.debug("Internal kill " + toString());
-		final List<ProcessHandle> cantKill = process.descendants().filter(processHandle -> {
-			return processHandle.isAlive();
-		}).filter(processHandle -> {
-			if (log.isDebugEnabled()) {
-				log.info("Close manually process " + processHandleToString(processHandle, true));
-			} else if (log.isInfoEnabled()) {
-				log.info("Close manually process " + processHandleToString(processHandle, false));
-			}
-			return processHandle.destroy() == false;
-		}).filter(processHandle -> {
-			if (log.isDebugEnabled()) {
-				log.info("Force to close process " + processHandleToString(processHandle, true));
-			} else if (log.isInfoEnabled()) {
-				log.info("Force to close process " + processHandleToString(processHandle, false));
-			}
-			return processHandle.destroyForcibly() == false;
-		}).collect(Collectors.toUnmodifiableList());
+		log.debug("Internal kill {}", this);
+		final List<ProcessHandle> cantKill = process.descendants().filter(ProcessHandle::isAlive)
+		        .filter(processHandle -> {
+			        if (log.isDebugEnabled()) {
+				        log.info(LOG_CLOSE_MANUALLY_PROCESS, () -> processHandleToString(processHandle, true));
+			        } else if (log.isInfoEnabled()) {
+				        log.info(LOG_CLOSE_MANUALLY_PROCESS, () -> processHandleToString(processHandle, false));
+			        }
+			        return processHandle.destroy() == false;
+		        }).filter(processHandle -> {
+			        if (log.isDebugEnabled()) {
+				        log.info(LOG_FORCE_TO_CLOSE_PROCESS, () -> processHandleToString(processHandle, true));
+			        } else if (log.isInfoEnabled()) {
+				        log.info(LOG_FORCE_TO_CLOSE_PROCESS, () -> processHandleToString(processHandle, false));
+			        }
+			        return processHandle.destroyForcibly() == false;
+		        }).collect(Collectors.toUnmodifiableList());
 
 		if (process.isAlive()) {
-			log.info("Close manually process " + processHandleToString(process.toHandle(), true));
+			log.info(LOG_CLOSE_MANUALLY_PROCESS, () -> processHandleToString(process.toHandle(), true));
 			if (process.toHandle().destroy() == false) {
-				log.info("Force to close process " + processHandleToString(process.toHandle(), true));
+				log.info(LOG_FORCE_TO_CLOSE_PROCESS, () -> processHandleToString(process.toHandle(), true));
 				if (process.toHandle().destroyForcibly() == false) {
-					throw new RuntimeException("Can't close process " + processHandleToString(process.toHandle(),
-					        true));
+					throw new ProcessLifeCycleException("Can't close process "
+					                                    + processHandleToString(process.toHandle(), true));
 				}
 			}
 		}
-
 		if (cantKill.isEmpty() == false) {
-			cantKill.forEach(processHandle -> {
-				log.error("Can't force close process " + processHandleToString(processHandle, true));
-			});
-			throw new RuntimeException("Can't close process " + toString() + " for PID " + cantKill.stream().map(p -> p
-			        .pid()).map(pid -> String.valueOf(pid)).collect(Collectors.joining(", ")));
+			cantKill.forEach(processHandle -> log.error("Can't force close process {}",
+			        () -> processHandleToString(processHandle, true)));
+			throw new ProcessLifeCycleException("Can't close process " + toString() + " for PID "
+			                                    + cantKill.stream()
+			                                            .map(ProcessHandle::pid)
+			                                            .map(String::valueOf)
+			                                            .collect(Collectors.joining(", ")));
 		}
 	}
 
@@ -239,7 +236,7 @@ public class ProcesslauncherLifecycle {
 	}
 
 	public long getUptime(final TimeUnit unit) {
-		if (endDate > 0l) {
+		if (endDate > 0L) {
 			return unit.convert(endDate - getStartDate(), TimeUnit.MILLISECONDS);
 		}
 		return unit.convert(System.currentTimeMillis() - getStartDate(), TimeUnit.MILLISECONDS);
@@ -278,8 +275,8 @@ public class ProcesslauncherLifecycle {
 			while (process.isAlive()) {
 				Thread.onSpinWait();
 			}
-		} catch (final InterruptedException e) {
-			throw new RuntimeException("Can't wait the end of " + fullCommandLine, e);
+		} catch (final InterruptedException e) {// NOSONAR
+			throw new ProcessLifeCycleException("Can't wait the end of " + fullCommandLine, e);
 		}
 		return this;
 	}
@@ -287,8 +284,8 @@ public class ProcesslauncherLifecycle {
 	public ProcesslauncherLifecycle waitForEnd(final long timeout, final TimeUnit unit) {
 		try {
 			process.waitFor(timeout, unit);
-		} catch (final InterruptedException e) {
-			throw new RuntimeException("Can't wait the end of " + fullCommandLine, e);
+		} catch (final InterruptedException e) {// NOSONAR
+			throw new ProcessLifeCycleException("Can't wait the end of " + fullCommandLine, e);
 		}
 		return this;
 	}
