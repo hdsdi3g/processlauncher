@@ -8,6 +8,8 @@ Please use Maven and Java 11 (OpenJDK) for build and test.
 
 Use internally Log4j2 for logging.
 
+![Java CI with Maven](https://github.com/hdsdi3g/processlauncher/workflows/Java%20CI%20with%20Maven/badge.svg)
+
 ## Usage example
 
 See `tv.hd3g.processlauncher.Exec` for shortcuts examples.
