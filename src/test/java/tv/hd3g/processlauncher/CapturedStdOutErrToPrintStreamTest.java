@@ -26,11 +26,6 @@ import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import tv.hd3g.processlauncher.CapturedStdOutErrToPrintStream;
-import tv.hd3g.processlauncher.EndStatus;
-import tv.hd3g.processlauncher.LineEntry;
-import tv.hd3g.processlauncher.Processlauncher;
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 

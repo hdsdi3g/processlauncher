@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
-import tv.hd3g.processlauncher.StdInInjection;
 
 public class StdInInjectionTest extends TestCase {
 

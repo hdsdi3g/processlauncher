@@ -29,11 +29,6 @@ import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import tv.hd3g.processlauncher.CaptureStandardOutputText;
-import tv.hd3g.processlauncher.CapturedStdOutErrText;
-import tv.hd3g.processlauncher.LineEntry;
-import tv.hd3g.processlauncher.Processlauncher;
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
 
 public class CaptureStandardOutputTextTest extends TestCase {
 
@@ -74,9 +69,9 @@ public class CaptureStandardOutputTextTest extends TestCase {
 		Assert.assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
 		Assert.assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));
 
-		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(le -> le
-		        .getLine()).collect(Collectors.toList());
-		final List<String> capturedlinesErr = capturedlines.stream().filter(le -> le.isStdErr()).map(le -> le.getLine())
+		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(
+		        LineEntry::getLine).collect(Collectors.toList());
+		final List<String> capturedlinesErr = capturedlines.stream().filter(LineEntry::isStdErr).map(LineEntry::getLine)
 		        .collect(Collectors.toList());
 
 		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdOut, capturedlinesOut));

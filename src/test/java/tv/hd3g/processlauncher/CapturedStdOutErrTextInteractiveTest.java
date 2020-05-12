@@ -25,10 +25,6 @@ import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import tv.hd3g.processlauncher.CapturedStdOutErrTextInteractive;
-import tv.hd3g.processlauncher.LineEntry;
-import tv.hd3g.processlauncher.ProcesslauncherLifecycle;
-import tv.hd3g.processlauncher.StdInInjection;
 
 public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 

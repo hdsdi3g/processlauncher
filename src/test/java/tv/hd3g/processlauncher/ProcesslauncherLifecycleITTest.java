@@ -192,7 +192,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		}, DemoExecLongSleep.MAX_DURATION * 4, TimeUnit.MILLISECONDS);
 
 		Assert.assertTrue(result.isRunning());
-		Thread.sleep(DemoExecLongSleep.MAX_DURATION);
+		Thread.sleep(DemoExecLongSleep.MAX_DURATION);// NOSONAR
 		/**
 		 * flacky on linux
 		 * Assert.assertEquals(1, result.getProcess().children().count());
@@ -223,7 +223,7 @@ public class ProcesslauncherLifecycleITTest extends TestCase {
 		final ProcesslauncherLifecycle result = ept.start().waitForEnd();
 
 		final long duration = System.currentTimeMillis() - startTime;
-		MatcherAssert.assertThat(duration, Matchers.greaterThanOrEqualTo(result.getUptime(TimeUnit.MILLISECONDS)));
+		MatcherAssert.assertThat(duration * 2, Matchers.greaterThanOrEqualTo(result.getUptime(TimeUnit.MILLISECONDS)));
 	}
 
 	public void testInteractiveHandler() throws Exception {
