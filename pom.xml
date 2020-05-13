@@ -52,6 +52,11 @@
 			<version>1.3</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>tv.hd3g.commons</groupId>
+			<artifactId>codepolicyvalidation</artifactId>
+			<version>0.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<organization>
