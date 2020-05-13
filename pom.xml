@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -59,14 +58,14 @@
 		<name>hd3g.tv</name>
 		<url>https://hd3g.tv</url>
 	</organization>
-    <developers>
-        <developer>
-            <name>hdsdi3g</name>
-            <email>admin@hd3g.tv</email>
-            <organization>hd3g.tv</organization>
-            <organizationUrl>https://hd3g.tv</organizationUrl>
-        </developer>
-    </developers>   
+	<developers>
+		<developer>
+			<name>hdsdi3g</name>
+			<email>admin@hd3g.tv</email>
+			<organization>hd3g.tv</organization>
+			<organizationUrl>https://hd3g.tv</organizationUrl>
+		</developer>
+	</developers>
 	<scm>
 		<connection>scm:git:https://github.com/hdsdi3g/processlauncher.git</connection>
 		<developerConnection>scm:git:https://github.com/hdsdi3g/processlauncher.git</developerConnection>
