@@ -16,16 +16,22 @@
  */
 package tv.hd3g.processlauncher.cmdline;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class SimpleParametersTest extends TestCase {
+public class SimpleParametersTest {
 
+	@Test
 	public void testParams() {
 		final String testChaoticLine = "-aa 1  -single --cc 3 -U  \"dsfdsf sdf s  -e foo\" -g 2 42 -f=f -h=i;j,k:l -m Ah! -l \"u \" m ";
 
@@ -33,7 +39,6 @@ public class SimpleParametersTest extends TestCase {
 
 		assertEquals("-", pu.getParametersKeysStartsWith());
 		assertFalse(pu.getParameters().isEmpty());
-		// assertEquals(pu.parameters, pu.getParameters());
 
 		final String actual = pu.toString();
 		pu = new SimpleParameters();
@@ -130,6 +135,7 @@ public class SimpleParametersTest extends TestCase {
 		assertEquals("a b  c defggg h i  efff ", pu.getParameters().stream().collect(Collectors.joining()));
 	}
 
+	@Test
 	public void testParamStyleChange() {
 		final SimpleParameters pu = new SimpleParameters("-a 1 /b 2").setParametersKeysStartsWith("/");
 		assertEquals("/", pu.getParametersKeysStartsWith());
@@ -144,6 +150,7 @@ public class SimpleParametersTest extends TestCase {
 
 	}
 
+	@Test
 	public void testTransfert() {
 		final SimpleParameters pu1 = new SimpleParameters("!ok1").setParametersKeysStartsWith("!");
 		final SimpleParameters pu2 = new SimpleParameters("-ok2");
@@ -160,6 +167,7 @@ public class SimpleParametersTest extends TestCase {
 		assertEquals("$", pu2.getParametersKeysStartsWith());
 	}
 
+	@Test
 	public void testPrepend() {
 		final SimpleParameters pu = new SimpleParameters("-3 -4");
 		pu.prependBulkParameters("-1 -2");
@@ -180,22 +188,24 @@ public class SimpleParametersTest extends TestCase {
 		assertEquals("-1 -2 -3 -4", pu.toString());
 	}
 
+	@Test
 	public void testHasParameters() {
 		final SimpleParameters pu = new SimpleParameters("-a -b");
-		Assert.assertTrue(pu.hasParameters("-a", "-b", "-z"));
-		Assert.assertTrue(pu.hasParameters("-a"));
-		Assert.assertTrue(pu.hasParameters("a"));
-		Assert.assertFalse(pu.hasParameters("-z"));
-		Assert.assertTrue(pu.hasParameters("-a", "-b"));
+		assertTrue(pu.hasParameters("-a", "-b", "-z"));
+		assertTrue(pu.hasParameters("-a"));
+		assertTrue(pu.hasParameters("a"));
+		assertFalse(pu.hasParameters("-z"));
+		assertTrue(pu.hasParameters("-a", "-b"));
 	}
 
+	@Test
 	public void testIfHasNotParameter() {
 		final SimpleParameters pu = new SimpleParameters("-a -b");
 		final AtomicInteger count = new AtomicInteger(0);
 		pu.ifHasNotParameter(() -> {
 			count.getAndIncrement();
 		}, "-z");
-		Assert.assertEquals(1, count.get());
+		assertEquals(1, count.get());
 	}
 
 }

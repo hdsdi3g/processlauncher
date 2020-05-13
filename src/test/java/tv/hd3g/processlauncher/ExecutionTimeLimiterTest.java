@@ -16,6 +16,9 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -28,19 +31,18 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+public class ExecutionTimeLimiterTest {
 
-public class ExecutionTimeLimiterTest extends TestCase {
-
+	@Test
 	public void test() {
 
 		final FakesScheduledExecutorService fakeSES = new FakesScheduledExecutorService();
 		final ExecutionTimeLimiter etl = new ExecutionTimeLimiter(1, TimeUnit.SECONDS, fakeSES);
 
-		Assert.assertEquals(1000, etl.getMaxExecTime(TimeUnit.MILLISECONDS));
+		assertEquals(1000, etl.getMaxExecTime(TimeUnit.MILLISECONDS));
 
 		final ProcesslauncherLifecycle toCallBack = Mockito.mock(ProcesslauncherLifecycle.class);
 		final Process process = Mockito.mock(Process.class);
@@ -49,9 +51,9 @@ public class ExecutionTimeLimiterTest extends TestCase {
 		etl.addTimesUp(toCallBack, process);
 		Mockito.verify(toCallBack).runningTakesTooLongTimeStopIt();
 
-		Assert.assertEquals(1000, fakeSES.delay);
-		Assert.assertEquals(TimeUnit.MILLISECONDS, fakeSES.unit);
-		Assert.assertTrue(fakeSES.returned.hasCancel);
+		assertEquals(1000, fakeSES.delay);
+		assertEquals(TimeUnit.MILLISECONDS, fakeSES.unit);
+		assertTrue(fakeSES.returned.hasCancel);
 	}
 
 	static class ReturnedScheduledFuture implements ScheduledFuture<Void> {

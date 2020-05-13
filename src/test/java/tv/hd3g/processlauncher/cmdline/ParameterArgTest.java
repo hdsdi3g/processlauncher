@@ -16,30 +16,37 @@
  */
 package tv.hd3g.processlauncher.cmdline;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ParameterArgTest extends TestCase {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class ParameterArgTest {
 
 	private ParameterArg pArg;
 
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		pArg = new ParameterArg(true);
 		pArg.add('a');
 		pArg.add('b');
 		pArg.add('c');
 	}
 
+	@Test
 	public void testToString() {
-		Assert.assertEquals("abc", pArg.toString());
+		assertEquals("abc", pArg.toString());
 	}
 
+	@Test
 	public void testIsInQuotes() {
-		Assert.assertTrue(pArg.isInQuotes());
+		assertTrue(pArg.isInQuotes());
 	}
 
+	@Test
 	public void testIsEmpty() {
-		Assert.assertFalse(pArg.isEmpty());
+		assertFalse(pArg.isEmpty());
 	}
 }

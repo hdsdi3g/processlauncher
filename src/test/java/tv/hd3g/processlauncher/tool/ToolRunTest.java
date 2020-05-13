@@ -16,18 +16,23 @@
  */
 package tv.hd3g.processlauncher.tool;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tv.hd3g.processlauncher.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.Exec;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.tool.ToolRunner.RunningTool;
 
-public class ToolRunTest extends TestCase {
+public class ToolRunTest {
 
 	private final String execName;
 	private final ExecutableFinder executableFinder;
@@ -39,8 +44,8 @@ public class ToolRunTest extends TestCase {
 
 	private Exec exec;
 
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("-version");
 	}
@@ -60,22 +65,22 @@ public class ToolRunTest extends TestCase {
 		};
 	}
 
+	@Test
 	public void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
 		final ToolRunner toolRun = new ToolRunner(executableFinder);
 
 		final ExecutableTool executableTool = makeExecutableTool();
 
 		final RunningTool<ExecutableTool> result = toolRun.execute(executableTool);
-		Assert.assertEquals(executableTool, result.getExecutableToolSource());
+		assertEquals(executableTool, result.getExecutableToolSource());
 
 		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = result.getTextRetention();
-		Assert.assertNotNull(capturedStdOutErrTextRetention);
-		Assert.assertNotNull(result.getLifecyle());
+		assertNotNull(capturedStdOutErrTextRetention);
+		assertNotNull(result.getLifecyle());
 
-		Assert.assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText());
-		Assert.assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> {
-			return line.contains("version");
-		}));
+		assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText());
+		assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> line.contains(
+		        "version")));
 	}
 
 }

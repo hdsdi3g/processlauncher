@@ -16,12 +16,15 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-public class LineEntryTest extends TestCase {
+public class LineEntryTest {
 
 	private final long date;
 	private final String line;
@@ -34,45 +37,51 @@ public class LineEntryTest extends TestCase {
 		date = System.currentTimeMillis();
 
 		source = Mockito.mock(ProcesslauncherLifecycle.class);
-		Mockito.when(source.getStartDate()).thenReturn(date - 10000l);
+		Mockito.when(source.getStartDate()).thenReturn(date - 10000L);
 	}
 
 	private LineEntry lineEntry;
 
-	@Override
+	@BeforeEach
 	public void setUp() {
 		lineEntry = new LineEntry(date, line, stdErr, source);
 	}
 
+	@Test
 	public void testGetTimeAgo() {
-		Assert.assertEquals(10000l, lineEntry.getTimeAgo());
+		assertEquals(10000L, lineEntry.getTimeAgo());
 	}
 
+	@Test
 	public void testGetDate() {
-		Assert.assertEquals(date, lineEntry.getDate());
+		assertEquals(date, lineEntry.getDate());
 	}
 
+	@Test
 	public void testGetLine() {
-		Assert.assertEquals(line, lineEntry.getLine());
+		assertEquals(line, lineEntry.getLine());
 	}
 
+	@Test
 	public void testGetSource() {
-		Assert.assertEquals(source, lineEntry.getSource());
+		assertEquals(source, lineEntry.getSource());
 	}
 
+	@Test
 	public void testIsStdErr() {
-		Assert.assertEquals(stdErr, lineEntry.isStdErr());
+		assertEquals(stdErr, lineEntry.isStdErr());
 	}
 
+	@Test
 	public void testCanUseThis() {
-		Assert.assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
-		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
-		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
+		assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
+		assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
+		assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
 
 		lineEntry = new LineEntry(date, line, stdErr == false, source);
 
-		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
-		Assert.assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
-		Assert.assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
+		assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
+		assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
+		assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));
 	}
 }

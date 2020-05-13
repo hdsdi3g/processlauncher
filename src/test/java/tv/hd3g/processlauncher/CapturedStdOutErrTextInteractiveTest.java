@@ -16,18 +16,19 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+public class CapturedStdOutErrTextInteractiveTest {
 
-public class CapturedStdOutErrTextInteractiveTest extends TestCase {
-
+	@Test
 	public void test() throws Exception {
 		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
 		Mockito.when(source.isRunning()).thenReturn(true);
@@ -40,7 +41,7 @@ public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 		final List<LineEntry> capturedLe = new ArrayList<>();
 		final Function<LineEntry, String> interactive = le -> {
 			if (le.getSource().equals(source) == false) {
-				throw new RuntimeException("Invalid source");
+				throw new IllegalStateException("Invalid source");
 			}
 			capturedLe.add(le);
 			return le.getLine().toUpperCase();
@@ -51,8 +52,8 @@ public class CapturedStdOutErrTextInteractiveTest extends TestCase {
 		csoeti.onText(added);
 		// csoeti.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
 
-		Assert.assertEquals(1, capturedLe.size());
-		Assert.assertEquals(added, capturedLe.get(0));
-		Assert.assertEquals("My text".toUpperCase() + System.lineSeparator(), new String(baos.toByteArray()));
+		assertEquals(1, capturedLe.size());
+		assertEquals(added, capturedLe.get(0));
+		assertEquals("My text".toUpperCase() + System.lineSeparator(), new String(baos.toByteArray()));
 	}
 }

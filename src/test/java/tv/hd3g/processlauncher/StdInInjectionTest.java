@@ -16,15 +16,18 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class StdInInjectionTest extends TestCase {
+public class StdInInjectionTest {
 
+	@Test
 	public void testInject() throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

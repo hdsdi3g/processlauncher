@@ -16,20 +16,24 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.demo.DemoExecEmpty;
 
-public class ProcesslauncherLifecycleTest extends TestCase {
+public class ProcesslauncherLifecycleTest {
 
 	private final long beforeStartDate;
 	private final long afterEndDate;
@@ -48,36 +52,37 @@ public class ProcesslauncherLifecycleTest extends TestCase {
 		afterEndDate = System.currentTimeMillis() + 100;
 	}
 
+	@Test
 	public void testStatues() {
-		Assert.assertEquals(launcher, p.getLauncher());
-		Assert.assertNotNull(p.getProcess());
-		Assert.assertFalse(p.getProcess().isAlive());
-		Assert.assertFalse(p.isRunning());
-		Assert.assertFalse(p.isKilled());
-		Assert.assertFalse(p.isTooLongTime());
-		Assert.assertEquals(0, p.getExitCode().intValue());
-		Assert.assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
-		Assert.assertTrue(p.isCorrectlyDone());
+		assertEquals(launcher, p.getLauncher());
+		assertNotNull(p.getProcess());
+		assertFalse(p.getProcess().isAlive());
+		assertFalse(p.isRunning());
+		assertFalse(p.isKilled());
+		assertFalse(p.isTooLongTime());
+		assertEquals(0, (int) p.getExitCode());
+		assertEquals(EndStatus.CORRECTLY_DONE, p.getEndStatus());
+		assertTrue(p.isCorrectlyDone());
 
 		MatcherAssert.assertThat(beforeStartDate, Matchers.lessThanOrEqualTo(p.getStartDate()));
 		MatcherAssert.assertThat(afterEndDate, Matchers.greaterThanOrEqualTo(p.getEndDate()));
 
-		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getUptime(TimeUnit.NANOSECONDS)));
-		MatcherAssert.assertThat(0l, Matchers.lessThanOrEqualTo(p.getCPUDuration(TimeUnit.NANOSECONDS)));
-		Assert.assertNotNull(p.getUserExec());
-		Assert.assertTrue(p.getPID().isPresent());
-		MatcherAssert.assertThat(0l, Matchers.lessThan(p.getPID().get()));
-		Assert.assertEquals(p.getProcess().pid(), (long) p.getPID().get());
+		MatcherAssert.assertThat(0L, Matchers.lessThan(p.getUptime(TimeUnit.NANOSECONDS)));
+		MatcherAssert.assertThat(0L, Matchers.lessThanOrEqualTo(p.getCPUDuration(TimeUnit.NANOSECONDS)));
+		assertNotNull(p.getUserExec());
+		assertTrue(p.getPID().isPresent());
+		MatcherAssert.assertThat(0L, Matchers.lessThan(p.getPID().get()));
+		assertEquals(p.getProcess().pid(), (long) p.getPID().get());
 		/**
 		 * Flacky on Linux
-		 * Assert.assertTrue(result.getUserExec().get().endsWith(System.getProperty("user.name")));
+		 * assertTrue(result.getUserExec().get().endsWith(System.getProperty("user.name")));
 		 */
 
 		/**
 		 * Should do nothing
 		 */
 		p.kill();
-		Assert.assertFalse(p.isKilled());
+		assertFalse(p.isKilled());
 		p.waitForEnd();
 		p.checkExecution();
 	}

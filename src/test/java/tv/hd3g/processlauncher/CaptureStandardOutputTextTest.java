@@ -16,6 +16,9 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,13 +28,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+public class CaptureStandardOutputTextTest {
 
-public class CaptureStandardOutputTextTest extends TestCase {
-
+	@Test
 	public void test() throws InterruptedException {
 		final List<LineEntry> capturedlines = new ArrayList<>();
 
@@ -66,16 +68,16 @@ public class CaptureStandardOutputTextTest extends TestCase {
 
 		cdl.await(1, TimeUnit.SECONDS);
 
-		Assert.assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
-		Assert.assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));
+		assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
+		assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));
 
 		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(
 		        LineEntry::getLine).collect(Collectors.toList());
 		final List<String> capturedlinesErr = capturedlines.stream().filter(LineEntry::isStdErr).map(LineEntry::getLine)
 		        .collect(Collectors.toList());
 
-		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdOut, capturedlinesOut));
-		Assert.assertTrue(CollectionUtils.isEqualCollection(textLinesStdErr, capturedlinesErr));
+		assertTrue(CollectionUtils.isEqualCollection(textLinesStdOut, capturedlinesOut));
+		assertTrue(CollectionUtils.isEqualCollection(textLinesStdErr, capturedlinesErr));
 	}
 
 }

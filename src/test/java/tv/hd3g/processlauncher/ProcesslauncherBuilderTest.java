@@ -16,6 +16,11 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,14 +28,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinderTest;
 
-public class ProcesslauncherBuilderTest extends TestCase {
+public class ProcesslauncherBuilderTest {
 
 	private ProcesslauncherBuilder pb;
 	private final File execFile;
@@ -40,30 +46,34 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		execFile = new ExecutableFinder().get("test-exec");
 	}
 
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		pb = new ProcesslauncherBuilder(execFile, Arrays.asList("p"));
 	}
 
+	@Test
 	public void testGetSetEnvironmentVar() {
 		pb.setEnvironmentVar("foo", "bar");
-		Assert.assertEquals("bar", pb.getEnvironmentVar("foo"));
+		assertEquals("bar", pb.getEnvironmentVar("foo"));
 	}
 
+	@Test
 	public void testGetSetEnvironmentVarWinPath() {
 		if (System.getProperty("os.name").toLowerCase().indexOf("win") > -1) {
 			pb.setEnvironmentVar("path", "foo");
-			Assert.assertEquals("foo", pb.getEnvironmentVar("Path"));
-			Assert.assertEquals("foo", pb.getEnvironmentVar("PATH"));
+			assertEquals("foo", pb.getEnvironmentVar("Path"));
+			assertEquals("foo", pb.getEnvironmentVar("PATH"));
 		}
 	}
 
+	@Test
 	public void testSetEnvironmentVarIfNotFound() {
 		pb.setEnvironmentVarIfNotFound("foo", "bar");
 		pb.setEnvironmentVarIfNotFound("foo", "tot");
-		Assert.assertEquals("bar", pb.getEnvironmentVar("foo"));
+		assertEquals("bar", pb.getEnvironmentVar("foo"));
 	}
 
+	@Test
 	public void testForEachEnvironmentVar() {
 		pb.setEnvironmentVar("foo1", "bar1");
 		pb.setEnvironmentVar("foo2", "bar2");
@@ -72,37 +82,41 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		pb.forEachEnvironmentVar((k, v) -> {
 			val.put(k, v);
 		});
-		Assert.assertEquals("bar1", val.get("foo1"));
-		Assert.assertEquals("bar2", val.get("foo2"));
+		assertEquals("bar1", val.get("foo1"));
+		assertEquals("bar2", val.get("foo2"));
 	}
 
+	@Test
 	public void testGetSetWorkingDirectory() throws IOException {
-		Assert.assertNull(pb.getWorkingDirectory());
+		assertNull(pb.getWorkingDirectory());
 		pb.setWorkingDirectory(new File("."));
-		Assert.assertEquals(new File("."), pb.getWorkingDirectory());
+		assertEquals(new File("."), pb.getWorkingDirectory());
 
 		try {
 			pb.setWorkingDirectory(new File("./DontExists"));
-			Assert.fail();
+			Assertions.fail();
 		} catch (final IOException e) {
 		}
 		try {
 			pb.setWorkingDirectory(execFile);
-			Assert.fail();
+			Assertions.fail();
 		} catch (final IOException e) {
 		}
 	}
 
+	@Test
 	public void testSetIsExecCodeMustBeZero() {
-		Assert.assertTrue(pb.isExecCodeMustBeZero());
+		assertTrue(pb.isExecCodeMustBeZero());
 		pb.setExecCodeMustBeZero(false);
-		Assert.assertFalse(pb.isExecCodeMustBeZero());
+		assertFalse(pb.isExecCodeMustBeZero());
 	}
 
+	@Test
 	public void testGetExecutionCallbackers() {
-		Assert.assertEquals(0, pb.getExecutionCallbackers().size());
+		assertEquals(0, pb.getExecutionCallbackers().size());
 	}
 
+	@Test
 	public void testAddExecutionCallbacker() {
 		final ExecutionCallbacker executionCallbacker0 = Mockito.mock(ExecutionCallbacker.class);
 		final ExecutionCallbacker executionCallbacker1 = Mockito.mock(ExecutionCallbacker.class);
@@ -110,60 +124,68 @@ public class ProcesslauncherBuilderTest extends TestCase {
 		pb.addExecutionCallbacker(executionCallbacker0);
 		pb.addExecutionCallbacker(executionCallbacker1);
 
-		Assert.assertEquals(executionCallbacker0, pb.getExecutionCallbackers().get(0));
-		Assert.assertEquals(executionCallbacker1, pb.getExecutionCallbackers().get(1));
+		assertEquals(executionCallbacker0, pb.getExecutionCallbackers().get(0));
+		assertEquals(executionCallbacker1, pb.getExecutionCallbackers().get(1));
 	}
 
+	@Test
 	public void testRemoveExecutionCallbacker() {
 		final ExecutionCallbacker executionCallbacker = Mockito.mock(ExecutionCallbacker.class);
 		pb.addExecutionCallbacker(executionCallbacker);
 		pb.removeExecutionCallbacker(executionCallbacker);
-		Assert.assertEquals(0, pb.getExecutionCallbackers().size());
+		assertEquals(0, pb.getExecutionCallbackers().size());
 	}
 
+	@Test
 	public void testGetSetExecutionTimeLimiter() {
-		Assert.assertFalse(pb.getExecutionTimeLimiter().isPresent());
+		assertFalse(pb.getExecutionTimeLimiter().isPresent());
 
 		final ExecutionTimeLimiter executionTimeLimiter = Mockito.mock(ExecutionTimeLimiter.class);
 		pb.setExecutionTimeLimiter(executionTimeLimiter);
 
-		Assert.assertEquals(executionTimeLimiter, pb.getExecutionTimeLimiter().get());
+		assertEquals(executionTimeLimiter, pb.getExecutionTimeLimiter().get());
 	}
 
+	@Test
 	public void testGetSetExternalProcessStartup() {
-		Assert.assertFalse(pb.getExternalProcessStartup().isPresent());
+		assertFalse(pb.getExternalProcessStartup().isPresent());
 
 		final ExternalProcessStartup externalProcessStartup = Mockito.mock(ExternalProcessStartup.class);
 		pb.setExternalProcessStartup(externalProcessStartup);
 
-		Assert.assertEquals(externalProcessStartup, pb.getExternalProcessStartup().get());
+		assertEquals(externalProcessStartup, pb.getExternalProcessStartup().get());
 	}
 
+	@Test
 	public void testSetGetCaptureStandardOutput() {
-		Assert.assertFalse(pb.getCaptureStandardOutput().isPresent());
+		assertFalse(pb.getCaptureStandardOutput().isPresent());
 
 		final CaptureStandardOutput captureStandardOutput = Mockito.mock(CaptureStandardOutput.class);
 		pb.setCaptureStandardOutput(captureStandardOutput);
 
-		Assert.assertEquals(captureStandardOutput, pb.getCaptureStandardOutput().get());
+		assertEquals(captureStandardOutput, pb.getCaptureStandardOutput().get());
 	}
 
+	@Test
 	public void testMakeProcessBuilder() {
 		final ProcessBuilder processb = pb.makeProcessBuilder();
-		Assert.assertEquals(pb.getFullCommandLine(), processb.command().stream().collect(Collectors.joining(" ")));
+		assertEquals(pb.getFullCommandLine(), processb.command().stream().collect(Collectors.joining(" ")));
 	}
 
+	@Test
 	public void testGetFullCommandLine() {
-		Assert.assertEquals(ProcesslauncherBuilder.addQuotesIfSpaces.apply(execFile.getAbsolutePath()) + " p", pb
+		assertEquals(ProcesslauncherBuilder.addQuotesIfSpaces.apply(execFile.getAbsolutePath()) + " p", pb
 		        .getFullCommandLine());
 	}
 
+	@Test
 	public void testToString() {
-		Assert.assertEquals(pb.getFullCommandLine(), pb.toString());
+		assertEquals(pb.getFullCommandLine(), pb.toString());
 	}
 
+	@Test
 	public void testGetExecutableName() {
-		Assert.assertEquals(execFile.getName(), pb.getExecutableName());
+		assertEquals(execFile.getName(), pb.getExecutableName());
 	}
 
 }

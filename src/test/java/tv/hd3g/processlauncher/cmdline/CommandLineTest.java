@@ -16,13 +16,16 @@
  */
 package tv.hd3g.processlauncher.cmdline;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CommandLineTest extends TestCase {
+public class CommandLineTest {
 
 	private final ExecutableFinder ef;
 	private final CommandLine cmd;
@@ -37,17 +40,20 @@ public class CommandLineTest extends TestCase {
 		parametersSource.addParameters("-b");
 	}
 
+	@Test
 	public void testGetExecutableFinder() {
-		Assert.assertEquals(ef, cmd.getExecutableFinder().get());
+		assertEquals(ef, cmd.getExecutableFinder().get());
 	}
 
+	@Test
 	public void testGetExecutable() throws FileNotFoundException {
-		Assert.assertEquals(ef.get("test-exec"), cmd.getExecutable());
+		assertEquals(ef.get("test-exec"), cmd.getExecutable());
 	}
 
+	@Test
 	public void testGetParameters() {
-		Assert.assertNotSame(parametersSource, cmd.getParameters());
-		Assert.assertFalse(parametersSource.toString().equals(cmd.getParameters().toString()));
+		assertNotSame(parametersSource, cmd.getParameters());
+		assertFalse(parametersSource.toString().equals(cmd.getParameters().toString()));
 	}
 
 }

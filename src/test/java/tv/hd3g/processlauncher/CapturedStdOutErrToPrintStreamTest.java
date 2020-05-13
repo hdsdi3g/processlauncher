@@ -16,18 +16,20 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-public class CapturedStdOutErrToPrintStreamTest extends TestCase {
+public class CapturedStdOutErrToPrintStreamTest {
 
 	private static final String execName = "launchedexec";
 	private final Processlauncher launcher;
@@ -45,9 +47,9 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 	private ByteArrayOutputStream errStreamContent;
 	private ProcesslauncherLifecycle source;
 
-	@Override
-	protected void setUp() throws Exception {
-		pid = Math.floorMod(Math.abs(new Random().nextLong()), 1000l);
+	@BeforeEach
+	void setUp() throws Exception {
+		pid = Math.floorMod(Math.abs(new Random().nextLong()), 1000L);
 		outStreamContent = new ByteArrayOutputStream();
 		errStreamContent = new ByteArrayOutputStream();
 		printStreamStdOut = new PrintStream(outStreamContent);
@@ -58,33 +60,37 @@ public class CapturedStdOutErrToPrintStreamTest extends TestCase {
 		Mockito.when(source.getPID()).thenReturn(Optional.of(pid));
 	}
 
+	@Test
 	public void testGetFilter() {
-		Assert.assertTrue(capture.getFilter().isEmpty());
+		assertTrue(capture.getFilter().isEmpty());
 	}
 
+	@Test
 	public void testSetFilter() {
 		final Predicate<LineEntry> filter = l -> true;
 		capture.setFilter(filter);
-		Assert.assertEquals(filter, capture.getFilter().get());
+		assertEquals(filter, capture.getFilter().get());
 	}
 
+	@Test
 	public void testOnFilteredText() {
 		capture.setFilter(l -> l.isStdErr() == false);
 		capture.onText(new LineEntry(System.currentTimeMillis(), "content", true, source));
-		Assert.assertEquals(0, outStreamContent.size());
-		Assert.assertEquals(0, errStreamContent.size());
+		assertEquals(0, outStreamContent.size());
+		assertEquals(0, errStreamContent.size());
 	}
 
+	@Test
 	public void testOnProcessCloseStreamExecOk() {
 		Mockito.when(source.isCorrectlyDone()).thenReturn(true);
 		Mockito.when(source.getEndStatus()).thenReturn(EndStatus.CORRECTLY_DONE);
 		Mockito.when(source.getExitCode()).thenReturn(0);
-		Mockito.when(source.getCPUDuration(null)).thenReturn(1l);
-		Mockito.when(source.getUptime(null)).thenReturn(1l);
+		Mockito.when(source.getCPUDuration(null)).thenReturn(1L);
+		Mockito.when(source.getUptime(null)).thenReturn(1L);
 
-		Assert.assertEquals(0, outStreamContent.size());
-		Assert.assertEquals(0, errStreamContent.size());
-		Assert.assertEquals(0, errStreamContent.size());
+		assertEquals(0, outStreamContent.size());
+		assertEquals(0, errStreamContent.size());
+		assertEquals(0, errStreamContent.size());
 	}
 
 }

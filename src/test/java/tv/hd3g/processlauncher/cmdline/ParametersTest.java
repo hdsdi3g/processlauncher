@@ -16,15 +16,20 @@
  */
 package tv.hd3g.processlauncher.cmdline;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ParametersTest extends TestCase {
+public class ParametersTest {
 
+	@Test
 	public void test() {
 		Parameters clp = new Parameters();
 
@@ -57,6 +62,7 @@ public class ParametersTest extends TestCase {
 		assertNull(clp.extractVarNameFromTaggedParameter("nope"));
 	}
 
+	@Test
 	public void testInjectVarKeepEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		final HashMap<String, String> vars = new HashMap<>();
@@ -64,16 +70,18 @@ public class ParametersTest extends TestCase {
 		vars.put("var2", "value2");
 		p.injectVariables(vars, false);
 
-		Assert.assertEquals("-a value1 value2 -b -c", p.toString());
+		assertEquals("-a value1 value2 -b -c", p.toString());
 	}
 
+	@Test
 	public void testRemoveVarsKeepEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		p.removeVariables(false);
 
-		Assert.assertEquals("-a -b -c", p.toString());
+		assertEquals("-a -b -c", p.toString());
 	}
 
+	@Test
 	public void testInjectVarRemoveEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		final HashMap<String, String> vars = new HashMap<>();
@@ -81,31 +89,33 @@ public class ParametersTest extends TestCase {
 		vars.put("var2", "value2");
 		p.injectVariables(vars, true);
 
-		Assert.assertEquals("-a value1 value2 -c", p.toString());
+		assertEquals("-a value1 value2 -c", p.toString());
 	}
 
+	@Test
 	public void testRemoveVarsRemoveEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		p.removeVariables(true);
-		Assert.assertEquals("-c", p.toString());
+		assertEquals("-c", p.toString());
 	}
 
+	@Test
 	public void testInjectParamsAroundVariable() throws IOException {
 		Parameters p = new Parameters("-before <%myvar%> -after");
 
 		p.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		Assert.assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -after", p.toString());
+		assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -after", p.toString());
 
 		p = new Parameters("-before <%myvar%> <%myvar%> -after");
 		p.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
-		Assert.assertEquals(
+		assertEquals(
 		        "-before -addedbefore 1 <%myvar%> -addedafter 2 -addedbefore 1 <%myvar%> -addedafter 2 -after", p
 		                .toString());
 
 		p = new Parameters("-before <%myvar1%> <%myvar2%> -after");
 		p.injectParamsAroundVariable("myvar1", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
 		p.injectParamsAroundVariable("myvar2", Arrays.asList("-addedbefore", "3"), Arrays.asList("-addedafter", "4"));
-		Assert.assertEquals(
+		assertEquals(
 		        "-before -addedbefore 1 <%myvar1%> -addedafter 2 -addedbefore 3 <%myvar2%> -addedafter 4 -after", p
 		                .toString());
 	}

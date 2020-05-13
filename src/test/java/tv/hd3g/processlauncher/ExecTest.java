@@ -16,18 +16,25 @@
  */
 package tv.hd3g.processlauncher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.tool.ExecutableTool;
 
-public class ExecTest extends TestCase {
+public class ExecTest {
 
 	private final String execName;
 	private final ExecutableFinder executableFinder;
@@ -37,32 +44,37 @@ public class ExecTest extends TestCase {
 		executableFinder = new ExecutableFinder();
 	}
 
+	@Test
 	public void testGetVarsToInject() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
-		Assert.assertNotNull(exec.getVarsToInject());
-		Assert.assertEquals(0, exec.getVarsToInject().size());
+		assertNotNull(exec.getVarsToInject());
+		assertEquals(0, exec.getVarsToInject().size());
 	}
 
+	@Test
 	public void testIsRemoveParamsIfNoVarToInject() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
-		Assert.assertFalse(exec.isRemoveParamsIfNoVarToInject());
+		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 	}
 
+	@Test
 	public void testSetRemoveParamsIfNoVarToInject() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
-		Assert.assertFalse(exec.isRemoveParamsIfNoVarToInject());
+		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 		exec.setRemoveParamsIfNoVarToInject(true);
-		Assert.assertTrue(exec.isRemoveParamsIfNoVarToInject());
+		assertTrue(exec.isRemoveParamsIfNoVarToInject());
 		exec.setRemoveParamsIfNoVarToInject(false);
-		Assert.assertFalse(exec.isRemoveParamsIfNoVarToInject());
+		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 	}
 
+	@Test
 	public void testGetParameters() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
-		Assert.assertNotNull(exec.getParameters());
-		Assert.assertTrue(exec.getParameters().getParameters().isEmpty());
+		assertNotNull(exec.getParameters());
+		assertTrue(exec.getParameters().getParameters().isEmpty());
 	}
 
+	@Test
 	public void testGetParametersViaExecutableTool() throws FileNotFoundException {
 		final Parameters parameters = new Parameters("-p");
 		final Exec exec = new Exec(new ExecutableTool() {
@@ -79,18 +91,20 @@ public class ExecTest extends TestCase {
 
 		}, executableFinder);
 
-		Assert.assertNotNull(exec.getParameters());
-		Assert.assertEquals(parameters, exec.getParameters());
-		Assert.assertEquals(1, exec.getParameters().getParameters().size());
+		assertNotNull(exec.getParameters());
+		assertEquals(parameters, exec.getParameters());
+		assertEquals(1, exec.getParameters().getParameters().size());
 	}
 
+	@Test
 	public void testGetReadyToRunParameters() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
-		Assert.assertNotNull(exec.getReadyToRunParameters());
-		Assert.assertTrue(exec.getReadyToRunParameters().getParameters().isEmpty());
-		Assert.assertNotSame(exec.getReadyToRunParameters(), exec.getParameters());
+		assertNotNull(exec.getReadyToRunParameters());
+		assertTrue(exec.getReadyToRunParameters().getParameters().isEmpty());
+		assertNotSame(exec.getReadyToRunParameters(), exec.getParameters());
 	}
 
+	@Test
 	public void testRunWaitGetText() throws IOException {
 		final Exec exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("-version");
@@ -101,14 +115,14 @@ public class ExecTest extends TestCase {
 		};
 
 		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = exec.runWaitGetText(beforeRun);
-		Assert.assertEquals(1, callBack.size());
-		Assert.assertNotNull(callBack.poll());
+		assertEquals(1, callBack.size());
+		assertNotNull(callBack.poll());
 
-		Assert.assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> {
-			return line.contains("version");
-		}));
+		assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> line.contains(
+		        "version")));
 	}
 
+	@Test
 	public void testRunWaitGetTextViaExecutableTool() throws IOException {
 		final LinkedBlockingQueue<ProcesslauncherBuilder> callBack1 = new LinkedBlockingQueue<>();
 		final LinkedBlockingQueue<Class<?>> orderCallback = new LinkedBlockingQueue<>();
@@ -141,38 +155,42 @@ public class ExecTest extends TestCase {
 
 		exec.runWaitGetText(beforeRun);
 
-		Assert.assertEquals(1, callBack1.size());
-		Assert.assertEquals(1, callBack2.size());
-		Assert.assertEquals(callBack1.poll(), callBack2.poll());
+		assertEquals(1, callBack1.size());
+		assertEquals(1, callBack2.size());
+		assertEquals(callBack1.poll(), callBack2.poll());
 
-		Assert.assertEquals(2, orderCallback.size());
-		Assert.assertEquals(ExecutableTool.class, orderCallback.poll());
-		Assert.assertEquals(ExecTest.class, orderCallback.poll());
+		assertEquals(2, orderCallback.size());
+		assertEquals(ExecutableTool.class, orderCallback.poll());
+		assertEquals(ExecTest.class, orderCallback.poll());
 	}
 
+	@Test
 	public void testRunCatchVerbosedError() throws IOException {
 		final Exec exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("a");
 
 		try {
 			exec.runWaitGetText();
-			Assert.fail("Not thown an InvalidExecution");
+			Assertions.fail("Not thown an InvalidExecution");
 		} catch (final InvalidExecution e) {
 			final String stdErr = e.getStdErr();
-			Assert.assertTrue(stdErr.contains("ClassNotFoundException"));
+			assertTrue(stdErr.contains("ClassNotFoundException"));
 		}
 	}
 
+	@Test
 	public void testGetExecutableName() throws FileNotFoundException {
-		Assert.assertEquals(execName, new Exec(execName, executableFinder).getExecutableName());
+		assertEquals(execName, new Exec(execName, executableFinder).getExecutableName());
 	}
 
+	@Test
 	public void testGetExecutableFinder() throws FileNotFoundException {
-		Assert.assertEquals(executableFinder, new Exec(execName, executableFinder).getExecutableFinder());
+		assertEquals(executableFinder, new Exec(execName, executableFinder).getExecutableFinder());
 	}
 
+	@Test
 	public void testGetExecutableFile() throws FileNotFoundException {
-		Assert.assertEquals(executableFinder.get(execName), new Exec(execName, executableFinder).getExecutableFile());
+		assertEquals(executableFinder.get(execName), new Exec(execName, executableFinder).getExecutableFile());
 	}
 
 }
