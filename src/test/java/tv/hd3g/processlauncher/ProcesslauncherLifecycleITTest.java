@@ -338,7 +338,8 @@ public class ProcesslauncherLifecycleITTest {
 
 		final ProcesslauncherLifecycle result = ept.start();
 		result.getStdInInjection().println(DemoExecStdinInjection.QUIT);
-		result.waitForEnd();
+		result.waitForEnd().checkExecution();
+		Thread.sleep(10);// NOSONAR
 		assertTrue(result.isCorrectlyDone());
 	}
 

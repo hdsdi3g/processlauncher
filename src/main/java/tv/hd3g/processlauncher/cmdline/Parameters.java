@@ -74,11 +74,11 @@ public class Parameters extends SimpleParameters {
 	public Parameters setVarTags(final String startVarTag, final String endVarTag) {
 		this.startVarTag = Objects.requireNonNull(startVarTag, "\"startVarTag\" can't to be null");
 		if (startVarTag.isEmpty()) {
-			throw new NullPointerException("\"startVarTag\" can't to be empty");
+			throw new IllegalArgumentException("\"startVarTag\" can't to be empty");
 		}
 		this.endVarTag = Objects.requireNonNull(endVarTag, "\"endVarTag\" can't to be null");
 		if (endVarTag.isEmpty()) {
-			throw new NullPointerException("\"endVarTag\" can't to be empty");
+			throw new IllegalArgumentException("\"endVarTag\" can't to be empty");
 		}
 		return this;
 	}
