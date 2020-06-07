@@ -32,7 +32,7 @@ import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.tool.ToolRunner.RunningTool;
 
-public class ToolRunTest {
+class ToolRunTest {
 
 	private final String execName;
 	private final ExecutableFinder executableFinder;
@@ -66,7 +66,7 @@ public class ToolRunTest {
 	}
 
 	@Test
-	public void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
+	void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
 		final ToolRunner toolRun = new ToolRunner(executableFinder);
 
 		final ExecutableTool executableTool = makeExecutableTool();

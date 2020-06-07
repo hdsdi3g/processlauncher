@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ParameterArgTest {
+class ParameterArgTest {
 
 	private ParameterArg pArg;
 
@@ -36,17 +36,17 @@ public class ParameterArgTest {
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		assertEquals("abc", pArg.toString());
 	}
 
 	@Test
-	public void testIsInQuotes() {
+	void testIsInQuotes() {
 		assertTrue(pArg.isInQuotes());
 	}
 
 	@Test
-	public void testIsEmpty() {
+	void testIsEmpty() {
 		assertFalse(pArg.isEmpty());
 	}
 }

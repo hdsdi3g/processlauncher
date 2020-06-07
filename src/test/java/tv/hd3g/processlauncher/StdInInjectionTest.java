@@ -25,10 +25,10 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class StdInInjectionTest {
+class StdInInjectionTest {
 
 	@Test
-	public void testInject() throws IOException {
+	void testInject() throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		final StdInInjection sii = new StdInInjection(baos);

@@ -31,10 +31,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class CaptureStandardOutputTextTest {
+class CaptureStandardOutputTextTest {
 
 	@Test
-	public void test() throws InterruptedException {
+	void test() throws InterruptedException {
 		final List<LineEntry> capturedlines = new ArrayList<>();
 
 		final CountDownLatch cdl = new CountDownLatch(2);

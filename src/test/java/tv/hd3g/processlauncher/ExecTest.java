@@ -34,31 +34,31 @@ import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.tool.ExecutableTool;
 
-public class ExecTest {
+class ExecTest {
 
 	private final String execName;
 	private final ExecutableFinder executableFinder;
 
-	public ExecTest() {
+	ExecTest() {
 		execName = "java";
 		executableFinder = new ExecutableFinder();
 	}
 
 	@Test
-	public void testGetVarsToInject() throws FileNotFoundException {
+	void testGetVarsToInject() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
 		assertNotNull(exec.getVarsToInject());
 		assertEquals(0, exec.getVarsToInject().size());
 	}
 
 	@Test
-	public void testIsRemoveParamsIfNoVarToInject() throws FileNotFoundException {
+	void testIsRemoveParamsIfNoVarToInject() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
 		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 	}
 
 	@Test
-	public void testSetRemoveParamsIfNoVarToInject() throws FileNotFoundException {
+	void testSetRemoveParamsIfNoVarToInject() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
 		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 		exec.setRemoveParamsIfNoVarToInject(true);
@@ -68,14 +68,14 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testGetParameters() throws FileNotFoundException {
+	void testGetParameters() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
 		assertNotNull(exec.getParameters());
 		assertTrue(exec.getParameters().getParameters().isEmpty());
 	}
 
 	@Test
-	public void testGetParametersViaExecutableTool() throws FileNotFoundException {
+	void testGetParametersViaExecutableTool() throws FileNotFoundException {
 		final Parameters parameters = new Parameters("-p");
 		final Exec exec = new Exec(new ExecutableTool() {
 
@@ -97,7 +97,7 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testGetReadyToRunParameters() throws FileNotFoundException {
+	void testGetReadyToRunParameters() throws FileNotFoundException {
 		final Exec exec = new Exec(execName, executableFinder);
 		assertNotNull(exec.getReadyToRunParameters());
 		assertTrue(exec.getReadyToRunParameters().getParameters().isEmpty());
@@ -105,7 +105,7 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testRunWaitGetText() throws IOException {
+	void testRunWaitGetText() throws IOException {
 		final Exec exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("-version");
 
@@ -123,7 +123,7 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testRunWaitGetTextViaExecutableTool() throws IOException {
+	void testRunWaitGetTextViaExecutableTool() throws IOException {
 		final LinkedBlockingQueue<ProcesslauncherBuilder> callBack1 = new LinkedBlockingQueue<>();
 		final LinkedBlockingQueue<Class<?>> orderCallback = new LinkedBlockingQueue<>();
 
@@ -165,7 +165,7 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testRunCatchVerbosedError() throws IOException {
+	void testRunCatchVerbosedError() throws IOException {
 		final Exec exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("a");
 
@@ -179,17 +179,17 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testGetExecutableName() throws FileNotFoundException {
+	void testGetExecutableName() throws FileNotFoundException {
 		assertEquals(execName, new Exec(execName, executableFinder).getExecutableName());
 	}
 
 	@Test
-	public void testGetExecutableFinder() throws FileNotFoundException {
+	void testGetExecutableFinder() throws FileNotFoundException {
 		assertEquals(executableFinder, new Exec(execName, executableFinder).getExecutableFinder());
 	}
 
 	@Test
-	public void testGetExecutableFile() throws FileNotFoundException {
+	void testGetExecutableFile() throws FileNotFoundException {
 		assertEquals(executableFinder.get(execName), new Exec(execName, executableFinder).getExecutableFile());
 	}
 

@@ -18,6 +18,7 @@ package tv.hd3g.processlauncher.cmdline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,10 +30,10 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-public class SimpleParametersTest {
+class SimpleParametersTest {
 
 	@Test
-	public void testParams() {
+	void testParams() {
 		final String testChaoticLine = "-aa 1  -single --cc 3 -U  \"dsfdsf sdf s  -e foo\" -g 2 42 -f=f -h=i;j,k:l -m Ah! -l \"u \" m ";
 
 		SimpleParameters pu = new SimpleParameters(testChaoticLine);
@@ -136,7 +137,7 @@ public class SimpleParametersTest {
 	}
 
 	@Test
-	public void testParamStyleChange() {
+	void testParamStyleChange() {
 		final SimpleParameters pu = new SimpleParameters("-a 1 /b 2").setParametersKeysStartsWith("/");
 		assertEquals("/", pu.getParametersKeysStartsWith());
 
@@ -151,24 +152,24 @@ public class SimpleParametersTest {
 	}
 
 	@Test
-	public void testTransfert() {
+	void testTransfert() {
 		final SimpleParameters pu1 = new SimpleParameters("!ok1").setParametersKeysStartsWith("!");
 		final SimpleParameters pu2 = new SimpleParameters("-ok2");
 
 		pu1.transfertThisConfigurationTo(pu2);
 		assertEquals("!", pu2.getParametersKeysStartsWith());
-		assertFalse(pu1.toString().equals(pu2.toString()));
+		assertNotEquals(pu1.toString(), pu2.toString());
 
 		pu1.setParametersKeysStartsWith("$");
 		assertEquals("!", pu2.getParametersKeysStartsWith());
 
 		pu2.importParametersFrom(pu1);
-		assertTrue(pu1.toString().equals(pu2.toString()));
+		assertEquals(pu1.toString(), pu2.toString());
 		assertEquals("$", pu2.getParametersKeysStartsWith());
 	}
 
 	@Test
-	public void testPrepend() {
+	void testPrepend() {
 		final SimpleParameters pu = new SimpleParameters("-3 -4");
 		pu.prependBulkParameters("-1 -2");
 
@@ -189,7 +190,7 @@ public class SimpleParametersTest {
 	}
 
 	@Test
-	public void testHasParameters() {
+	void testHasParameters() {
 		final SimpleParameters pu = new SimpleParameters("-a -b");
 		assertTrue(pu.hasParameters("-a", "-b", "-z"));
 		assertTrue(pu.hasParameters("-a"));
@@ -199,7 +200,7 @@ public class SimpleParametersTest {
 	}
 
 	@Test
-	public void testIfHasNotParameter() {
+	void testIfHasNotParameter() {
 		final SimpleParameters pu = new SimpleParameters("-a -b");
 		final AtomicInteger count = new AtomicInteger(0);
 		pu.ifHasNotParameter(() -> {

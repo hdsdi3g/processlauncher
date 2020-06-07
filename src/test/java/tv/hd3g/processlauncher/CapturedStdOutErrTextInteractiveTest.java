@@ -26,10 +26,10 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class CapturedStdOutErrTextInteractiveTest {
+class CapturedStdOutErrTextInteractiveTest {
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
 		Mockito.when(source.isRunning()).thenReturn(true);
 

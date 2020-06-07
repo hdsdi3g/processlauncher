@@ -33,7 +33,7 @@ import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.demo.DemoExecEmpty;
 
-public class ProcesslauncherLifecycleTest {
+class ProcesslauncherLifecycleTest {
 
 	private final long beforeStartDate;
 	private final long afterEndDate;
@@ -41,7 +41,7 @@ public class ProcesslauncherLifecycleTest {
 	private final ProcesslauncherBuilder processlauncherBuilder;
 	private final ProcesslauncherLifecycle p;
 
-	public ProcesslauncherLifecycleTest() throws IOException {
+	ProcesslauncherLifecycleTest() throws IOException {
 		beforeStartDate = System.currentTimeMillis() - 100;
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class
 		        .getName());
@@ -53,7 +53,7 @@ public class ProcesslauncherLifecycleTest {
 	}
 
 	@Test
-	public void testStatues() {
+	void testStatues() {
 		assertEquals(launcher, p.getLauncher());
 		assertNotNull(p.getProcess());
 		assertFalse(p.getProcess().isAlive());

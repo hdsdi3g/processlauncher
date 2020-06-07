@@ -21,44 +21,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class ExecutableFinderTest {
+import tv.hd3g.processlauncher.Tool;
 
-	/**
-	 * During some maven operation, on Linux, executable state can be drop.
-	 */
-	public static void patchTestExec() {
-		if (File.separator.equals("\\")) {
-			/**
-			 * Test is running on windows, cancel this patch.
-			 */
-			return;
-		}
-		Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator)).map(File::new).filter(
-		        ExecutableFinder.isValidDirectory).flatMap(dir -> Arrays.stream(dir.listFiles())).filter(
-		                subFile -> (subFile.isFile() && subFile.canExecute() == false && subFile.getName().equals(
-		                        "test-exec"))).findFirst().ifPresent(f -> {
-			                        System.out.println(f.getAbsolutePath()
-			                                           + " has not the executable bit, set it now.");
-			                        f.setExecutable(true);
-		                        });
-	}
+class ExecutableFinderTest {
 
-	public ExecutableFinderTest() {
-		ExecutableFinderTest.patchTestExec();
+	ExecutableFinderTest() {
+		Tool.patchTestExec();
 	}
 
 	@Test
-	public void testPreCheck() throws IOException {
+	void testPreCheck() throws IOException {
 		assertEquals("\\", "/".replaceAll("/", "\\\\"));
 		assertEquals("/", "\\".replaceAll("\\\\", "/"));
 	}
 
 	@Test
-	public void test() throws IOException {
+	void test() throws IOException {
 		final ExecutableFinder ef = new ExecutableFinder();
 
 		assertTrue(ef.getFullPath().contains(new File(System.getProperty("user.dir"))));
@@ -72,7 +53,7 @@ public class ExecutableFinderTest {
 	}
 
 	@Test
-	public void testRegisterExecutable() throws IOException {
+	void testRegisterExecutable() throws IOException {
 		ExecutableFinder ef = new ExecutableFinder();
 
 		final File element = ef.get("test-exec");

@@ -28,7 +28,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class ProcesslauncherTest {
+class ProcesslauncherTest {
 
 	private final List<ExecutionCallbacker> executionCallbackers;
 	private final ExecutionTimeLimiter executionTimeLimiter;
@@ -40,7 +40,7 @@ public class ProcesslauncherTest {
 
 	private final Processlauncher pl;
 
-	public ProcesslauncherTest() {
+	ProcesslauncherTest() {
 		executionCallbackers = new ArrayList<>();
 		executionTimeLimiter = Mockito.mock(ExecutionTimeLimiter.class);
 		captureStandardOutput = Mockito.mock(CaptureStandardOutput.class);
@@ -61,52 +61,52 @@ public class ProcesslauncherTest {
 	}
 
 	@Test
-	public void testGetExecutionCallbackers() {
+	void testGetExecutionCallbackers() {
 		assertTrue(CollectionUtils.isEqualCollection(executionCallbackers, pl.getExecutionCallbackers()));
 	}
 
 	@Test
-	public void testGetExecutionTimeLimiter() {
+	void testGetExecutionTimeLimiter() {
 		assertEquals(executionTimeLimiter, pl.getExecutionTimeLimiter().get());
 	}
 
 	@Test
-	public void testGetCaptureStandardOutput() {
+	void testGetCaptureStandardOutput() {
 		assertEquals(captureStandardOutput, pl.getCaptureStandardOutput().get());
 	}
 
 	@Test
-	public void testGetExternalProcessStartup() {
+	void testGetExternalProcessStartup() {
 		assertEquals(externalProcessStartup, pl.getExternalProcessStartup().get());
 	}
 
 	@Test
-	public void testIsExecCodeMustBeZero() {
+	void testIsExecCodeMustBeZero() {
 		assertFalse(pl.isExecCodeMustBeZero());
 	}
 
 	@Test
-	public void testGetProcessBuilder() {
+	void testGetProcessBuilder() {
 		assertEquals(processBuilder, pl.getProcessBuilder());
 	}
 
 	@Test
-	public void testGetFullCommandLine() {
+	void testGetFullCommandLine() {
 		assertEquals(fullCommandLine, pl.getFullCommandLine());
 	}
 
 	@Test
-	public void testGetProcesslauncherBuilder() {
+	void testGetProcesslauncherBuilder() {
 		assertEquals(processlauncherBuilder, pl.getProcesslauncherBuilder());
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		assertEquals(fullCommandLine, pl.toString());
 	}
 
 	@Test
-	public void testGetExecutableName() {
+	void testGetExecutableName() {
 		assertEquals(processlauncherBuilder.getExecutableName(), pl.getExecutableName());
 	}
 

@@ -27,10 +27,10 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 
-public class ParametersTest {
+class ParametersTest {
 
 	@Test
-	public void test() {
+	void test() {
 		Parameters clp = new Parameters();
 
 		assertEquals("<%", clp.getStartVarTag());
@@ -63,7 +63,7 @@ public class ParametersTest {
 	}
 
 	@Test
-	public void testInjectVarKeepEmptyParam() {
+	void testInjectVarKeepEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		final HashMap<String, String> vars = new HashMap<>();
 		vars.put("var1", "value1");
@@ -74,7 +74,7 @@ public class ParametersTest {
 	}
 
 	@Test
-	public void testRemoveVarsKeepEmptyParam() {
+	void testRemoveVarsKeepEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		p.removeVariables(false);
 
@@ -82,7 +82,7 @@ public class ParametersTest {
 	}
 
 	@Test
-	public void testInjectVarRemoveEmptyParam() {
+	void testInjectVarRemoveEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		final HashMap<String, String> vars = new HashMap<>();
 		vars.put("var1", "value1");
@@ -93,14 +93,14 @@ public class ParametersTest {
 	}
 
 	@Test
-	public void testRemoveVarsRemoveEmptyParam() {
+	void testRemoveVarsRemoveEmptyParam() {
 		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		p.removeVariables(true);
 		assertEquals("-c", p.toString());
 	}
 
 	@Test
-	public void testInjectParamsAroundVariable() throws IOException {
+	void testInjectParamsAroundVariable() throws IOException {
 		Parameters p = new Parameters("-before <%myvar%> -after");
 
 		p.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));

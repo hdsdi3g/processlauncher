@@ -29,12 +29,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class CapturedStdOutErrToPrintStreamTest {
+class CapturedStdOutErrToPrintStreamTest {
 
 	private static final String execName = "launchedexec";
 	private final Processlauncher launcher;
 
-	public CapturedStdOutErrToPrintStreamTest() {
+	CapturedStdOutErrToPrintStreamTest() {
 		launcher = Mockito.mock(Processlauncher.class);
 		Mockito.when(launcher.getExecutableName()).thenReturn(execName);
 	}
@@ -61,19 +61,19 @@ public class CapturedStdOutErrToPrintStreamTest {
 	}
 
 	@Test
-	public void testGetFilter() {
+	void testGetFilter() {
 		assertTrue(capture.getFilter().isEmpty());
 	}
 
 	@Test
-	public void testSetFilter() {
+	void testSetFilter() {
 		final Predicate<LineEntry> filter = l -> true;
 		capture.setFilter(filter);
 		assertEquals(filter, capture.getFilter().get());
 	}
 
 	@Test
-	public void testOnFilteredText() {
+	void testOnFilteredText() {
 		capture.setFilter(l -> l.isStdErr() == false);
 		capture.onText(new LineEntry(System.currentTimeMillis(), "content", true, source));
 		assertEquals(0, outStreamContent.size());
@@ -81,7 +81,7 @@ public class CapturedStdOutErrToPrintStreamTest {
 	}
 
 	@Test
-	public void testOnProcessCloseStreamExecOk() {
+	void testOnProcessCloseStreamExecOk() {
 		Mockito.when(source.isCorrectlyDone()).thenReturn(true);
 		Mockito.when(source.getEndStatus()).thenReturn(EndStatus.CORRECTLY_DONE);
 		Mockito.when(source.getExitCode()).thenReturn(0);

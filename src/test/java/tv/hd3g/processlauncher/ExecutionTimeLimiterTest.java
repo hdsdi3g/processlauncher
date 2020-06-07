@@ -34,10 +34,10 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class ExecutionTimeLimiterTest {
+class ExecutionTimeLimiterTest {
 
 	@Test
-	public void test() {
+	void test() {
 
 		final FakesScheduledExecutorService fakeSES = new FakesScheduledExecutorService();
 		final ExecutionTimeLimiter etl = new ExecutionTimeLimiter(1, TimeUnit.SECONDS, fakeSES);

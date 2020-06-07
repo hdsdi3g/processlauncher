@@ -51,7 +51,7 @@ import tv.hd3g.processlauncher.demo.DemoExecStdinInjection;
 import tv.hd3g.processlauncher.demo.DemoExecSubProcess;
 import tv.hd3g.processlauncher.demo.DemoExecWorkingdir;
 
-public class ProcesslauncherLifecycleITTest {
+public class ProcesslauncherLifecycleITTest {// NOSONAR
 
 	private static Logger log = LogManager.getLogger();
 	private final ExecutableFinder executableFinder;
@@ -81,7 +81,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testSimpleExec() throws IOException {
+	void testSimpleExec() throws IOException {
 		final ProcesslauncherLifecycle result = captureTextAndStart(prepareBuilder(DemoExecSimple.class)).waitForEnd();
 		assertEquals(DemoExecSimple.expected, textRetention.getStdouterr(true, ""));
 		assertEquals(0, (int) result.getExitCode());
@@ -89,7 +89,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testWorkingDirectory() throws IOException, InterruptedException, ExecutionException {
+	void testWorkingDirectory() throws IOException, InterruptedException, ExecutionException {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecWorkingdir.class);
 		final File wd = new File(System.getProperty("user.dir")).getCanonicalFile();
 		ept.setWorkingDirectory(wd);
@@ -104,7 +104,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testExecutionCallback() throws Exception {
+	void testExecutionCallback() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecSimple.class);
 
 		final LinkedBlockingQueue<ProcesslauncherLifecycle> onEndExecutions = new LinkedBlockingQueue<>();
@@ -130,7 +130,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testResultValues() throws Exception {
+	void testResultValues() throws Exception {
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecIOText.class
 		        .getName());
 		parameters.addParameters(DemoExecIOText.expectedIn);
@@ -151,7 +151,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testMaxExecTime() throws Exception {
+	void testMaxExecTime() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecLongSleep.class);
 
 		ept.setExecutionTimeLimiter(DemoExecLongSleep.MAX_DURATION, TimeUnit.MILLISECONDS, scheduledThreadPool);
@@ -172,7 +172,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testKill() throws Exception {
+	void testKill() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecLongSleep.class);
 
 		final long startTime = System.currentTimeMillis();
@@ -197,7 +197,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testKillSubProcess() throws Exception {
+	void testKillSubProcess() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecSubProcess.class);
 
 		final long startTime = System.currentTimeMillis();
@@ -231,7 +231,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testTimesAndProcessProps() throws Exception {
+	void testTimesAndProcessProps() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecSubProcess.class);
 
 		ept.setExecutionTimeLimiter(DemoExecLongSleep.MAX_DURATION, TimeUnit.MILLISECONDS, scheduledThreadPool);
@@ -244,7 +244,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testInteractiveHandler() throws Exception {
+	void testInteractiveHandler() throws Exception {
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"),
 		        DemoExecInteractive.class.getName());
 		parameters.addParameters("foo");
@@ -294,18 +294,18 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testWaitForEnd() throws Exception {
+	void testWaitForEnd() throws Exception {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecShortSleep.class);
 		assertTrue(ept.start().waitForEnd(500, TimeUnit.MILLISECONDS).isCorrectlyDone());
 	}
 
 	@Test
-	public void testToString() throws IOException {
+	void testToString() throws IOException {
 		assertNotNull(prepareBuilder(DemoExecSimple.class).start().toString());
 	}
 
 	@Test
-	public void testCheckExecutionOk() throws InterruptedException, ExecutionException, IOException {
+	void testCheckExecutionOk() throws InterruptedException, ExecutionException, IOException {
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"),
 		        DemoExecExitCode.class.getName());
 		parameters.addParameters("0");
@@ -316,7 +316,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testCheckExecutionError() throws InterruptedException, ExecutionException, IOException {
+	void testCheckExecutionError() throws InterruptedException, ExecutionException, IOException {
 		final Parameters parameters = new Parameters("-cp", System.getProperty("java.class.path"),
 		        DemoExecExitCode.class.getName());
 		parameters.addParameters("1");
@@ -332,7 +332,7 @@ public class ProcesslauncherLifecycleITTest {
 	}
 
 	@Test
-	public void testStdInInjection() throws IOException, InterruptedException, ExecutionException {
+	void testStdInInjection() throws IOException, InterruptedException, ExecutionException {
 		final ProcesslauncherBuilder ept = prepareBuilder(DemoExecStdinInjection.class);
 		ept.setExecutionTimeLimiter(500, TimeUnit.MILLISECONDS, scheduledThreadPool);
 

@@ -24,14 +24,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class LineEntryTest {
+class LineEntryTest {
 
 	private final long date;
 	private final String line;
 	private final boolean stdErr;
 	private final ProcesslauncherLifecycle source;
 
-	public LineEntryTest() {
+	LineEntryTest() {
 		line = "This is a test";
 		stdErr = true;
 		date = System.currentTimeMillis();
@@ -43,37 +43,37 @@ public class LineEntryTest {
 	private LineEntry lineEntry;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		lineEntry = new LineEntry(date, line, stdErr, source);
 	}
 
 	@Test
-	public void testGetTimeAgo() {
+	void testGetTimeAgo() {
 		assertEquals(10000L, lineEntry.getTimeAgo());
 	}
 
 	@Test
-	public void testGetDate() {
+	void testGetDate() {
 		assertEquals(date, lineEntry.getDate());
 	}
 
 	@Test
-	public void testGetLine() {
+	void testGetLine() {
 		assertEquals(line, lineEntry.getLine());
 	}
 
 	@Test
-	public void testGetSource() {
+	void testGetSource() {
 		assertEquals(source, lineEntry.getSource());
 	}
 
 	@Test
-	public void testIsStdErr() {
+	void testIsStdErr() {
 		assertEquals(stdErr, lineEntry.isStdErr());
 	}
 
 	@Test
-	public void testCanUseThis() {
+	void testCanUseThis() {
 		assertFalse(lineEntry.canUseThis(CapturedStreams.ONLY_STDOUT));
 		assertTrue(lineEntry.canUseThis(CapturedStreams.ONLY_STDERR));
 		assertTrue(lineEntry.canUseThis(CapturedStreams.BOTH_STDOUT_STDERR));

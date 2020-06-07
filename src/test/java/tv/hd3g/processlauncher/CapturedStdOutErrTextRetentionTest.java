@@ -27,12 +27,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class CapturedStdOutErrTextRetentionTest {
+class CapturedStdOutErrTextRetentionTest {
 
 	private final ProcesslauncherLifecycle source;
 	private final CapturedStdOutErrTextRetention capText;
 
-	public CapturedStdOutErrTextRetentionTest() {
+	CapturedStdOutErrTextRetentionTest() {
 		source = Mockito.mock(ProcesslauncherLifecycle.class);
 		capText = new CapturedStdOutErrTextRetention();
 		capText.onText(createLineEntry("Out 0", false));
@@ -50,7 +50,7 @@ public class CapturedStdOutErrTextRetentionTest {
 	}
 
 	@Test
-	public void testGetStdoutLines() {
+	void testGetStdoutLines() {
 		List<String> lines = Arrays.asList("Out 0", "Out 1", "", "Out 3");
 		assertTrue(CollectionUtils.isEqualCollection(lines, capText.getStdoutLines(true).collect(Collectors
 		        .toList())));
@@ -61,7 +61,7 @@ public class CapturedStdOutErrTextRetentionTest {
 	}
 
 	@Test
-	public void testGetStderrLines() {
+	void testGetStderrLines() {
 		List<String> lines = Arrays.asList("Err 0", "Err 1", "", "Err 3");
 		assertTrue(CollectionUtils.isEqualCollection(lines, capText.getStderrLines(true).collect(Collectors
 		        .toList())));
@@ -72,7 +72,7 @@ public class CapturedStdOutErrTextRetentionTest {
 	}
 
 	@Test
-	public void testGetStdouterrLines() {
+	void testGetStdouterrLines() {
 		List<String> lines = Arrays.asList("Out 0", "Err 0", "Out 1", "Err 1", "", "", "Out 3", "Err 3");
 		assertTrue(CollectionUtils.isEqualCollection(lines, capText.getStdouterrLines(true).collect(Collectors
 		        .toList())));
@@ -83,19 +83,19 @@ public class CapturedStdOutErrTextRetentionTest {
 	}
 
 	@Test
-	public void testGetStdout() {
+	void testGetStdout() {
 		assertEquals("Out 0,Out 1,,Out 3", capText.getStdout(true, ","));
 		assertEquals("Out 0,Out 1,Out 3", capText.getStdout(false, ","));
 	}
 
 	@Test
-	public void testGetStderr() {
+	void testGetStderr() {
 		assertEquals("Err 0,Err 1,,Err 3", capText.getStderr(true, ","));
 		assertEquals("Err 0,Err 1,Err 3", capText.getStderr(false, ","));
 	}
 
 	@Test
-	public void testGetStdouterr() {
+	void testGetStdouterr() {
 		assertEquals("Out 0,Err 0,Out 1,Err 1,,,Out 3,Err 3", capText.getStdouterr(true, ","));
 		assertEquals("Out 0,Err 0,Out 1,Err 1,Out 3,Err 3", capText.getStdouterr(false, ","));
 	}
