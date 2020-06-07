@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class SimpleParameters {
+public class SimpleParameters {
 	private static final String LOG_ADD_PARAMETERS = "Add parameters: {}";
 
 	private static final String PARAMS_CAN_T_TO_BE_NULL = "\"params\" can't to be null";
