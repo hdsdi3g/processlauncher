@@ -36,6 +36,7 @@ import tv.hd3g.processlauncher.tool.ExecutableTool;
 public class Exec implements ExecutableTool {
 
 	private final String execName;
+	private final File execFile;
 	private final ExecutableFinder executableFinder;
 	private final Parameters parameters;
 	private final Map<String, String> varsToInject;
@@ -45,7 +46,7 @@ public class Exec implements ExecutableTool {
 	public Exec(final String execName, final ExecutableFinder executableFinder) throws FileNotFoundException {
 		this.execName = Objects.requireNonNull(execName, "\"execName\" can't to be null");
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
-		executableFinder.get(execName);
+		execFile = executableFinder.get(execName);
 		parameters = new Parameters();
 		varsToInject = new HashMap<>();
 		preBeforeRun = processBuilder -> {
@@ -55,7 +56,7 @@ public class Exec implements ExecutableTool {
 	public Exec(final ExecutableTool tool, final ExecutableFinder executableFinder) throws FileNotFoundException {
 		execName = Objects.requireNonNull(tool.getExecutableName(), "\"tool#getExecutableName\" can't to be null");
 		this.executableFinder = Objects.requireNonNull(executableFinder, "\"executableFinder\" can't to be null");
-		executableFinder.get(execName);
+		execFile = executableFinder.get(execName);
 		parameters = tool.getReadyToRunParameters();
 		varsToInject = new HashMap<>();
 		preBeforeRun = tool::beforeRun;
@@ -96,8 +97,8 @@ public class Exec implements ExecutableTool {
 		return executableFinder;
 	}
 
-	public File getExecutableFile() throws FileNotFoundException {
-		return executableFinder.get(execName);
+	public File getExecutableFile() {
+		return execFile;
 	}
 
 	/**
