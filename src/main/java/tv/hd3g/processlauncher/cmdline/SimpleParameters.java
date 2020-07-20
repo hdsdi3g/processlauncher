@@ -20,7 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -413,6 +416,109 @@ public class SimpleParameters {
 		}
 
 		return false;
+	}
+
+	public int count() {
+		return parameters.size();
+	}
+
+	public boolean isEmpty() {
+		return parameters.isEmpty();
+	}
+
+	public Map<String, List<String>> getAllArgKeyValues() {
+		final var result = new HashMap<String, List<String>>();
+		for (var pos = 0; pos < parameters.size(); pos++) {
+			final var actualArg = parameters.get(pos);
+			if (isParameterArgIsAParametersKey(actualArg) == false) {
+				continue;
+			}
+			final var values = result.computeIfAbsent(actualArg, a -> new ArrayList<>());
+			if (parameters.size() > pos + 1) {
+				final var nextArg = parameters.get(pos + 1);
+				if (isParameterArgIsAParametersKey(nextArg) == false) {
+					values.add(nextArg);
+					pos++;// NOSONAR S127
+				}
+			}
+		}
+
+		/**
+		 * Strongify to unmodifiable Lists / Map
+		 */
+		final var result2 = new HashMap<String, List<String>>(result.size());
+		result.forEach((k, v) -> result2.put(k, Collections.unmodifiableList(v)));
+		return Collections.unmodifiableMap(result2);
+	}
+
+	/**
+	 * @param argValueChoice policy to apply if some args keys a in common with actual and toCompare
+	 * @param removeActualMissing remove all current args not founded in toCompare args list
+	 * @param addComparedMissing add all args from toCompare args list for some not found in actual args list
+	 * @see getAllArgKeyValues()
+	 */
+	public void compareAndAlter(final SimpleParameters toCompare,
+	                            final ArgValueChoice argValueChoice) {
+		final var allCurrentArgsKeyValues = getAllArgKeyValues();
+		final var allComparedArgsKeyValues = toCompare.getAllArgKeyValues();
+
+		final var newParameters = new ArrayList<String>();
+		final var computedKeys = new HashSet<String>();
+
+		for (var pos = 0; pos < parameters.size(); pos++) {
+			final var actualArg = parameters.get(pos);
+			if (isParameterArgIsAParametersKey(actualArg) == false) {
+				newParameters.add(actualArg);
+				continue;
+			}
+
+			List<String> selectedValues = null;
+			if (computedKeys.contains(actualArg) == false) {
+				if (allComparedArgsKeyValues.containsKey(actualArg)) {
+					selectedValues = argValueChoice.choose(actualArg,
+					        allCurrentArgsKeyValues.get(actualArg),
+					        allComparedArgsKeyValues.get(actualArg));
+				} else if (argValueChoice.removeActualMissing() == false) {
+					selectedValues = allCurrentArgsKeyValues.get(actualArg);
+				}
+				computedKeys.add(actualArg);
+			}
+
+			if (selectedValues != null) {
+				if (selectedValues.isEmpty()) {
+					newParameters.add(actualArg);
+				} else {
+					selectedValues.forEach(v -> {
+						newParameters.add(actualArg);
+						newParameters.add(v);
+					});
+				}
+			}
+
+			if (parameters.size() > pos + 1 && isParameterArgIsAParametersKey(parameters.get(pos + 1)) == false) {
+				/**
+				 * Next arg is a regular value: this was previsouly added, skip to the next.
+				 */
+				pos++;// NOSONAR S127
+			}
+		}
+
+		if (argValueChoice.addComparedMissing()) {
+			allComparedArgsKeyValues.entrySet().stream()
+			        .filter(entry -> computedKeys.contains(entry.getKey()) == false)
+			        .forEach(entry -> {
+				        if (entry.getValue().isEmpty()) {
+					        newParameters.add(entry.getKey());
+				        } else {
+					        entry.getValue().forEach(v -> {
+						        newParameters.add(entry.getKey());
+						        newParameters.add(v);
+					        });
+				        }
+			        });
+		}
+
+		replaceParameters(newParameters);
 	}
 
 }

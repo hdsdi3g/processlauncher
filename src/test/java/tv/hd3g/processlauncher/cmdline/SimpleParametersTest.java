@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class SimpleParametersTest {
@@ -207,6 +208,154 @@ class SimpleParametersTest {
 			count.getAndIncrement();
 		}, "-z");
 		assertEquals(1, count.get());
+	}
+
+	@Test
+	void count() {
+		assertEquals(0, new SimpleParameters("").count());
+		assertEquals(1, new SimpleParameters("-a").count());
+		assertEquals(2, new SimpleParameters("-a b").count());
+	}
+
+	@Test
+	void isEmpty() {
+		assertTrue(new SimpleParameters("").isEmpty());
+		assertFalse(new SimpleParameters("-a").isEmpty());
+		assertFalse(new SimpleParameters("b").isEmpty());
+	}
+
+	@Test
+	void getAllArgKeyValues() {
+		final var result = new SimpleParameters("0 -a 1 -b 2 0 -c 3 -c 4 0 -d -e")
+		        .getAllArgKeyValues();
+
+		assertNotNull(result);
+		assertEquals(5, result.size());
+		assertEquals(List.of("1"), result.get("-a"));
+		assertEquals(List.of("2"), result.get("-b"));
+		assertEquals(List.of("3", "4"), result.get("-c"));
+		assertEquals(List.of(), result.get("-d"));
+		assertEquals(List.of(), result.get("-e"));
+	}
+
+	static class Chooser implements ArgValueChoice {
+		final List<String> result;
+
+		public Chooser(final List<String> result) {
+			this.result = result;
+		}
+
+		@Override
+		public List<String> choose(final String argKey,
+		                           final List<String> actualValues,
+		                           final List<String> comparedValues) {
+			return result;
+		}
+
+		@Override
+		public boolean addComparedMissing() {
+			return false;
+		}
+
+		@Override
+		public boolean removeActualMissing() {
+			return false;
+		}
+	}
+
+	static class ActualValuesChooser implements ArgValueChoice {
+		final boolean removeActualMissing;
+		final boolean addComparedMissing;
+
+		public ActualValuesChooser(final boolean removeActualMissing, final boolean addComparedMissing) {
+			this.removeActualMissing = removeActualMissing;
+			this.addComparedMissing = addComparedMissing;
+		}
+
+		@Override
+		public List<String> choose(final String argKey,
+		                           final List<String> actualValues,
+		                           final List<String> comparedValues) {
+			return actualValues;
+		}
+
+		@Override
+		public boolean addComparedMissing() {
+			return addComparedMissing;
+		}
+
+		@Override
+		public boolean removeActualMissing() {
+			return removeActualMissing;
+		}
+	}
+
+	@Nested
+	class CompareAndAlter {
+
+		@Test
+		void base() {
+			final var params = "-spcfiActl -cmnSimple -cmnArg 0 -cmnArgs 1 -cmnArgs 2 -cmnArgs 3 -spcfiActlArg 4 -spcfiActlArgs 5p 6";
+			final var compareParams = "-specificCompare -cmnSimple -cmnArg 7 -cmnArgs 8 -cmnArgs 9 -cmnArgs 10 -spcfiCompareArg 11 -spcfiCompareArgs 12p 13";
+			final var toCompare = new SimpleParameters(compareParams);
+
+			final var p = new SimpleParameters(params);
+			p.compareAndAlter(toCompare, new Chooser(List.of("é", "è")));
+			assertEquals(
+			        "-spcfiActl -cmnSimple é -cmnSimple è -cmnArg é -cmnArg è -cmnArgs é -cmnArgs è -spcfiActlArg 4 -spcfiActlArgs 5p 6",
+			        p.toString());
+
+			assertEquals(compareParams, toCompare.toString());
+		}
+
+		@Test
+		void emptyChooser() {
+			final var params = "-specificActual 0 -common 1 -common 11";
+			final var compareParams = "-specificCompared 2 -common 3 -common 33";
+			final var toCompare = new SimpleParameters(compareParams);
+
+			final var p = new SimpleParameters(params);
+			p.compareAndAlter(toCompare, new Chooser(List.of()));
+			assertEquals("-specificActual 0 -common", p.toString());
+			assertEquals(compareParams, toCompare.toString());
+		}
+
+		@Test
+		void nullChooser() {
+			final var params = "-specificActual 0 -common 1 -common 11";
+			final var compareParams = "-specificCompared 2 -common 3 -common 33";
+			final var toCompare = new SimpleParameters(compareParams);
+
+			final var p = new SimpleParameters(params);
+			p.compareAndAlter(toCompare, new Chooser(null));
+			assertEquals("-specificActual 0", p.toString());
+			assertEquals(compareParams, toCompare.toString());
+		}
+
+		@Test
+		void removeActualMissing() {
+			final var params = "-specificActual 0 -common 1 -common 11";
+			final var compareParams = "-specificCompared 2 -common 3 -common 33";
+			final var toCompare = new SimpleParameters(compareParams);
+
+			final var p = new SimpleParameters(params);
+			p.compareAndAlter(toCompare, new ActualValuesChooser(true, false));
+			assertEquals("-common 1 -common 11", p.toString());
+			assertEquals(compareParams, toCompare.toString());
+		}
+
+		@Test
+		void addComparedMissing() {
+			final var params = "-specificActual 0 -common 1 -common 11";
+			final var compareParams = "-specificCompared 2 -common 3 -common 33 -specificCompared 4";
+			final var toCompare = new SimpleParameters(compareParams);
+
+			final var p = new SimpleParameters(params);
+			p.compareAndAlter(toCompare, new ActualValuesChooser(false, true));
+			assertEquals("-specificActual 0 -common 1 -common 11 -specificCompared 2 -specificCompared 4", p
+			        .toString());
+			assertEquals(compareParams, toCompare.toString());
+		}
 	}
 
 }
