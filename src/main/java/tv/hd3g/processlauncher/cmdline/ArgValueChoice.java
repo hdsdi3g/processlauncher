@@ -16,12 +16,4 @@ public interface ArgValueChoice {
 	 */
 	List<String> choose(String argKey, List<String> actualValues, List<String> comparedValues);
 
-	default boolean removeActualMissing() {
-		return false;
-	}
-
-	default boolean addComparedMissing() {
-		return true;
-	}
-
 }

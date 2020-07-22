@@ -238,58 +238,6 @@ class SimpleParametersTest {
 		assertEquals(List.of(), result.get("-e"));
 	}
 
-	static class Chooser implements ArgValueChoice {
-		final List<String> result;
-
-		public Chooser(final List<String> result) {
-			this.result = result;
-		}
-
-		@Override
-		public List<String> choose(final String argKey,
-		                           final List<String> actualValues,
-		                           final List<String> comparedValues) {
-			return result;
-		}
-
-		@Override
-		public boolean addComparedMissing() {
-			return false;
-		}
-
-		@Override
-		public boolean removeActualMissing() {
-			return false;
-		}
-	}
-
-	static class ActualValuesChooser implements ArgValueChoice {
-		final boolean removeActualMissing;
-		final boolean addComparedMissing;
-
-		public ActualValuesChooser(final boolean removeActualMissing, final boolean addComparedMissing) {
-			this.removeActualMissing = removeActualMissing;
-			this.addComparedMissing = addComparedMissing;
-		}
-
-		@Override
-		public List<String> choose(final String argKey,
-		                           final List<String> actualValues,
-		                           final List<String> comparedValues) {
-			return actualValues;
-		}
-
-		@Override
-		public boolean addComparedMissing() {
-			return addComparedMissing;
-		}
-
-		@Override
-		public boolean removeActualMissing() {
-			return removeActualMissing;
-		}
-	}
-
 	@Nested
 	class CompareAndAlter {
 
@@ -300,7 +248,7 @@ class SimpleParametersTest {
 			final var toCompare = new SimpleParameters(compareParams);
 
 			final var p = new SimpleParameters(params);
-			p.compareAndAlter(toCompare, new Chooser(List.of("é", "è")));
+			p.compareAndAlter(toCompare, (ak, a, c) -> List.of("é", "è"), false, false);
 			assertEquals(
 			        "-spcfiActl -cmnSimple é -cmnSimple è -cmnArg é -cmnArg è -cmnArgs é -cmnArgs è -spcfiActlArg 4 -spcfiActlArgs 5p 6",
 			        p.toString());
@@ -315,7 +263,7 @@ class SimpleParametersTest {
 			final var toCompare = new SimpleParameters(compareParams);
 
 			final var p = new SimpleParameters(params);
-			p.compareAndAlter(toCompare, new Chooser(List.of()));
+			p.compareAndAlter(toCompare, (ak, a, c) -> List.of(), false, false);
 			assertEquals("-specificActual 0 -common", p.toString());
 			assertEquals(compareParams, toCompare.toString());
 		}
@@ -327,7 +275,7 @@ class SimpleParametersTest {
 			final var toCompare = new SimpleParameters(compareParams);
 
 			final var p = new SimpleParameters(params);
-			p.compareAndAlter(toCompare, new Chooser(null));
+			p.compareAndAlter(toCompare, (ak, a, c) -> null, false, false);
 			assertEquals("-specificActual 0", p.toString());
 			assertEquals(compareParams, toCompare.toString());
 		}
@@ -339,7 +287,7 @@ class SimpleParametersTest {
 			final var toCompare = new SimpleParameters(compareParams);
 
 			final var p = new SimpleParameters(params);
-			p.compareAndAlter(toCompare, new ActualValuesChooser(true, false));
+			p.compareAndAlter(toCompare, (argKey, actualValues, comparedValues) -> actualValues, true, false);
 			assertEquals("-common 1 -common 11", p.toString());
 			assertEquals(compareParams, toCompare.toString());
 		}
@@ -351,7 +299,7 @@ class SimpleParametersTest {
 			final var toCompare = new SimpleParameters(compareParams);
 
 			final var p = new SimpleParameters(params);
-			p.compareAndAlter(toCompare, new ActualValuesChooser(false, true));
+			p.compareAndAlter(toCompare, (argKey, actualValues, comparedValues) -> actualValues, false, true);
 			assertEquals("-specificActual 0 -common 1 -common 11 -specificCompared 2 -specificCompared 4", p
 			        .toString());
 			assertEquals(compareParams, toCompare.toString());

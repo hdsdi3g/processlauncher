@@ -458,7 +458,9 @@ public class SimpleParameters {
 	 * @see getAllArgKeyValues()
 	 */
 	public void compareAndAlter(final SimpleParameters toCompare,
-	                            final ArgValueChoice argValueChoice) {
+	                            final ArgValueChoice argValueChoice,
+	                            final boolean removeActualMissing,
+	                            final boolean addComparedMissing) {
 		final var allCurrentArgsKeyValues = getAllArgKeyValues();
 		final var allComparedArgsKeyValues = toCompare.getAllArgKeyValues();
 
@@ -478,7 +480,7 @@ public class SimpleParameters {
 					selectedValues = argValueChoice.choose(actualArg,
 					        allCurrentArgsKeyValues.get(actualArg),
 					        allComparedArgsKeyValues.get(actualArg));
-				} else if (argValueChoice.removeActualMissing() == false) {
+				} else if (removeActualMissing == false) {
 					selectedValues = allCurrentArgsKeyValues.get(actualArg);
 				}
 				computedKeys.add(actualArg);
@@ -503,7 +505,7 @@ public class SimpleParameters {
 			}
 		}
 
-		if (argValueChoice.addComparedMissing()) {
+		if (addComparedMissing) {
 			allComparedArgsKeyValues.entrySet().stream()
 			        .filter(entry -> computedKeys.contains(entry.getKey()) == false)
 			        .forEach(entry -> {
