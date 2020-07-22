@@ -84,6 +84,15 @@ public class Parameters extends SimpleParameters {
 	}
 
 	/**
+	 * Don't touch to current parameters, only parameterKeysStartsWith, startVarTag, endVarTag.
+	 */
+	public Parameters transfertThisConfigurationTo(final Parameters newInstance) {
+		this.transfertThisConfigurationTo((SimpleParameters) newInstance);
+		newInstance.setVarTags(startVarTag, endVarTag);
+		return this;
+	}
+
+	/**
 	 * @return like "%&gt;"
 	 */
 	public String getEndVarTag() {

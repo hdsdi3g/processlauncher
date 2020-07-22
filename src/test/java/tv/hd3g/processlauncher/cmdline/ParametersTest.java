@@ -18,6 +18,7 @@ package tv.hd3g.processlauncher.cmdline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -118,6 +119,21 @@ class ParametersTest {
 		assertEquals(
 		        "-before -addedbefore 1 <%myvar1%> -addedafter 2 -addedbefore 3 <%myvar2%> -addedafter 4 -after", p
 		                .toString());
+	}
+
+	@Test
+	void transfertThisConfigurationTo() {
+		final var pu1 = new Parameters("!ok1");
+		pu1.setParametersKeysStartsWith("!");
+		pu1.setVarTags("{", "}");
+
+		final var pu2 = new Parameters("-ok2");
+		pu1.transfertThisConfigurationTo(pu2);
+
+		assertEquals("!", pu2.getParametersKeysStartsWith());
+		assertEquals("{", pu2.getStartVarTag());
+		assertEquals("}", pu2.getEndVarTag());
+		assertNotEquals(pu1.toString(), pu2.toString());
 	}
 
 }
