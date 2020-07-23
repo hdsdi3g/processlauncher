@@ -136,4 +136,15 @@ class ParametersTest {
 		assertNotEquals(pu1.toString(), pu2.toString());
 	}
 
+	@Test
+	void tagVar() {
+		final var pu1 = new Parameters("ok");
+		final var tags = pu1.tagVar("myvar");
+		assertEquals("<%myvar%>", tags);
+
+		pu1.setVarTags("<", ">");
+		final var tags2 = pu1.tagVar("myvar");
+		assertEquals("<myvar>", tags2);
+	}
+
 }

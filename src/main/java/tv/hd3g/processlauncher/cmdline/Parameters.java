@@ -71,6 +71,10 @@ public class Parameters extends SimpleParameters {
 		setVarTags("<%", "%>");
 	}
 
+	public String tagVar(final String varName) {
+		return startVarTag + varName + endVarTag;
+	}
+
 	public Parameters setVarTags(final String startVarTag, final String endVarTag) {
 		this.startVarTag = Objects.requireNonNull(startVarTag, "\"startVarTag\" can't to be null");
 		if (startVarTag.isEmpty()) {
