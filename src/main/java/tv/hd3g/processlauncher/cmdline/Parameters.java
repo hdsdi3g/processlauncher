@@ -16,6 +16,9 @@
  */
 package tv.hd3g.processlauncher.cmdline;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toUnmodifiableList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -162,19 +165,24 @@ public class Parameters extends SimpleParameters {
 
 		final AtomicBoolean isDone = new AtomicBoolean(false);
 
-		final List<String> newParameters = getParameters().stream().reduce(Collections.unmodifiableList(
-		        new ArrayList<String>()), (list, arg) -> {
-			        if (isTaggedParameter(arg)) {
-				        final String currentVarName = extractVarNameFromTaggedParameter(arg);
-				        if (currentVarName.equals(varName)) {
-					        isDone.set(true);
-					        return Stream.concat(list.stream(), Stream.concat(Stream.concat(addBefore.stream(), Stream
-					                .of(arg)), addAfter.stream())).collect(Collectors.toUnmodifiableList());
-				        }
-			        }
+		final List<String> newParameters = getParameters().stream()
+		        .reduce(unmodifiableList(new ArrayList<String>()),
+		                (list, arg) -> {
+			                if (isTaggedParameter(arg)) {
+				                final String currentVarName = extractVarNameFromTaggedParameter(arg);
+				                if (currentVarName.equals(varName)) {
+					                isDone.set(true);
+					                return Stream.concat(list.stream(), Stream.concat(Stream.concat(addBefore.stream(),
+					                        Stream
+					                                .of(arg)), addAfter.stream())).collect(Collectors
+					                                        .toUnmodifiableList());
+				                }
+			                }
 
-			        return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors.toUnmodifiableList());
-		        }, LIST_COMBINER);
+			                return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors
+			                        .toUnmodifiableList());
+		                },
+		                LIST_COMBINER);
 
 		replaceParameters(newParameters);
 		return isDone.get();
@@ -196,36 +204,40 @@ public class Parameters extends SimpleParameters {
 	                                  final boolean removeParamsIfNoVarToInject) {
 		final List<String> newParameters;
 		if (removeParamsIfNoVarToInject) {
-			newParameters = getParameters().stream().reduce(Collections.unmodifiableList(new ArrayList<String>()), (
-			                                                                                                        list,
-			                                                                                                        arg) -> {
-				if (isTaggedParameter(arg)) {
-					final String varName = extractVarNameFromTaggedParameter(arg);
-					if (varsToInject.containsKey(varName)) {
-						return Stream.concat(list.stream(), Stream.of(varsToInject.get(varName))).collect(Collectors
-						        .toUnmodifiableList());
-					} else {
-						if (list.isEmpty()) {
-							return list;
-						} else if (isParameterArgIsAParametersKey(list.get(list.size() - 1))) {
-							return list.stream().limit(list.size() - 1L).collect(Collectors.toUnmodifiableList());
-						} else {
-							return list;
-						}
-					}
-				} else {
-					return Stream.concat(list.stream(), Stream.of(arg)).collect(Collectors.toUnmodifiableList());
-				}
-			}, LIST_COMBINER);
+			newParameters = getParameters().stream()
+			        .reduce(unmodifiableList(new ArrayList<String>()),
+			                (list, varName) -> {
+				                if (isTaggedParameter(varName)) {
+					                if (varsToInject.containsKey(varName)) {
+						                return Stream.concat(list.stream(), Stream.of(varsToInject.get(varName)))
+						                        .collect(toUnmodifiableList());
+					                } else {
+						                if (list.isEmpty()) {
+							                return list;
+						                } else if (isParameterArgIsAParametersKey(list.get(list.size() - 1))) {
+							                return list.stream().limit(list.size() - 1L).collect(Collectors
+							                        .toUnmodifiableList());
+						                } else {
+							                return list;
+						                }
+					                }
+				                } else {
+					                return Stream.concat(list.stream(), Stream.of(varName)).collect(Collectors
+					                        .toUnmodifiableList());
+				                }
+			                },
+			                LIST_COMBINER);
 		} else {
-			newParameters = getParameters().stream().map(arg -> {
-				final String varName = extractVarNameFromTaggedParameter(arg);
-				if (varName != null) {
-					return varsToInject.get(varName);
-				} else {
-					return arg;
-				}
-			}).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+			newParameters = getParameters().stream()
+			        .map(arg -> {
+				        if (isTaggedParameter(arg)) {
+					        return varsToInject.get(arg);
+				        } else {
+					        return arg;
+				        }
+			        })
+			        .filter(Objects::nonNull)
+			        .collect(toUnmodifiableList());
 		}
 
 		replaceParameters(newParameters);
