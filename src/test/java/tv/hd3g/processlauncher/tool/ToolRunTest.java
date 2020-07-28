@@ -18,6 +18,7 @@ package tv.hd3g.processlauncher.tool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import tv.hd3g.processlauncher.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.Exec;
+import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 import tv.hd3g.processlauncher.tool.ToolRunner.RunningTool;
@@ -83,4 +85,55 @@ class ToolRunTest {
 		        "version")));
 	}
 
+	@Test
+	void checkExecutionGetText_withError() {
+		exec.getParameters().clear().addBulkParameters("-thiswillneverexec");
+		final var toolRun = new ToolRunner(executableFinder);
+		final var executableTool = makeExecutableTool();
+		final var result = toolRun.execute(executableTool);
+
+		final var afterWait = result.waitForEnd();
+		assertNotNull(afterWait);
+		assertThrows(InvalidExecution.class, () -> afterWait.checkExecutionGetText());
+	}
+
+	@Test
+	void waitForEnd_isReallydone() {
+		final var toolRun = new ToolRunner(executableFinder);
+		final var executableTool = makeExecutableTool();
+		final var result = toolRun.execute(executableTool);
+		assertTrue(result.waitForEnd().getLifecyle().isCorrectlyDone());
+	}
+
+	@Test
+	void waitForEndAndCheckExecution_ok() {
+		final var toolRun = new ToolRunner(executableFinder);
+		final var executableTool = makeExecutableTool();
+		final var result = toolRun.execute(executableTool).waitForEndAndCheckExecution();
+		assertNotNull(result);
+		assertTrue(result.getLifecyle().isCorrectlyDone());
+
+		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = result.getTextRetention();
+		assertNotNull(capturedStdOutErrTextRetention);
+		assertNotNull(result.getLifecyle());
+
+		assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText());
+		assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false)
+		        .anyMatch(line -> line.contains("version")));
+	}
+
+	@Test
+	void waitForEndAndCheckExecution_error() {
+		exec.getParameters().clear().addBulkParameters("-thiswillneverexec");
+		final var toolRun = new ToolRunner(executableFinder);
+		final var executableTool = makeExecutableTool();
+		final var result = toolRun.execute(executableTool);
+		assertThrows(InvalidExecution.class, () -> result.waitForEndAndCheckExecution());
+	}
+
+	@Test
+	void getExecutableFinder() {
+		final var toolRun = new ToolRunner(executableFinder);
+		assertEquals(executableFinder, toolRun.getExecutableFinder());
+	}
 }

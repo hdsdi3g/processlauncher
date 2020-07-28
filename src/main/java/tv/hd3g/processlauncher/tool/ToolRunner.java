@@ -108,5 +108,21 @@ public class ToolRunner {
 			getLifecyle().waitForEnd();
 			return this;
 		}
+
+		/**
+		 * Merge waitForEnd and checkExecutionGetText behaviors
+		 */
+		public RunningTool<T> waitForEndAndCheckExecution() {
+			waitForEnd();
+			try {
+				getLifecyle().checkExecution();
+			} catch (final InvalidExecution e) {
+				throw e.injectStdErr(getTextRetention().getStderrLines(false)
+				        .filter(getExecutableToolSource().filterOutErrorLines())
+				        .map(String::trim).collect(Collectors.joining("|")));
+			}
+			return this;
+		}
+
 	}
 }
