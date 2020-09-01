@@ -12,6 +12,8 @@ Use internally Log4j2 for logging.
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hdsdi3g_processlauncher&metric=alert_status)](https://sonarcloud.io/dashboard?id=hdsdi3g_processlauncher)
 
+![CodeQL](https://github.com/hdsdi3g/processlauncher/workflows/CodeQL/badge.svg)
+
 ## Usage example
 
 See `tv.hd3g.processlauncher.Exec` for shortcuts examples.
