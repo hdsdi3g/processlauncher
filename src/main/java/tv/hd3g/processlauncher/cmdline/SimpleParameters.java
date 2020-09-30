@@ -289,6 +289,33 @@ public class SimpleParameters {
 		return parameters.stream().collect(Collectors.joining(" "));
 	}
 
+	public static final List<Character> MUST_ESCAPE = List.of('\\', '$', '"');
+	public static final List<Character> MUST_SURROUND_QUOTE = List.of(' ', '+', ';', '&', '\'', '#', '|',
+	        '(', ')', '[', ']', '{', '}', '*', '?', '/', '.', '<', '>');
+
+	/**
+	 * Mostly in Linux/Bash mode.
+	 * @return with automatic escape
+	 */
+	public String exportToExternalCommandLine(final String processExecFile) {
+		return processExecFile + " " + parameters.stream()
+		        .map(arg -> {
+			        var escapedChr = arg;
+			        for (final var chr : MUST_ESCAPE) {
+				        escapedChr = escapedChr.replace("" + chr, "\\" + chr);
+			        }
+			        return escapedChr;
+		        })
+		        .map(arg -> {
+			        if (MUST_SURROUND_QUOTE.stream()
+			                .anyMatch(chr -> arg.indexOf(chr) > -1)) {
+				        return "\"" + arg + "\"";
+			        }
+			        return arg;
+		        })
+		        .collect(Collectors.joining(" "));
+	}
+
 	/**
 	 * @param parameterKeysStartsWith "-" by default
 	 */

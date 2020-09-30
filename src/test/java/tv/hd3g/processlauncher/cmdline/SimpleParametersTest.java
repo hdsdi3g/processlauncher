@@ -306,4 +306,23 @@ class SimpleParametersTest {
 		}
 	}
 
+	@Test
+	void testExportToExternalCommandLine() {
+		final var p0 = new SimpleParameters("-a b -c d");
+		assertEquals(4, p0.count());
+		assertEquals("exec -a b -c d", p0.exportToExternalCommandLine("exec"));
+
+		final var p1 = new SimpleParameters("-a [b] -c d");
+		assertEquals(4, p1.count());
+		assertEquals("exec -a \"[b]\" -c d", p1.exportToExternalCommandLine("exec"));
+
+		final var p2 = new SimpleParameters("-a [b] -c $d");
+		assertEquals(4, p2.count());
+		assertEquals("exec -a \"[b]\" -c \\$d", p2.exportToExternalCommandLine("exec"));
+
+		final var p3 = new SimpleParameters(List.of("a", "b \\ c", "d"));
+		assertEquals(3, p3.count());
+		assertEquals("exec a \"b \\\\ c\" d", p3.exportToExternalCommandLine("exec"));
+	}
+
 }
