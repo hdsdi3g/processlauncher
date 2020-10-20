@@ -65,13 +65,14 @@ class ParametersTest {
 
 	@Test
 	void testInjectVarKeepEmptyParam() {
-		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
-		final HashMap<String, String> vars = new HashMap<>();
-		vars.put("<%var1%>", "value1");
-		vars.put("<%var2%>", "value2");
+		final var p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		final var vars = new HashMap<String, Parameters>();
+		vars.put("<%var1%>", new Parameters("value1 value2"));
+		vars.put("<%var2%>", new Parameters("value3"));
+		vars.put("<%ignored%>", new Parameters("value4"));
 		p.injectVariables(vars, false);
 
-		assertEquals("-a value1 value2 -b -c", p.toString());
+		assertEquals("-a value1 value2 value3 -b -c", p.toString());
 	}
 
 	@Test
@@ -84,13 +85,14 @@ class ParametersTest {
 
 	@Test
 	void testInjectVarRemoveEmptyParam() {
-		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
-		final HashMap<String, String> vars = new HashMap<>();
-		vars.put("<%var1%>", "value1");
-		vars.put("<%var2%>", "value2");
+		final var p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		final var vars = new HashMap<String, Parameters>();
+		vars.put("<%var1%>", new Parameters("value1 value2"));
+		vars.put("<%var2%>", new Parameters("value3"));
+		vars.put("<%ignored%>", new Parameters("value4"));
 		p.injectVariables(vars, true);
 
-		assertEquals("-a value1 value2 -c", p.toString());
+		assertEquals("-a value1 value2 value3 -c", p.toString());
 	}
 
 	@Test

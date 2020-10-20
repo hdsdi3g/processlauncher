@@ -39,7 +39,7 @@ public class Exec implements ExecutableTool {
 	private final File execFile;
 	private final ExecutableFinder executableFinder;
 	private final Parameters parameters;
-	private final Map<String, String> varsToInject;
+	private final Map<String, Parameters> varsToInject;
 	private boolean removeParamsIfNoVarToInject;
 	private final Consumer<ProcesslauncherBuilder> preBeforeRun;
 
@@ -62,7 +62,7 @@ public class Exec implements ExecutableTool {
 		preBeforeRun = tool::beforeRun;
 	}
 
-	public Map<String, String> getVarsToInject() {
+	public Map<String, Parameters> getVarsToInject() {
 		return varsToInject;
 	}
 

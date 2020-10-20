@@ -200,7 +200,7 @@ public class Parameters extends SimpleParameters {
 	 * @param removeParamsIfNoVarToInject if true, for "-a -b ? -d" -&gt; "-a -d", else "-a -b -d"
 	 * @return this
 	 */
-	public Parameters injectVariables(final Map<String, String> varsToInject,
+	public Parameters injectVariables(final Map<String, Parameters> varsToInject,
 	                                  final boolean removeParamsIfNoVarToInject) {
 		final List<String> newParameters;
 		if (removeParamsIfNoVarToInject) {
@@ -209,16 +209,17 @@ public class Parameters extends SimpleParameters {
 			                (list, varName) -> {
 				                if (isTaggedParameter(varName)) {
 					                if (varsToInject.containsKey(varName)) {
-						                return Stream.concat(list.stream(), Stream.of(varsToInject.get(varName)))
+						                return Stream.concat(
+						                        list.stream(),
+						                        varsToInject.get(varName).getParameters().stream())
 						                        .collect(toUnmodifiableList());
 					                } else {
-						                if (list.isEmpty()) {
+						                if (list.isEmpty()
+						                    || !isParameterArgIsAParametersKey(list.get(list.size() - 1))) {
 							                return list;
-						                } else if (isParameterArgIsAParametersKey(list.get(list.size() - 1))) {
+						                } else {
 							                return list.stream().limit(list.size() - 1L).collect(Collectors
 							                        .toUnmodifiableList());
-						                } else {
-							                return list;
 						                }
 					                }
 				                } else {
@@ -228,20 +229,29 @@ public class Parameters extends SimpleParameters {
 			                },
 			                LIST_COMBINER);
 		} else {
-			newParameters = getParameters().stream()
-			        .map(arg -> {
-				        if (isTaggedParameter(arg)) {
-					        return varsToInject.get(arg);
-				        } else {
-					        return arg;
-				        }
-			        })
-			        .filter(Objects::nonNull)
-			        .collect(toUnmodifiableList());
+			newParameters = computeInjectVariablesKeepParams(varsToInject);
 		}
 
 		replaceParameters(newParameters);
 		return this;
+	}
+
+	private List<String> computeInjectVariablesKeepParams(final Map<String, Parameters> varsToInject) {
+		final List<String> newParameters;
+		newParameters = getParameters().stream()
+		        .flatMap(arg -> {
+			        if (isTaggedParameter(arg)) {
+				        if (varsToInject.containsKey(arg)) {
+					        return varsToInject.get(arg).getParameters().stream();
+				        } else {
+					        return Stream.empty();
+				        }
+			        } else {
+				        return Stream.of(arg);
+			        }
+		        })
+		        .collect(toUnmodifiableList());
+		return newParameters;
 	}
 
 }
