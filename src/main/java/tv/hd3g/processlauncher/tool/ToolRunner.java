@@ -42,12 +42,12 @@ public class ToolRunner {
 	}
 
 	public <T extends ExecutableTool> RunningTool<T> execute(final T execTool) {
-		final String executableName = execTool.getExecutableName();
+		final var executableName = execTool.getExecutableName();
 		try {
-			final CommandLine cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(),
+			final var cmd = new CommandLine(executableName, execTool.getReadyToRunParameters(),
 			        executableFinder);
-			final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(cmd);
-			final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
+			final var builder = new ProcesslauncherBuilder(cmd);
+			final var textRetention = new CapturedStdOutErrTextRetention();
 			builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
 			        .addObserver(textRetention);
 			execTool.beforeRun(builder);

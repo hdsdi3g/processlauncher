@@ -35,19 +35,19 @@ class SimpleParametersTest {
 
 	@Test
 	void testParams() {
-		final String testChaoticLine = "-aa 1  -single --cc 3 -U  \"dsfdsf sdf s  -e foo\" -g 2 42 -f=f -h=i;j,k:l -m Ah! -l \"u \" m ";
+		final var testChaoticLine = "-aa 1  -single --cc 3 -U  \"dsfdsf sdf s  -e foo\" -g 2 42 -f=f -h=i;j,k:l -m Ah! -l \"u \" m ";
 
-		SimpleParameters pu = new SimpleParameters(testChaoticLine);
+		var pu = new SimpleParameters(testChaoticLine);
 
 		assertEquals("-", pu.getParametersKeysStartsWith());
 		assertFalse(pu.getParameters().isEmpty());
 
-		final String actual = pu.toString();
+		final var actual = pu.toString();
 		pu = new SimpleParameters();
 		pu.addBulkParameters(testChaoticLine);
 		assertEquals(actual, pu.toString());
 
-		final List<String> compare = Arrays.asList("-aa", "1", "-single", "--cc", "3", "-U", "dsfdsf sdf s  -e foo",
+		final var compare = Arrays.asList("-aa", "1", "-single", "--cc", "3", "-U", "dsfdsf sdf s  -e foo",
 		        "-g", "2", "42", "-f=f", "-h=i;j,k:l", "-m", "Ah!", "-l", "u ", "m");
 
 		assertTrue(Arrays.equals(compare.toArray(), pu.getParameters().toArray()));
@@ -139,7 +139,7 @@ class SimpleParametersTest {
 
 	@Test
 	void testParamStyleChange() {
-		final SimpleParameters pu = new SimpleParameters("-a 1 /b 2").setParametersKeysStartsWith("/");
+		final var pu = new SimpleParameters("-a 1 /b 2").setParametersKeysStartsWith("/");
 		assertEquals("/", pu.getParametersKeysStartsWith());
 
 		assertTrue(Arrays.equals(Arrays.asList("-a", "1", "/b", "2").toArray(), pu.getParameters().toArray()));
@@ -154,8 +154,8 @@ class SimpleParametersTest {
 
 	@Test
 	void testTransfert() {
-		final SimpleParameters pu1 = new SimpleParameters("!ok1").setParametersKeysStartsWith("!");
-		final SimpleParameters pu2 = new SimpleParameters("-ok2");
+		final var pu1 = new SimpleParameters("!ok1").setParametersKeysStartsWith("!");
+		final var pu2 = new SimpleParameters("-ok2");
 
 		pu1.transfertThisConfigurationTo(pu2);
 		assertEquals("!", pu2.getParametersKeysStartsWith());
@@ -171,7 +171,7 @@ class SimpleParametersTest {
 
 	@Test
 	void testPrepend() {
-		final SimpleParameters pu = new SimpleParameters("-3 -4");
+		final var pu = new SimpleParameters("-3 -4");
 		pu.prependBulkParameters("-1 -2");
 
 		assertEquals(4, pu.getParameters().size());
@@ -192,7 +192,7 @@ class SimpleParametersTest {
 
 	@Test
 	void testHasParameters() {
-		final SimpleParameters pu = new SimpleParameters("-a -b");
+		final var pu = new SimpleParameters("-a -b");
 		assertTrue(pu.hasParameters("-a", "-b", "-z"));
 		assertTrue(pu.hasParameters("-a"));
 		assertTrue(pu.hasParameters("a"));
@@ -202,8 +202,8 @@ class SimpleParametersTest {
 
 	@Test
 	void testIfHasNotParameter() {
-		final SimpleParameters pu = new SimpleParameters("-a -b");
-		final AtomicInteger count = new AtomicInteger(0);
+		final var pu = new SimpleParameters("-a -b");
+		final var count = new AtomicInteger(0);
 		pu.ifHasNotParameter(() -> {
 			count.getAndIncrement();
 		}, "-z");

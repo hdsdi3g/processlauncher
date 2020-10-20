@@ -58,7 +58,7 @@ public class CapturedStdOutErrToPrintStream extends CapturedStdOutErrText {
 			out = printStreamStdOut;
 		}
 
-		final ProcesslauncherLifecycle source = lineEntry.getSource();
+		final var source = lineEntry.getSource();
 		out.print(source.getExecNameWithoutExt());
 		out.print(source.getPID().map(pid -> "#" + pid).orElse(""));
 

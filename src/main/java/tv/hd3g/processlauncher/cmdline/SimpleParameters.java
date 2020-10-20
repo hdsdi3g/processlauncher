@@ -111,8 +111,8 @@ public class SimpleParameters {
 			        /**
 			         * Get current entry
 			         */
-			        final int lastPos = list.size() - 1;
-			        final ParameterArg lastEntry = list.get(lastPos);
+			        final var lastPos = list.size() - 1;
+			        final var lastEntry = list.get(lastPos);
 
 			        if (chr.equals(QUOTE)) {
 				        if (lastEntry.isInQuotes()) {
@@ -156,7 +156,7 @@ public class SimpleParameters {
 		        }
 		        return list;
 	        }, (list1, list2) -> {
-		        final ArrayList<ParameterArg> parameterArgs = new ArrayList<>(list1);
+		        final var parameterArgs = new ArrayList<>(list1);
 		        parameterArgs.addAll(list2);
 		        return parameterArgs;
 	        }).stream();
@@ -174,7 +174,7 @@ public class SimpleParameters {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
 		return Arrays.stream(params).filter(Objects::nonNull).anyMatch(parameter -> {
-			final String param = conformParameterKey(parameter);
+			final var param = conformParameterKey(parameter);
 			return parameters.contains(param);
 		});
 	}
@@ -250,7 +250,7 @@ public class SimpleParameters {
 	public SimpleParameters prependParameters(final Collection<String> params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		final List<String> newList = Stream.concat(params.stream().filter(Objects::nonNull), parameters.stream())
+		final var newList = Stream.concat(params.stream().filter(Objects::nonNull), parameters.stream())
 		        .collect(
 		                Collectors.toUnmodifiableList());
 		replaceParameters(newList);
@@ -353,17 +353,17 @@ public class SimpleParameters {
 	public List<String> getValues(final String parameterKey) {
 		Objects.requireNonNull(parameterKey, "\"parameterKey\" can't to be null");
 
-		final String param = conformParameterKey(parameterKey);
+		final var param = conformParameterKey(parameterKey);
 
-		final ArrayList<String> result = new ArrayList<>();
+		final var result = new ArrayList<String>();
 
-		boolean has = false;
-		for (int pos = 0; pos < parameters.size(); pos++) {
-			final String current = parameters.get(pos);
+		var has = false;
+		for (var pos = 0; pos < parameters.size(); pos++) {
+			final var current = parameters.get(pos);
 			if (current.equals(param)) {
 				has = true;
 				if (parameters.size() > pos + 1) {
-					final String next = parameters.get(pos + 1);
+					final var next = parameters.get(pos + 1);
 					if (isParameterArgIsAParametersKey(next) == false) {
 						result.add(next);
 					}
@@ -385,17 +385,17 @@ public class SimpleParameters {
 	public boolean removeParameter(final String parametersKey, final int paramAsThisKeyPos) {
 		Objects.requireNonNull(parametersKey, "\"parametersKey\" can't to be null");
 
-		final String param = conformParameterKey(parametersKey);
+		final var param = conformParameterKey(parametersKey);
 
-		int toSkip = paramAsThisKeyPos + 1;
+		var toSkip = paramAsThisKeyPos + 1;
 
-		for (int pos = 0; pos < parameters.size(); pos++) {
-			final String current = parameters.get(pos);
+		for (var pos = 0; pos < parameters.size(); pos++) {
+			final var current = parameters.get(pos);
 			if (current.equals(param)) {
 				toSkip--;
 				if (toSkip == 0) {
 					if (parameters.size() > pos + 1) {
-						final String next = parameters.get(pos + 1);
+						final var next = parameters.get(pos + 1);
 						if (isParameterArgIsAParametersKey(next) == false) {
 							parameters.remove(pos + 1);
 						}
@@ -417,17 +417,17 @@ public class SimpleParameters {
 		Objects.requireNonNull(parameterKey, "\"parameterKey\" can't to be null");
 		Objects.requireNonNull(newValue, "\"newValue\" can't to be null");
 
-		final String param = conformParameterKey(parameterKey);
+		final var param = conformParameterKey(parameterKey);
 
-		int toSkip = paramAsThisKeyPos + 1;
+		var toSkip = paramAsThisKeyPos + 1;
 
-		for (int pos = 0; pos < parameters.size(); pos++) {
-			final String current = parameters.get(pos);
+		for (var pos = 0; pos < parameters.size(); pos++) {
+			final var current = parameters.get(pos);
 			if (current.equals(param)) {
 				toSkip--;
 				if (toSkip == 0) {
 					if (parameters.size() > pos + 1) {
-						final String next = parameters.get(pos + 1);
+						final var next = parameters.get(pos + 1);
 						if (isParameterArgIsAParametersKey(next) == false) {
 							parameters.set(pos + 1, newValue);
 						} else {

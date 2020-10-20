@@ -187,7 +187,7 @@ public class ProcesslauncherBuilder {
 		fullCommandLine.add(executable.getPath());
 		fullCommandLine.addAll(parameters);
 
-		final ProcessBuilder processBuilder = new ProcessBuilder(fullCommandLine);
+		final var processBuilder = new ProcessBuilder(fullCommandLine);
 		processBuilder.environment().putAll(environment);
 
 		if (workingDirectory != null && workingDirectory.exists() && workingDirectory.isDirectory()) {
@@ -207,7 +207,7 @@ public class ProcesslauncherBuilder {
 	};
 
 	public String getFullCommandLine() {
-		final StringBuilder sb = new StringBuilder();
+		final var sb = new StringBuilder();
 		sb.append(addQuotesIfSpaces.apply(executable.getPath()));
 		sb.append(" ");
 		sb.append(parameters.stream().map(addQuotesIfSpaces).collect(Collectors.joining(" ")));
@@ -237,7 +237,7 @@ public class ProcesslauncherBuilder {
 	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
 	 */
 	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior) {
-		final CaptureStandardOutputText csot = getCaptureStandardOutput().filter(
+		final var csot = getCaptureStandardOutput().filter(
 		        cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(
 		                () -> new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior));
 

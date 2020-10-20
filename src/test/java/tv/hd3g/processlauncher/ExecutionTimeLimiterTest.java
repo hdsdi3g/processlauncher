@@ -39,13 +39,13 @@ class ExecutionTimeLimiterTest {
 	@Test
 	void test() {
 
-		final FakesScheduledExecutorService fakeSES = new FakesScheduledExecutorService();
-		final ExecutionTimeLimiter etl = new ExecutionTimeLimiter(1, TimeUnit.SECONDS, fakeSES);
+		final var fakeSES = new FakesScheduledExecutorService();
+		final var etl = new ExecutionTimeLimiter(1, TimeUnit.SECONDS, fakeSES);
 
 		assertEquals(1000, etl.getMaxExecTime(TimeUnit.MILLISECONDS));
 
-		final ProcesslauncherLifecycle toCallBack = Mockito.mock(ProcesslauncherLifecycle.class);
-		final Process process = Mockito.mock(Process.class);
+		final var toCallBack = Mockito.mock(ProcesslauncherLifecycle.class);
+		final var process = Mockito.mock(Process.class);
 		Mockito.when(process.onExit()).thenReturn(CompletableFuture.completedFuture(null));
 
 		etl.addTimesUp(toCallBack, process);

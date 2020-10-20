@@ -41,7 +41,8 @@ public class ExecutionTimeLimiter {
 	}
 
 	void addTimesUp(final ProcesslauncherLifecycle toCallBack, final Process process) {
-		final Runnable action = toCallBack::runningTakesTooLongTimeStopIt;
+		Runnable action;
+		action = toCallBack::runningTakesTooLongTimeStopIt;
 
 		final ScheduledFuture<?> maxExecTimeStopper = maxExecTimeScheduler.schedule(action,
 		        maxExecTime, TimeUnit.MILLISECONDS);

@@ -27,12 +27,10 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tv.hd3g.processlauncher.CapturedStdOutErrTextRetention;
 import tv.hd3g.processlauncher.Exec;
 import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.tool.ToolRunner.RunningTool;
 
 class ToolRunTest {
 
@@ -69,14 +67,14 @@ class ToolRunTest {
 
 	@Test
 	void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
-		final ToolRunner toolRun = new ToolRunner(executableFinder);
+		final var toolRun = new ToolRunner(executableFinder);
 
-		final ExecutableTool executableTool = makeExecutableTool();
+		final var executableTool = makeExecutableTool();
 
-		final RunningTool<ExecutableTool> result = toolRun.execute(executableTool);
+		final var result = toolRun.execute(executableTool);
 		assertEquals(executableTool, result.getExecutableToolSource());
 
-		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = result.getTextRetention();
+		final var capturedStdOutErrTextRetention = result.getTextRetention();
 		assertNotNull(capturedStdOutErrTextRetention);
 		assertNotNull(result.getLifecyle());
 
@@ -113,7 +111,7 @@ class ToolRunTest {
 		assertNotNull(result);
 		assertTrue(result.getLifecyle().isCorrectlyDone());
 
-		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = result.getTextRetention();
+		final var capturedStdOutErrTextRetention = result.getTextRetention();
 		assertNotNull(capturedStdOutErrTextRetention);
 		assertNotNull(result.getLifecyle());
 

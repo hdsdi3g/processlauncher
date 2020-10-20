@@ -49,8 +49,8 @@ public class CapturedStdOutErrTextInteractive extends CapturedStdOutErrText {
 
 	@Override
 	void onText(final LineEntry lineEntry) {
-		final String result = interactive.apply(lineEntry);
-		final ProcesslauncherLifecycle source = lineEntry.getSource();
+		final var result = interactive.apply(lineEntry);
+		final var source = lineEntry.getSource();
 
 		if (result != null && source.isRunning()) {
 			try {

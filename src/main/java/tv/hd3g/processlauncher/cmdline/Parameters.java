@@ -148,7 +148,7 @@ public class Parameters extends SimpleParameters {
 	}
 
 	public Parameters duplicate() {
-		final Parameters newInstance = new Parameters(startVarTag, endVarTag);
+		final var newInstance = new Parameters(startVarTag, endVarTag);
 		newInstance.importParametersFrom(this);
 		return newInstance;
 	}
@@ -163,9 +163,9 @@ public class Parameters extends SimpleParameters {
 		Objects.requireNonNull(addBefore, "\"addBefore\" can't to be null");
 		Objects.requireNonNull(addAfter, "\"addAfter\" can't to be null");
 
-		final AtomicBoolean isDone = new AtomicBoolean(false);
+		final var isDone = new AtomicBoolean(false);
 
-		final List<String> newParameters = getParameters().stream()
+		final var newParameters = getParameters().stream()
 		        .reduce(unmodifiableList(new ArrayList<String>()),
 		                (list, arg) -> {
 			                if (isTaggedParameter(arg)) {

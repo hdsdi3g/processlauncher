@@ -59,7 +59,7 @@ public class ExecutableFinder {
 			/**
 			 * Like .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
 			 */
-			final String pathExt = System.getenv("PATHEXT");
+			final var pathExt = System.getenv("PATHEXT");
 			if (pathExt.indexOf(';') >= 0) {
 				WINDOWS_EXEC_EXTENSIONS = Collections.unmodifiableList(Arrays.stream(pathExt.split(";")).map(ext -> ext
 				        .toLowerCase().substring(1)).collect(Collectors.toUnmodifiableList()));
@@ -113,7 +113,7 @@ public class ExecutableFinder {
 		/**
 		 * Remove duplicate entries
 		 */
-		final List<File> newList = paths.stream().distinct().collect(Collectors.toUnmodifiableList());
+		final var newList = paths.stream().distinct().collect(Collectors.toUnmodifiableList());
 		paths.clear();
 		paths.addAll(newList);
 
@@ -147,8 +147,8 @@ public class ExecutableFinder {
 			converted = relativeUserHomePath.replace("\\\\", "/");
 		}
 
-		final String userHome = System.getProperty("user.home");
-		final File f = new File(userHome + File.separator + converted).getAbsoluteFile();
+		final var userHome = System.getProperty("user.home");
+		final var f = new File(userHome + File.separator + converted).getAbsoluteFile();
 
 		return addPath(f);
 	}
@@ -157,7 +157,7 @@ public class ExecutableFinder {
 	 * Put in top priority.
 	 */
 	public ExecutableFinder addPath(final File filePath) {
-		final File f = filePath.getAbsoluteFile();
+		final var f = filePath.getAbsoluteFile();
 
 		if (isValidDirectory.test(f)) {
 			synchronized (this) {
@@ -169,11 +169,7 @@ public class ExecutableFinder {
 	}
 
 	private boolean validExec(final File exec) {
-		if (exec.exists() == false) {
-			return false;
-		} else if (exec.isFile() == false) {
-			return false;
-		} else if (exec.canRead() == false) {
+		if ((exec.exists() == false) || (exec.isFile() == false) || (exec.canRead() == false)) {
 			return false;
 		} else {
 			return exec.canExecute();
@@ -200,12 +196,12 @@ public class ExecutableFinder {
 			return declaredInConfiguration.get(name);
 		}
 
-		final File exec = new File(name);
+		final var exec = new File(name);
 		if (validExec(exec)) {
 			return exec;
 		}
 
-		final List<File> allFileCandidates = Stream.concat(declaredInConfiguration.values().stream().map(
+		final var allFileCandidates = Stream.concat(declaredInConfiguration.values().stream().map(
 		        File::getParentFile), paths.stream()).map(dir -> new File(dir + File.separator + name)
 		                .getAbsoluteFile())
 		        .distinct().collect(Collectors.toUnmodifiableList());
@@ -222,7 +218,7 @@ public class ExecutableFinder {
 			 * Try with add windows ext
 			 */
 			return allFileCandidates.stream().flatMap(file -> {
-				final boolean hasAlreadyValidExt = WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> file.getName()
+				final var hasAlreadyValidExt = WINDOWS_EXEC_EXTENSIONS.stream().anyMatch(ext -> file.getName()
 				        .toLowerCase().endsWith("." + ext.toLowerCase()));
 
 				if (hasAlreadyValidExt) {

@@ -23,9 +23,9 @@ public class DemoExecStdinInjection {
 	public static final String QUIT = "q";
 
 	public static void main(final String[] args) throws InterruptedException {
-		final Scanner s = new Scanner(System.in);
+		final var s = new Scanner(System.in);
 		while (s.hasNext()) {
-			final String line = s.next();
+			final var line = s.next();
 			if (line.equals(QUIT)) {
 				break;
 			}

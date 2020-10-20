@@ -29,14 +29,14 @@ class StdInInjectionTest {
 
 	@Test
 	void testInject() throws IOException {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final var baos = new ByteArrayOutputStream();
 
-		final StdInInjection sii = new StdInInjection(baos);
+		final var sii = new StdInInjection(baos);
 
-		final byte[] test = { 1, 2, 3 };
+		final var test = new byte[] { 1, 2, 3 };
 		sii.write(test);
 		sii.close();
-		byte[] result = baos.toByteArray();
+		var result = baos.toByteArray();
 
 		assertTrue(Arrays.equals(test, result));
 

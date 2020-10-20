@@ -115,7 +115,7 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 		@Override
 		public void run() {
 			try {
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(processStream));
+				final var reader = new BufferedReader(new InputStreamReader(processStream));
 				subRun(reader);
 			} catch (final IOException ioe) {
 				log.error("Trouble opening process streams: {}", this, ioe);
@@ -124,9 +124,9 @@ public class CaptureStandardOutputText implements CaptureStandardOutput {
 
 		private void subRun(final BufferedReader reader) throws IOException {
 			try {
-				String line = "";
+				var line = "";
 				while ((line = reader.readLine()) != null) {
-					final LineEntry lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr,
+					final var lineEntry = new LineEntry(System.currentTimeMillis(), line, isStdErr,
 					        source);
 					observers.forEach(observer -> {
 						try {

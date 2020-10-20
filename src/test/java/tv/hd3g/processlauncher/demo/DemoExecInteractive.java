@@ -25,9 +25,9 @@ public class DemoExecInteractive {
 	public static void main(final String[] args) throws InterruptedException {
 		System.out.println(args[0].toUpperCase());
 
-		final Scanner s = new Scanner(System.in);
+		final var s = new Scanner(System.in);
 		while (s.hasNext()) {
-			final String line = s.next();
+			final var line = s.next();
 			if (line.equals(QUIT)) {
 				break;
 			}

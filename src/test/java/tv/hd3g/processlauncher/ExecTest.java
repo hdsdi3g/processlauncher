@@ -46,20 +46,20 @@ class ExecTest {
 
 	@Test
 	void testGetVarsToInject() throws FileNotFoundException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		assertNotNull(exec.getVarsToInject());
 		assertEquals(0, exec.getVarsToInject().size());
 	}
 
 	@Test
 	void testIsRemoveParamsIfNoVarToInject() throws FileNotFoundException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 	}
 
 	@Test
 	void testSetRemoveParamsIfNoVarToInject() throws FileNotFoundException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		assertFalse(exec.isRemoveParamsIfNoVarToInject());
 		exec.setRemoveParamsIfNoVarToInject(true);
 		assertTrue(exec.isRemoveParamsIfNoVarToInject());
@@ -69,15 +69,15 @@ class ExecTest {
 
 	@Test
 	void testGetParameters() throws FileNotFoundException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		assertNotNull(exec.getParameters());
 		assertTrue(exec.getParameters().getParameters().isEmpty());
 	}
 
 	@Test
 	void testGetParametersViaExecutableTool() throws FileNotFoundException {
-		final Parameters parameters = new Parameters("-p");
-		final Exec exec = new Exec(new ExecutableTool() {
+		final var parameters = new Parameters("-p");
+		final var exec = new Exec(new ExecutableTool() {
 
 			@Override
 			public Parameters getReadyToRunParameters() {
@@ -98,7 +98,7 @@ class ExecTest {
 
 	@Test
 	void testGetReadyToRunParameters() throws FileNotFoundException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		assertNotNull(exec.getReadyToRunParameters());
 		assertTrue(exec.getReadyToRunParameters().getParameters().isEmpty());
 		assertNotSame(exec.getReadyToRunParameters(), exec.getParameters());
@@ -106,15 +106,15 @@ class ExecTest {
 
 	@Test
 	void testRunWaitGetText() throws IOException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("-version");
 
-		final LinkedBlockingQueue<ProcesslauncherBuilder> callBack = new LinkedBlockingQueue<>();
+		final var callBack = new LinkedBlockingQueue<ProcesslauncherBuilder>();
 		final Consumer<ProcesslauncherBuilder> beforeRun = pb -> {
 			callBack.add(pb);
 		};
 
-		final CapturedStdOutErrTextRetention capturedStdOutErrTextRetention = exec.runWaitGetText(beforeRun);
+		final var capturedStdOutErrTextRetention = exec.runWaitGetText(beforeRun);
 		assertEquals(1, callBack.size());
 		assertNotNull(callBack.poll());
 
@@ -124,10 +124,10 @@ class ExecTest {
 
 	@Test
 	void testRunWaitGetTextViaExecutableTool() throws IOException {
-		final LinkedBlockingQueue<ProcesslauncherBuilder> callBack1 = new LinkedBlockingQueue<>();
-		final LinkedBlockingQueue<Class<?>> orderCallback = new LinkedBlockingQueue<>();
+		final var callBack1 = new LinkedBlockingQueue<ProcesslauncherBuilder>();
+		final var orderCallback = new LinkedBlockingQueue<Class<?>>();
 
-		final Exec exec = new Exec(new ExecutableTool() {
+		final var exec = new Exec(new ExecutableTool() {
 
 			@Override
 			public Parameters getReadyToRunParameters() {
@@ -147,7 +147,7 @@ class ExecTest {
 
 		}, executableFinder);
 
-		final LinkedBlockingQueue<ProcesslauncherBuilder> callBack2 = new LinkedBlockingQueue<>();
+		final var callBack2 = new LinkedBlockingQueue<ProcesslauncherBuilder>();
 		final Consumer<ProcesslauncherBuilder> beforeRun = pb -> {
 			orderCallback.offer(ExecTest.class);
 			callBack2.add(pb);
@@ -166,14 +166,14 @@ class ExecTest {
 
 	@Test
 	void testRunCatchVerbosedError() throws IOException {
-		final Exec exec = new Exec(execName, executableFinder);
+		final var exec = new Exec(execName, executableFinder);
 		exec.getParameters().addParameters("a");
 
 		try {
 			exec.runWaitGetText();
 			Assertions.fail("Not thown an InvalidExecution");
 		} catch (final InvalidExecution e) {
-			final String stdErr = e.getStdErr();
+			final var stdErr = e.getStdErr();
 			assertTrue(stdErr.contains("ClassNotFoundException"));
 		}
 	}

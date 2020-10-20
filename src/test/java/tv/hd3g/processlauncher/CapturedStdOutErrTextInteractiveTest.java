@@ -30,11 +30,11 @@ class CapturedStdOutErrTextInteractiveTest {
 
 	@Test
 	void test() throws Exception {
-		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
+		final var source = Mockito.mock(ProcesslauncherLifecycle.class);
 		Mockito.when(source.isRunning()).thenReturn(true);
 
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final StdInInjection stdInInject = new StdInInjection(baos);
+		final var baos = new ByteArrayOutputStream();
+		final var stdInInject = new StdInInjection(baos);
 
 		Mockito.when(source.getStdInInjection()).thenReturn(stdInInject);
 
@@ -47,8 +47,8 @@ class CapturedStdOutErrTextInteractiveTest {
 			return le.getLine().toUpperCase();
 		};
 
-		final CapturedStdOutErrTextInteractive csoeti = new CapturedStdOutErrTextInteractive(interactive);
-		final LineEntry added = new LineEntry(0, "My text", true, source);
+		final var csoeti = new CapturedStdOutErrTextInteractive(interactive);
+		final var added = new LineEntry(0, "My text", true, source);
 		csoeti.onText(added);
 		// csoeti.onProcessCloseStream(source, true, CapturedStreams.BOTH_STDOUT_STDERR);
 

@@ -37,7 +37,7 @@ class CaptureStandardOutputTextTest {
 	void test() throws InterruptedException {
 		final List<LineEntry> capturedlines = new ArrayList<>();
 
-		final CountDownLatch cdl = new CountDownLatch(2);
+		final var cdl = new CountDownLatch(2);
 		final CapturedStdOutErrText csoeto = new CapturedStdOutErrText() {
 
 			@Override
@@ -47,19 +47,19 @@ class CaptureStandardOutputTextTest {
 
 		};
 
-		final CaptureStandardOutputText csot = new CaptureStandardOutputText();
+		final var csot = new CaptureStandardOutputText();
 		csot.addObserver(csoeto);
 
-		final List<String> textLinesStdOut = Arrays.asList("Line 1", "Line 2", "", "\tline 4");
-		final ByteArrayInputStream processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(
+		final var textLinesStdOut = Arrays.asList("Line 1", "Line 2", "", "\tline 4");
+		final var processInputStreamOut = new ByteArrayInputStream(textLinesStdOut.stream().collect(
 		        Collectors.joining("\n")).getBytes());
 
-		final List<String> textLinesStdErr = Arrays.asList("Line 5", "Line 6", "", "\tline 8");
-		final ByteArrayInputStream processInputStreamErr = new ByteArrayInputStream(textLinesStdErr.stream().collect(
+		final var textLinesStdErr = Arrays.asList("Line 5", "Line 6", "", "\tline 8");
+		final var processInputStreamErr = new ByteArrayInputStream(textLinesStdErr.stream().collect(
 		        Collectors.joining("\r\n")).getBytes());
 
-		final ProcesslauncherLifecycle source = Mockito.mock(ProcesslauncherLifecycle.class);
-		final Processlauncher launcher = Mockito.mock(Processlauncher.class);
+		final var source = Mockito.mock(ProcesslauncherLifecycle.class);
+		final var launcher = Mockito.mock(Processlauncher.class);
 		Mockito.when(source.getLauncher()).thenReturn(launcher);
 		Mockito.when(launcher.getExecutableName()).thenReturn("some-exec");
 
@@ -71,9 +71,9 @@ class CaptureStandardOutputTextTest {
 		assertEquals(textLinesStdOut.size() + textLinesStdErr.size(), capturedlines.size());
 		assertTrue(capturedlines.stream().anyMatch(le -> le.getSource().equals(source)));
 
-		final List<String> capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(
+		final var capturedlinesOut = capturedlines.stream().filter(le -> le.isStdErr() == false).map(
 		        LineEntry::getLine).collect(Collectors.toList());
-		final List<String> capturedlinesErr = capturedlines.stream().filter(LineEntry::isStdErr).map(LineEntry::getLine)
+		final var capturedlinesErr = capturedlines.stream().filter(LineEntry::isStdErr).map(LineEntry::getLine)
 		        .collect(Collectors.toList());
 
 		assertTrue(CollectionUtils.isEqualCollection(textLinesStdOut, capturedlinesOut));

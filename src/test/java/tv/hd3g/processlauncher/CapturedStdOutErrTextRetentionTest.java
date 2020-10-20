@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,7 +50,7 @@ class CapturedStdOutErrTextRetentionTest {
 
 	@Test
 	void testGetStdoutLines() {
-		List<String> lines = Arrays.asList("Out 0", "Out 1", "", "Out 3");
+		var lines = Arrays.asList("Out 0", "Out 1", "", "Out 3");
 		assertTrue(CollectionUtils.isEqualCollection(lines, capText.getStdoutLines(true).collect(Collectors
 		        .toList())));
 
@@ -62,7 +61,7 @@ class CapturedStdOutErrTextRetentionTest {
 
 	@Test
 	void testGetStderrLines() {
-		List<String> lines = Arrays.asList("Err 0", "Err 1", "", "Err 3");
+		var lines = Arrays.asList("Err 0", "Err 1", "", "Err 3");
 		assertTrue(CollectionUtils.isEqualCollection(lines, capText.getStderrLines(true).collect(Collectors
 		        .toList())));
 
@@ -73,7 +72,7 @@ class CapturedStdOutErrTextRetentionTest {
 
 	@Test
 	void testGetStdouterrLines() {
-		List<String> lines = Arrays.asList("Out 0", "Err 0", "Out 1", "Err 1", "", "", "Out 3", "Err 3");
+		var lines = Arrays.asList("Out 0", "Err 0", "Out 1", "Err 1", "", "", "Out 3", "Err 3");
 		assertTrue(CollectionUtils.isEqualCollection(lines, capText.getStdouterrLines(true).collect(Collectors
 		        .toList())));
 

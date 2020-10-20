@@ -115,10 +115,10 @@ public class Exec implements ExecutableTool {
 	 * @throws InvalidExecution
 	 */
 	public CapturedStdOutErrTextRetention runWaitGetText(final Consumer<ProcesslauncherBuilder> beforeRun) throws IOException {
-		final CommandLine commandLine = new CommandLine(execName, getReadyToRunParameters(), executableFinder);
-		final ProcesslauncherBuilder builder = new ProcesslauncherBuilder(commandLine);
+		final var commandLine = new CommandLine(execName, getReadyToRunParameters(), executableFinder);
+		final var builder = new ProcesslauncherBuilder(commandLine);
 
-		final CapturedStdOutErrTextRetention textRetention = new CapturedStdOutErrTextRetention();
+		final var textRetention = new CapturedStdOutErrTextRetention();
 		builder.getSetCaptureStandardOutputAsOutputText(CapturedStreams.BOTH_STDOUT_STDERR)
 		        .addObserver(textRetention);
 

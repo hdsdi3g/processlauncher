@@ -32,7 +32,7 @@ class ParametersTest {
 
 	@Test
 	void test() {
-		Parameters clp = new Parameters();
+		var clp = new Parameters();
 
 		assertEquals("<%", clp.getStartVarTag());
 		assertEquals("%>", clp.getEndVarTag());
@@ -77,7 +77,7 @@ class ParametersTest {
 
 	@Test
 	void testRemoveVarsKeepEmptyParam() {
-		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		final var p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		p.removeVariables(false);
 
 		assertEquals("-a -b -c", p.toString());
@@ -97,14 +97,14 @@ class ParametersTest {
 
 	@Test
 	void testRemoveVarsRemoveEmptyParam() {
-		final Parameters p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
+		final var p = new Parameters("-a <%var1%> <%var2%> <%varNOPE%> -b <%varNOPE%> -c");
 		p.removeVariables(true);
 		assertEquals("-c", p.toString());
 	}
 
 	@Test
 	void testInjectParamsAroundVariable() throws IOException {
-		Parameters p = new Parameters("-before <%myvar%> -after");
+		var p = new Parameters("-before <%myvar%> -after");
 
 		p.injectParamsAroundVariable("myvar", Arrays.asList("-addedbefore", "1"), Arrays.asList("-addedafter", "2"));
 		assertEquals("-before -addedbefore 1 <%myvar%> -addedafter 2 -after", p.toString());

@@ -40,11 +40,11 @@ class ExecutableFinderTest {
 
 	@Test
 	void test() throws IOException {
-		final ExecutableFinder ef = new ExecutableFinder();
+		final var ef = new ExecutableFinder();
 
 		assertTrue(ef.getFullPath().contains(new File(System.getProperty("user.dir"))));
 
-		final File exec = ef.get("test-exec");
+		final var exec = ef.get("test-exec");
 		if (File.separator.equals("/")) {
 			assertEquals("test-exec", exec.getName());
 		} else {
@@ -54,9 +54,9 @@ class ExecutableFinderTest {
 
 	@Test
 	void testRegisterExecutable() throws IOException {
-		ExecutableFinder ef = new ExecutableFinder();
+		var ef = new ExecutableFinder();
 
-		final File element = ef.get("test-exec");
+		final var element = ef.get("test-exec");
 
 		ef = new ExecutableFinder();
 		ef.registerExecutable("other-test", element);

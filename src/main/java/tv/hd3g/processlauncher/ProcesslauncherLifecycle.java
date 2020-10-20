@@ -18,7 +18,6 @@ package tv.hd3g.processlauncher;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
@@ -69,9 +68,9 @@ public class ProcesslauncherLifecycle {
 		processWasStoppedBecauseTooLongTime = false;
 		fullCommandLine = launcher.getFullCommandLine();
 
-		final ProcessBuilder pBuilder = launcher.getProcessBuilder();
+		final var pBuilder = launcher.getProcessBuilder();
 
-		final Optional<ExternalProcessStartup> externalProcessStartup = launcher.getExternalProcessStartup();
+		final var externalProcessStartup = launcher.getExternalProcessStartup();
 		if (externalProcessStartup.isPresent()) {
 			process = externalProcessStartup.get().startProcess(pBuilder);
 			Objects.requireNonNull(process, "Can't manage null process");
@@ -92,7 +91,7 @@ public class ProcesslauncherLifecycle {
 
 		launcher.getExecutionTimeLimiter().ifPresent(etl -> etl.addTimesUp(this, process));
 
-		final List<ExecutionCallbacker> executionCallbackers = launcher.getExecutionCallbackers();
+		final var executionCallbackers = launcher.getExecutionCallbackers();
 		executionCallbackers.forEach(ec -> ec.postStartupExecution(this));
 
 		launcher.getCaptureStandardOutput().ifPresent(cso -> {
@@ -104,12 +103,12 @@ public class ProcesslauncherLifecycle {
 			final var pName = getExecNameWithoutExt();
 			final var pid = getPID().map(p -> "#" + p).orElse("");
 			final var status = getEndStatus().toString().toLowerCase();
-			String retnr = "";
+			var retnr = "";
 			if (isCorrectlyDone() == false) {
 				retnr = " return " + getExitCode();
 			}
 
-			String dur = "";
+			var dur = "";
 			if (getUptime(TimeUnit.SECONDS) == 0) {
 				final var msec = getCPUDuration(TimeUnit.MILLISECONDS);
 				if (msec == 0) {
@@ -130,7 +129,7 @@ public class ProcesslauncherLifecycle {
 	}
 
 	public String getExecNameWithoutExt() {
-		final String execName = launcher.getExecutableName();
+		final var execName = launcher.getExecutableName();
 		if (ExecutableFinder.WINDOWS_EXEC_EXTENSIONS.stream()
 		        .anyMatch(ext -> execName.toLowerCase().endsWith(ext.toLowerCase()))) {
 			return execName.substring(0, execName.length() - 4);
@@ -172,7 +171,7 @@ public class ProcesslauncherLifecycle {
 		}
 
 		log.debug("Internal kill {}", this);
-		final List<ProcessHandle> cantKill = process.descendants().filter(ProcessHandle::isAlive)
+		final var cantKill = process.descendants().filter(ProcessHandle::isAlive)
 		        .filter(processHandle -> {
 			        if (log.isDebugEnabled()) {
 				        log.info(LOG_CLOSE_MANUALLY_PROCESS, () -> processHandleToString(processHandle, true));

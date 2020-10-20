@@ -77,7 +77,7 @@ class ProcesslauncherBuilderTest {
 		pb.setEnvironmentVar("foo1", "bar1");
 		pb.setEnvironmentVar("foo2", "bar2");
 
-		final HashMap<String, String> val = new HashMap<>();
+		final var val = new HashMap<String, String>();
 		pb.forEachEnvironmentVar((k, v) -> {
 			val.put(k, v);
 		});
@@ -117,8 +117,8 @@ class ProcesslauncherBuilderTest {
 
 	@Test
 	void testAddExecutionCallbacker() {
-		final ExecutionCallbacker executionCallbacker0 = Mockito.mock(ExecutionCallbacker.class);
-		final ExecutionCallbacker executionCallbacker1 = Mockito.mock(ExecutionCallbacker.class);
+		final var executionCallbacker0 = Mockito.mock(ExecutionCallbacker.class);
+		final var executionCallbacker1 = Mockito.mock(ExecutionCallbacker.class);
 
 		pb.addExecutionCallbacker(executionCallbacker0);
 		pb.addExecutionCallbacker(executionCallbacker1);
@@ -129,7 +129,7 @@ class ProcesslauncherBuilderTest {
 
 	@Test
 	void testRemoveExecutionCallbacker() {
-		final ExecutionCallbacker executionCallbacker = Mockito.mock(ExecutionCallbacker.class);
+		final var executionCallbacker = Mockito.mock(ExecutionCallbacker.class);
 		pb.addExecutionCallbacker(executionCallbacker);
 		pb.removeExecutionCallbacker(executionCallbacker);
 		assertEquals(0, pb.getExecutionCallbackers().size());
@@ -139,7 +139,7 @@ class ProcesslauncherBuilderTest {
 	void testGetSetExecutionTimeLimiter() {
 		assertFalse(pb.getExecutionTimeLimiter().isPresent());
 
-		final ExecutionTimeLimiter executionTimeLimiter = Mockito.mock(ExecutionTimeLimiter.class);
+		final var executionTimeLimiter = Mockito.mock(ExecutionTimeLimiter.class);
 		pb.setExecutionTimeLimiter(executionTimeLimiter);
 
 		assertEquals(executionTimeLimiter, pb.getExecutionTimeLimiter().get());
@@ -149,7 +149,7 @@ class ProcesslauncherBuilderTest {
 	void testGetSetExternalProcessStartup() {
 		assertFalse(pb.getExternalProcessStartup().isPresent());
 
-		final ExternalProcessStartup externalProcessStartup = Mockito.mock(ExternalProcessStartup.class);
+		final var externalProcessStartup = Mockito.mock(ExternalProcessStartup.class);
 		pb.setExternalProcessStartup(externalProcessStartup);
 
 		assertEquals(externalProcessStartup, pb.getExternalProcessStartup().get());
@@ -159,7 +159,7 @@ class ProcesslauncherBuilderTest {
 	void testSetGetCaptureStandardOutput() {
 		assertFalse(pb.getCaptureStandardOutput().isPresent());
 
-		final CaptureStandardOutput captureStandardOutput = Mockito.mock(CaptureStandardOutput.class);
+		final var captureStandardOutput = Mockito.mock(CaptureStandardOutput.class);
 		pb.setCaptureStandardOutput(captureStandardOutput);
 
 		assertEquals(captureStandardOutput, pb.getCaptureStandardOutput().get());
@@ -167,7 +167,7 @@ class ProcesslauncherBuilderTest {
 
 	@Test
 	void testMakeProcessBuilder() {
-		final ProcessBuilder processb = pb.makeProcessBuilder();
+		final var processb = pb.makeProcessBuilder();
 		assertEquals(pb.getFullCommandLine(), processb.command().stream().collect(Collectors.joining(" ")));
 	}
 
