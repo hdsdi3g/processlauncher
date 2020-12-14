@@ -41,7 +41,7 @@ Use maven and Junit for run internal UT and IT.
 
 ## API organisation and relation
 
-[![Java diagram](https://github.com/hdsdi3g/processlauncher/raw/doc/code-organization.png "Java diagram")](https://github.com/hdsdi3g/processlauncher/raw/doc/code-organization.png)
+[![Java diagram](https://raw.githubusercontent.com/hdsdi3g/processlauncher/master/code-organization.png)](https://raw.githubusercontent.com/hdsdi3g/processlauncher/master/code-organization.png)
 
 ## Licence
 
