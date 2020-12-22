@@ -139,7 +139,7 @@ public class ProcesslauncherLifecycle {
 	}
 
 	public long getStartDate() {
-		return getProcess().info().startInstant().flatMap(i -> Optional.of(i.toEpochMilli())).orElse(startDate);
+		return getProcess().info().startInstant().flatMap(i -> Optional.ofNullable(i.toEpochMilli())).orElse(startDate);
 	}
 
 	@Override
@@ -345,7 +345,7 @@ public class ProcesslauncherLifecycle {
 
 	public Optional<Long> getPID() {
 		try {
-			return Optional.of(getProcess().pid());
+			return Optional.ofNullable(getProcess().pid());
 		} catch (final UnsupportedOperationException e) {
 			return Optional.empty();
 		}

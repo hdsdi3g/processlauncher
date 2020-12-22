@@ -57,7 +57,7 @@ class CapturedStdOutErrToPrintStreamTest {
 		capture = new CapturedStdOutErrToPrintStream(printStreamStdOut, printStreamStdErr);
 		source = Mockito.mock(ProcesslauncherLifecycle.class);
 		Mockito.when(source.getLauncher()).thenReturn(launcher);
-		Mockito.when(source.getPID()).thenReturn(Optional.of(pid));
+		Mockito.when(source.getPID()).thenReturn(Optional.ofNullable(pid));
 	}
 
 	@Test

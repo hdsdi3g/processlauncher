@@ -49,11 +49,14 @@ class ProcesslauncherTest {
 		fullCommandLine = "aaa bbb ccc";
 		processlauncherBuilder = Mockito.mock(ProcesslauncherBuilder.class);
 
-		Mockito.when(processlauncherBuilder.getExecutionCallbackers()).thenReturn(executionCallbackers);
-		Mockito.when(processlauncherBuilder.getExecutionTimeLimiter()).thenReturn(Optional.of(executionTimeLimiter));
-		Mockito.when(processlauncherBuilder.getCaptureStandardOutput()).thenReturn(Optional.of(captureStandardOutput));
-		Mockito.when(processlauncherBuilder.getExternalProcessStartup()).thenReturn(Optional.of(
-		        externalProcessStartup));
+		Mockito.when(processlauncherBuilder.getExecutionCallbackers())
+		        .thenReturn(executionCallbackers);
+		Mockito.when(processlauncherBuilder.getExecutionTimeLimiter())
+		        .thenReturn(Optional.ofNullable(executionTimeLimiter));
+		Mockito.when(processlauncherBuilder.getCaptureStandardOutput())
+		        .thenReturn(Optional.ofNullable(captureStandardOutput));
+		Mockito.when(processlauncherBuilder.getExternalProcessStartup())
+		        .thenReturn(Optional.ofNullable(externalProcessStartup));
 		Mockito.when(processlauncherBuilder.makeProcessBuilder()).thenReturn(processBuilder);
 		Mockito.when(processlauncherBuilder.getFullCommandLine()).thenReturn(fullCommandLine);
 
