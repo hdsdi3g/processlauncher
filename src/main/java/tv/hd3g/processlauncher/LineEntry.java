@@ -50,7 +50,21 @@ public class LineEntry {
 		return stdErr;
 	}
 
-	public boolean canUseThis(final CapturedStreams choosedStream) {
+	boolean canUseThis(final CapturedStreams choosedStream) {
 		return stdErr && choosedStream.canCaptureStderr() || stdErr == false && choosedStream.canCaptureStdout();
 	}
+
+	/**
+	 * For logging purpose
+	 */
+	@Override
+	public String toString() {
+		final var execName = source.getLauncher().getExecutableName();
+		if (stdErr) {
+			return execName + " ❌ " + line;
+		} else {
+			return execName + " ✅ " + line;
+		}
+	}
+
 }
