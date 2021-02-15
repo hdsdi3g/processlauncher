@@ -14,44 +14,46 @@
  * Copyright (C) hdsdi3g for hd3g.tv 2019
  *
  */
-package tv.hd3g.processlauncher.tool;
+package tv.hd3g.processlauncher;
 
+import static org.apache.logging.log4j.Level.ALL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
-import tv.hd3g.processlauncher.Exec;
-import tv.hd3g.processlauncher.InvalidExecution;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
 
-class ToolRunTest {
+class ExecutableToolTest {
 
-	private final String execName;
-	private final ExecutableFinder executableFinder;
-
-	public ToolRunTest() {
-		execName = "java";
-		executableFinder = new ExecutableFinder();
-	}
-
-	private Exec exec;
+	String execName;
+	ExecutableFinder executableFinder;
+	Parameters parameters;
+	ExecutableTool exec;
 
 	@BeforeEach
-	void setUp() throws Exception {
-		exec = new Exec(execName, executableFinder);
-		exec.getParameters().addParameters("-version");
-	}
+	void init() throws Exception {
+		execName = "java";
+		executableFinder = new ExecutableFinder();
+		parameters = new Parameters("-version");
 
-	private ExecutableTool makeExecutableTool() {
-		return new ExecutableTool() {
+		exec = new ExecutableTool() {
 
 			@Override
 			public String getExecutableName() {
@@ -60,35 +62,28 @@ class ToolRunTest {
 
 			@Override
 			public Parameters getReadyToRunParameters() {
-				return exec.getReadyToRunParameters();
+				return parameters;
 			}
 		};
 	}
 
 	@Test
 	void testExecute() throws InterruptedException, ExecutionException, TimeoutException {
-		final var toolRun = new ToolRunner(executableFinder);
-
-		final var executableTool = makeExecutableTool();
-
-		final var result = toolRun.execute(executableTool);
-		assertEquals(executableTool, result.getExecutableToolSource());
+		final var result = exec.execute(executableFinder);
 
 		final var capturedStdOutErrTextRetention = result.getTextRetention();
 		assertNotNull(capturedStdOutErrTextRetention);
 		assertNotNull(result.getLifecyle());
 
 		assertEquals(capturedStdOutErrTextRetention, result.checkExecutionGetText());
-		assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false).anyMatch(line -> line.contains(
-		        "version")));
+		assertTrue(capturedStdOutErrTextRetention.getStdouterrLines(false)
+		        .anyMatch(line -> line.contains("version")));
 	}
 
 	@Test
 	void checkExecutionGetText_withError() {
-		exec.getParameters().clear().addBulkParameters("-thiswillneverexec");
-		final var toolRun = new ToolRunner(executableFinder);
-		final var executableTool = makeExecutableTool();
-		final var result = toolRun.execute(executableTool);
+		parameters.clear().addBulkParameters("-thiswillneverexec");
+		final var result = exec.execute(executableFinder);
 
 		final var afterWait = result.waitForEnd();
 		assertNotNull(afterWait);
@@ -97,17 +92,13 @@ class ToolRunTest {
 
 	@Test
 	void waitForEnd_isReallydone() {
-		final var toolRun = new ToolRunner(executableFinder);
-		final var executableTool = makeExecutableTool();
-		final var result = toolRun.execute(executableTool);
+		final var result = exec.execute(executableFinder);
 		assertTrue(result.waitForEnd().getLifecyle().isCorrectlyDone());
 	}
 
 	@Test
 	void waitForEndAndCheckExecution_ok() {
-		final var toolRun = new ToolRunner(executableFinder);
-		final var executableTool = makeExecutableTool();
-		final var result = toolRun.execute(executableTool).waitForEndAndCheckExecution();
+		final var result = exec.execute(executableFinder).waitForEndAndCheckExecution();
 		assertNotNull(result);
 		assertTrue(result.getLifecyle().isCorrectlyDone());
 
@@ -122,16 +113,30 @@ class ToolRunTest {
 
 	@Test
 	void waitForEndAndCheckExecution_error() {
-		exec.getParameters().clear().addBulkParameters("-thiswillneverexec");
-		final var toolRun = new ToolRunner(executableFinder);
-		final var executableTool = makeExecutableTool();
-		final var result = toolRun.execute(executableTool);
+		parameters.clear().addBulkParameters("-thiswillneverexec");
+		final var result = exec.execute(executableFinder);
 		assertThrows(InvalidExecution.class, () -> result.waitForEndAndCheckExecution());
 	}
 
 	@Test
-	void getExecutableFinder() {
-		final var toolRun = new ToolRunner(executableFinder);
-		assertEquals(executableFinder, toolRun.getExecutableFinder());
+	void testExecute_Logger() {
+		final var log = Mockito.mock(Logger.class);
+		when(log.isEnabled(ALL)).thenReturn(true);
+
+		final var lines = new LinkedBlockingQueue<LineEntry>();
+		final var result = exec.execute(executableFinder, log, line -> {
+			lines.add(line);
+			return ALL;
+		});
+		result.waitForEnd();
+
+		final var msgs = ArgumentCaptor.forClass(Object.class);
+		verify(log, atLeastOnce()).log(eq(ALL), msgs.capture());
+		assertTrue(lines.size() > 0);
+		assertEquals(msgs.getAllValues().size(), lines.size());
+
+		verify(log, atLeastOnce()).isEnabled(eq(ALL));
+		verifyNoMoreInteractions(log);
 	}
+
 }

@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 import tv.hd3g.processlauncher.cmdline.CommandLine;
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.tool.ExecutableTool;
 
 /**
  * Shortcut for some classes

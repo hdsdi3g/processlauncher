@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 
 import tv.hd3g.processlauncher.cmdline.ExecutableFinder;
 import tv.hd3g.processlauncher.cmdline.Parameters;
-import tv.hd3g.processlauncher.tool.ExecutableTool;
 
 class ExecTest {
 
