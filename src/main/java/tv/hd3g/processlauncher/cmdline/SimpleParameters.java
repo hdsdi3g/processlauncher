@@ -16,6 +16,9 @@
  */
 package tv.hd3g.processlauncher.cmdline;
 
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toUnmodifiableList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,27 +89,33 @@ public class SimpleParameters {
 		parameters.addAll(source.parameters);
 	}
 
-	private final Function<String, Stream<ParameterArg>> filterAnTransformParameter = p -> p.trim().chars().mapToObj(
-	        i -> (char) i).reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
+	private static void filterMapFirstEntry(final ArrayList<ParameterArg> list, final Character chr) {
+		if (chr.equals(QUOTE)) {
+			/**
+			 * Start quote zone
+			 */
+			list.add(new ParameterArg(true));
+		} else if (chr.equals(SPACE)) {
+			/**
+			 * Trailing space > ignore it
+			 */
+		} else {
+			/**
+			 * Start first "classic" ParameterArg
+			 */
+			list.add(new ParameterArg(false).add(chr));
+		}
+	}
+
+	private final Function<String, Stream<ParameterArg>> filterAndTransformParameter = p -> p.trim()
+	        .chars()
+	        .mapToObj(i -> (char) i)// NOSONAR S1612
+	        .reduce(new ArrayList<ParameterArg>(), (list, chr) -> {
 		        if (list.isEmpty()) {
 			        /**
 			         * First entry
 			         */
-			        if (chr.equals(QUOTE)) {
-				        /**
-				         * Start quote zone
-				         */
-				        list.add(new ParameterArg(true));
-			        } else if (chr.equals(SPACE)) {
-				        /**
-				         * Trailing space > ignore it
-				         */
-			        } else {
-				        /**
-				         * Start first "classic" ParameterArg
-				         */
-				        list.add(new ParameterArg(false).add(chr));
-			        }
+			        filterMapFirstEntry(list, chr);
 		        } else {
 			        /**
 			         * Get current entry
@@ -173,10 +182,9 @@ public class SimpleParameters {
 	public boolean hasParameters(final String... params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		return Arrays.stream(params).filter(Objects::nonNull).anyMatch(parameter -> {
-			final var param = conformParameterKey(parameter);
-			return parameters.contains(param);
-		});
+		return Arrays.stream(params)
+		        .filter(Objects::nonNull)
+		        .anyMatch(parameter -> parameters.contains(conformParameterKey(parameter)));
 	}
 
 	/**
@@ -187,7 +195,6 @@ public class SimpleParameters {
 		if (hasParameters(inParameters) == false) {
 			toDoIfMissing.run();
 		}
-
 		return this;
 	}
 
@@ -206,41 +213,49 @@ public class SimpleParameters {
 
 	/**
 	 * @param params don't alter params
+	 *        Remove null and empty
 	 */
 	public SimpleParameters addParameters(final String... params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
-
-		parameters.addAll(Arrays.stream(params).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList()));
-
-		log.trace(LOG_ADD_PARAMETERS, () -> Arrays.stream(params).collect(Collectors.toUnmodifiableList()));
-
+		addParameters(Arrays.stream(params)
+		        .filter(Objects::nonNull)
+		        .filter(not(String::isEmpty))
+		        .collect(toUnmodifiableList()));
 		return this;
 	}
 
 	/**
 	 * @param params don't alter params
+	 *        Remove null and empty
 	 */
 	public SimpleParameters addParameters(final Collection<String> params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		parameters.addAll(params.stream().filter(Objects::nonNull).collect(Collectors.toUnmodifiableList()));
+		final var subList = params.stream()
+		        .filter(Objects::nonNull)
+		        .filter(not(String::isEmpty))
+		        .collect(toUnmodifiableList());
+		parameters.addAll(subList);
 
-		log.trace(LOG_ADD_PARAMETERS, () -> params);
-
+		log.trace(LOG_ADD_PARAMETERS, () -> subList);
 		return this;
 	}
 
 	/**
 	 * @param params transform spaces in each param to new params: "a b c d" -&gt; ["a", "b", "c", "d"], and it manage " but not tabs.
+	 *        Remove empty
 	 */
 	public SimpleParameters addBulkParameters(final String params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		parameters.addAll(filterAnTransformParameter.apply(params).map(ParameterArg::toString).collect(
-		        Collectors.toUnmodifiableList()));
+		final var subList = filterAndTransformParameter.apply(params)
+		        .map(ParameterArg::toString)
+		        .filter(not(String::isEmpty))
+		        .collect(toUnmodifiableList());
 
-		log.trace(LOG_ADD_PARAMETERS, params);
+		parameters.addAll(subList);
 
+		log.trace(LOG_ADD_PARAMETERS, subList);
 		return this;
 	}
 
@@ -250,13 +265,13 @@ public class SimpleParameters {
 	public SimpleParameters prependParameters(final Collection<String> params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		final var newList = Stream.concat(params.stream().filter(Objects::nonNull), parameters.stream())
-		        .collect(
-		                Collectors.toUnmodifiableList());
+		final var newList = Stream.concat(
+		        params.stream().filter(Objects::nonNull),
+		        parameters.stream())
+		        .collect(toUnmodifiableList());
 		replaceParameters(newList);
 
 		log.trace("Prepend parameters: {}", () -> params);
-
 		return this;
 	}
 
@@ -266,8 +281,9 @@ public class SimpleParameters {
 	public SimpleParameters prependParameters(final String... params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		prependParameters(Arrays.stream(params).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList()));
-
+		prependParameters(Arrays.stream(params)
+		        .filter(Objects::nonNull)
+		        .collect(toUnmodifiableList()));
 		return this;
 	}
 
@@ -277,10 +293,10 @@ public class SimpleParameters {
 	public SimpleParameters prependBulkParameters(final String params) {
 		Objects.requireNonNull(params, PARAMS_CAN_T_TO_BE_NULL);
 
-		prependParameters(filterAnTransformParameter.apply(params).map(
-		        tv.hd3g.processlauncher.cmdline.ParameterArg::toString).collect(
-		                Collectors.toUnmodifiableList()));
-
+		prependParameters(
+		        filterAndTransformParameter.apply(params)
+		                .map(ParameterArg::toString)
+		                .collect(toUnmodifiableList()));
 		return this;
 	}
 

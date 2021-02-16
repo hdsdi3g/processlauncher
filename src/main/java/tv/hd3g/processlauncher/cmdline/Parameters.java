@@ -48,30 +48,43 @@ public class Parameters extends SimpleParameters {
 	}
 
 	/**
-	 * Use "&lt;%" and "%&gt;"" by default
+	 * @param parameters add each entry without alter it.
+	 *        Use "&lt;%" and "%&gt;" by default
 	 */
-	public Parameters(final String bulkParameters) {
-		super(bulkParameters);
-		setVarTags("<%", "%>");
+	public static Parameters of(final String... parameters) {
+		final var p = new Parameters();
+		p.addParameters(parameters);
+		return p;
 	}
 
 	/**
-	 * Use "&lt;%" and "%&gt;" by default
+	 * @param parameters add each entry without alter it.
+	 *        Use "&lt;%" and "%&gt;" by default
 	 */
-	public Parameters(final String... bulkParameters) {
-		super();
-		setVarTags("<%", "%>");
-
-		Objects.requireNonNull(bulkParameters, "\"bulkParameters\" can't to be null");
-		Arrays.stream(bulkParameters).filter(Objects::nonNull).forEach(super::addBulkParameters);
+	public static Parameters of(final Collection<String> parameters) {
+		final var p = new Parameters();
+		p.addParameters(parameters);
+		return p;
 	}
 
 	/**
-	 * Use "&lt;%" and "%&gt;" by default
+	 * @param parameters add each entry with addBulkParameters
+	 *        Use "&lt;%" and "%&gt;" by default
 	 */
-	public Parameters(final Collection<String> parameters) {
-		super(parameters);
-		setVarTags("<%", "%>");
+	public static Parameters bulk(final String... bulkParameters) {
+		final var p = new Parameters();
+		Arrays.stream(bulkParameters).filter(Objects::nonNull).forEach(p::addBulkParameters);
+		return p;
+	}
+
+	/**
+	 * @param parameters add each entry with addBulkParameters
+	 *        Use "&lt;%" and "%&gt;" by default
+	 */
+	public static Parameters bulk(final Collection<String> bulkParameters) {
+		final var p = new Parameters();
+		bulkParameters.forEach(p::addBulkParameters);
+		return p;
 	}
 
 	public String tagVar(final String varName) {
@@ -148,7 +161,8 @@ public class Parameters extends SimpleParameters {
 	}
 
 	public Parameters duplicate() {
-		final var newInstance = new Parameters(startVarTag, endVarTag);
+		final var newInstance = new Parameters();
+		newInstance.setVarTags(startVarTag, endVarTag);
 		newInstance.importParametersFrom(this);
 		return newInstance;
 	}
@@ -169,7 +183,7 @@ public class Parameters extends SimpleParameters {
 		        .reduce(unmodifiableList(new ArrayList<String>()),
 		                (list, arg) -> {
 			                if (isTaggedParameter(arg)) {
-				                final String currentVarName = extractVarNameFromTaggedParameter(arg);
+				                final var currentVarName = extractVarNameFromTaggedParameter(arg);
 				                if (currentVarName.equals(varName)) {
 					                isDone.set(true);
 					                return Stream.concat(list.stream(), Stream.concat(Stream.concat(addBefore.stream(),

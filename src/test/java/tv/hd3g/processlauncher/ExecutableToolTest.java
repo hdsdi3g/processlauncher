@@ -51,7 +51,7 @@ class ExecutableToolTest {
 	void init() throws Exception {
 		execName = "java";
 		executableFinder = new ExecutableFinder();
-		parameters = new Parameters("-version");
+		parameters = Parameters.of("-version");
 
 		exec = new ExecutableTool() {
 

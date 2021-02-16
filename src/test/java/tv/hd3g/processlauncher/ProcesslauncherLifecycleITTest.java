@@ -63,7 +63,7 @@ public class ProcesslauncherLifecycleITTest {// NOSONAR
 	}
 
 	public ProcesslauncherBuilder prepareBuilder(final Class<?> execClass) throws IOException {
-		final var parameters = new Parameters("-cp", System.getProperty("java.class.path"), execClass.getName());
+		final var parameters = Parameters.of("-cp", System.getProperty("java.class.path"), execClass.getName());
 		final var cmd = new CommandLine("java", parameters, executableFinder);
 		return new ProcesslauncherBuilder(cmd);
 	}
@@ -131,8 +131,8 @@ public class ProcesslauncherLifecycleITTest {// NOSONAR
 
 	@Test
 	void testResultValues() throws Exception {
-		final var parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecIOText.class
-		        .getName());
+		final var parameters = Parameters.of("-cp", System.getProperty("java.class.path"),
+		        DemoExecIOText.class.getName());
 		parameters.addParameters(DemoExecIOText.expectedIn);
 		final var cmd = new CommandLine("java", parameters, executableFinder);
 		final var ept = new ProcesslauncherBuilder(cmd);
@@ -245,7 +245,7 @@ public class ProcesslauncherLifecycleITTest {// NOSONAR
 
 	@Test
 	void testInteractiveHandler() throws Exception {
-		final var parameters = new Parameters("-cp", System.getProperty("java.class.path"),
+		final var parameters = Parameters.of("-cp", System.getProperty("java.class.path"),
 		        DemoExecInteractive.class.getName());
 		parameters.addParameters("foo");
 		final var cmd = new CommandLine("java", parameters, executableFinder);
@@ -306,7 +306,7 @@ public class ProcesslauncherLifecycleITTest {// NOSONAR
 
 	@Test
 	void testCheckExecutionOk() throws InterruptedException, ExecutionException, IOException {
-		final var parameters = new Parameters("-cp", System.getProperty("java.class.path"),
+		final var parameters = Parameters.of("-cp", System.getProperty("java.class.path"),
 		        DemoExecExitCode.class.getName());
 		parameters.addParameters("0");
 		final var cmd = new CommandLine("java", parameters, executableFinder);
@@ -317,7 +317,7 @@ public class ProcesslauncherLifecycleITTest {// NOSONAR
 
 	@Test
 	void testCheckExecutionError() throws InterruptedException, ExecutionException, IOException {
-		final var parameters = new Parameters("-cp", System.getProperty("java.class.path"),
+		final var parameters = Parameters.of("-cp", System.getProperty("java.class.path"),
 		        DemoExecExitCode.class.getName());
 		parameters.addParameters("1");
 		final var cmd = new CommandLine("java", parameters, executableFinder);

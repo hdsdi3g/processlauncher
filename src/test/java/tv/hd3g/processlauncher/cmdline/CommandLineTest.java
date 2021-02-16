@@ -34,7 +34,7 @@ class CommandLineTest {
 	private final Parameters parametersSource;
 
 	CommandLineTest() throws IOException {
-		parametersSource = new Parameters("-a");
+		parametersSource = Parameters.of("-a");
 		Tool.patchTestExec();
 
 		ef = new ExecutableFinder();

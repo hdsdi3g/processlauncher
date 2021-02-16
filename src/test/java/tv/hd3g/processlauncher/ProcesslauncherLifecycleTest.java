@@ -43,7 +43,7 @@ class ProcesslauncherLifecycleTest {
 
 	ProcesslauncherLifecycleTest() throws IOException {
 		beforeStartDate = System.currentTimeMillis() - 100;
-		final var parameters = new Parameters("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class
+		final var parameters = Parameters.of("-cp", System.getProperty("java.class.path"), DemoExecEmpty.class
 		        .getName());
 		final var cmd = new CommandLine("java", parameters, new ExecutableFinder());
 		processlauncherBuilder = new ProcesslauncherBuilder(cmd);

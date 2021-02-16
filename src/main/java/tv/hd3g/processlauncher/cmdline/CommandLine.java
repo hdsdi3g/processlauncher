@@ -64,13 +64,13 @@ public class CommandLine {
 		this.parameters = Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL).duplicate();
 	}
 
-	public CommandLine(final File executable, final String parameters) throws IOException {
-		this(executable, new Parameters(Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL)));
+	public CommandLine(final File executable, final String bulkParameters) throws IOException {
+		this(executable, Parameters.bulk(Objects.requireNonNull(bulkParameters, PARAMETERS_CAN_T_TO_BE_NULL)));
 	}
 
-	public CommandLine(final String execName, final String parameters,
+	public CommandLine(final String execName, final String bulkParameters,
 	                   final ExecutableFinder executableFinder) throws IOException {
-		this(execName, new Parameters(Objects.requireNonNull(parameters, PARAMETERS_CAN_T_TO_BE_NULL)),
+		this(execName, Parameters.bulk(Objects.requireNonNull(bulkParameters, PARAMETERS_CAN_T_TO_BE_NULL)),
 		        executableFinder);
 	}
 
