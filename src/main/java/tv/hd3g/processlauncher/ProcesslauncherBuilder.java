@@ -237,9 +237,10 @@ public class ProcesslauncherBuilder {
 	 * Shortcut for CaptureStandardOutputText. Set if missing or not a CaptureStandardOutputText.
 	 */
 	public CaptureStandardOutputText getSetCaptureStandardOutputAsOutputText(final CapturedStreams defaultCaptureOutStreamsBehavior) {
-		final var csot = getCaptureStandardOutput().filter(
-		        cso -> cso instanceof CaptureStandardOutputText).map(cso -> (CaptureStandardOutputText) cso).orElseGet(
-		                () -> new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior));
+		final var csot = getCaptureStandardOutput()
+		        .filter(CaptureStandardOutputText.class::isInstance)
+		        .map(CaptureStandardOutputText.class::cast)
+		        .orElseGet(() -> new CaptureStandardOutputText(defaultCaptureOutStreamsBehavior));
 
 		setCaptureStandardOutput(csot);
 		return csot;
