@@ -1,52 +1,60 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>tv.hd3g</groupId>
-	<artifactId>processlauncher</artifactId>
-	<version>6.0.5-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <groupId>tv.hd3g</groupId>
+    <artifactId>processlauncher</artifactId>
+    <version>6.0.5-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<name>processlauncher</name>
-	<url>https://github.com/hdsdi3g/processlauncher</url>
-	<description>Another lib to start process in Java</description>
+    <name>processlauncher</name>
+    <url>https://github.com/hdsdi3g/processlauncher</url>
+    <description>Another lib to start process in Java</description>
 
-	<parent>
-		<groupId>tv.hd3g.commons</groupId>
-		<artifactId>starter</artifactId>
-		<version>7.0.0</version>
-		<relativePath />
-	</parent>
+    <parent>
+        <groupId>tv.hd3g.commons</groupId>
+        <artifactId>starter</artifactId>
+        <version>8.0.0</version>
+        <relativePath />
+    </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>4.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>tv.hd3g.commons</groupId>
-			<artifactId>codepolicyvalidation</artifactId>
-			<version>${codepolicyvalidation.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <properties>
+        <interfaces.version>8.0.0</interfaces.version>
+    </properties>
 
-	<scm>
-		<connection>scm:git:https://github.com/hdsdi3g/processlauncher.git</connection>
-		<developerConnection>scm:git:https://github.com/hdsdi3g/processlauncher.git</developerConnection>
-		<url>https://github.com/hdsdi3g</url>
-		<tag>HEAD</tag>
-	</scm>
-	<issueManagement>
-		<url>https://github.com/hdsdi3g/processlauncher/issues</url>
-		<system>GitHub</system>
-	</issueManagement>
+    <dependencies>
+        <dependency>
+            <groupId>tv.hd3g.commons</groupId>
+            <artifactId>interfaces</artifactId>
+            <version>${interfaces.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>tv.hd3g.commons</groupId>
+            <artifactId>codepolicyvalidation</artifactId>
+            <version>${codepolicyvalidation.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <scm>
+        <connection>scm:git:https://github.com/hdsdi3g/processlauncher.git</connection>
+        <developerConnection>scm:git:https://github.com/hdsdi3g/processlauncher.git</developerConnection>
+        <url>https://github.com/hdsdi3g</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <url>https://github.com/hdsdi3g/processlauncher/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
 </project>
